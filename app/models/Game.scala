@@ -39,15 +39,15 @@ object Game {
     def id = column[Long]("ID", O.PrimaryKey, O.AutoInc)
     def start = column[DateTime]("START")
     def end = column[DateTime]("END")
-    def maxtime = column[Int]("MATIME")
+    def maxtime = column[Int]("MAXTIME")
     def top_left_latitude = column[Float]("TOP_LEFT_LATITUDE")
-    def top_left_longitude = column[Float]("END")
-    def top_right_latitude = column[Float]("END")
-    def top_right_longitude = column[Float]("END")
-    def bottom_left_latitude = column[Float]("END")
-    def bottom_left_longitude = column[Float]("END")
-    def bottom_right_latitude = column[Float]("END")
-    def bottom_right_longitude = column[Float]("END")
+    def top_left_longitude = column[Float]("TOP_LEFT_LONGITUDE")
+    def top_right_latitude = column[Float]("TOP_RIGHT_LATITUDE")
+    def top_right_longitude = column[Float]("TOP_RIGHT_LONGITUDE")
+    def bottom_left_latitude = column[Float]("BOTTOM_LEFT_LATITUDE")
+    def bottom_left_longitude = column[Float]("BOTTOM_LEFT_LONGITUDE")
+    def bottom_right_latitude = column[Float]("BOTTOM_RIGHT_LATITUDE")
+    def bottom_right_longitude = column[Float]("BOTTOM_RIGHT_LONGITUDE")
 
 
     def * = (id.?, start, end, maxtime, top_left_latitude, top_left_longitude, top_right_latitude,top_right_longitude,bottom_left_latitude,bottom_left_longitude,bottom_right_latitude,bottom_right_longitude) <>
@@ -57,8 +57,8 @@ object Game {
   val table = TableQuery[GamesTable]
 
   def list: Future[Seq[Game]] = {
-    val eventList = table.result
-    db.run(eventList)
+    val gameList = table.result
+    db.run(gameList)
   }
 
   def getByID(gameID: Long): Future[Option[Game]] = {
