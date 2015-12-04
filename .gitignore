@@ -1,25 +1,16 @@
-# general
-*~
-*.log
-tmp
-dump
-
-# Eclipse
-.settings
+# Ignore Play! working directory #
+bin/
+/db
+.eclipse
+/lib/
+/logs/
+/modules
+/project/target
+/target
+tmp/
+test-result
+server.pid
+*.eml
+/dist/
 .cache
-.classpath
-.scala_dependencies
-bin
-.cache-main
-
-# SBT
-dist
-project/boot
-project/target
-project/plugins/target
-target
-.target
-
-# Play
-logs
-RUNNING_PID
+.DS_Store
