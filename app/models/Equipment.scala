@@ -14,8 +14,8 @@ import SlickMapping.jodaDateTimeMapping
 
 case class Equipment (
   id: Option[Long],
-  player_id: Int,
-  item_id: Int
+  player_id: Long,
+  item_id: Long
 )
 
 object Equipment {
@@ -28,9 +28,11 @@ object Equipment {
   class EquipmentsTable(tag: Tag) extends Table[Equipment](tag, "EQUIPMENTS") {
 
     def id = column[Long]("ID", O.PrimaryKey, O.AutoInc)
-    def player_id = foreignKey("PLAYER", id, Player.table)(_.id)
-    def item_id = foreignKey("ITEM", id, Item.table)(_.id)
-
+    def player_id = column[Long]("PLAYER")
+    def item_id = column[Long]("ITEM")
+    
+    def player_ref = foreignKey("PLAYER", player_id, Player.table)(_.id)
+    def item_ref = foreignKey("ITEM", item_id, Item.table)(_.id)
 
     def * = (id.?, player_id, item_id) <>
       ((Equipment.apply _).tupled, Equipment.unapply)

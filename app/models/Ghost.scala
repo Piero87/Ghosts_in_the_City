@@ -31,16 +31,19 @@ object Ghost {
 
   class GhostsTable(tag: Tag) extends Table[Ghost](tag, "GHOSTS") {
 
-    def id = column[Int]("ID", O.PrimaryKey, O.AutoInc)
-    def player_id = foreignKey("PLAYER", id, Player.table)(_.id)
-    def level_id = foreignKey("ITEM", id, Item.table)(_.id)
+    def id = column[Long]("ID", O.PrimaryKey, O.AutoInc)
+    def game_id = column[Long]("GAME")
+    def level_id = column[Long]("LEVEL")
     def status = column[Int]("STATUS")
     def latitude = column[Float]("LATITUDE")
     def longitude = column[Float]("LONGITUDE")
-    def treasure_id = foreignKey("TREASURE", id, Treasure.table)(_.id)
+    def treasure_id = column[Long]("TREASURE")
 
+    def game_ref = foreignKey("GAME", game_id, Game.table)(_.id)
+    def level_ref = foreignKey("GHOST_LEVEL", level_id, Ghost_Level.table)(_.id)
+    def treasure_ref = foreignKey("TREASURE", treasure_id, Treasure.table)(_.id)
 
-    def * = (id.?, player_id, treasure_id) <>
+    def * = (id.?, game_id, level_id, status, latitude, longitude, treasure_id) <>
       ((Ghost.apply _).tupled, Ghost.unapply)
   }
 
@@ -51,7 +54,7 @@ object Ghost {
     db.run(ghostList)
   }
 
-  def getByID(ghostID: Int): Future[Option[Ghost]] = {
+  def getByID(ghostID: Long): Future[Option[Ghost]] = {
     val ghostByID = table.filter { f =>
       f.id === ghostID
     }.result.headOption
