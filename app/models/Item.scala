@@ -16,7 +16,7 @@ case class Item (
   cost: Int,
   latitude: Float,
   longitude: Float,
-  game_id: Int
+  game_id: Option[Long]
 )
 
 object Item{
@@ -32,10 +32,11 @@ object Item{
     def cost = column[Int]("COST")
     def latitude = column[Float]("LATITUDE")
     def longitude = column[Float]("LONGITUDE")
-    def game_id = foreignKey("GAME", id, Game.table)(_.id)
+    def game_id = column[Long]("GAME_ID")
     
-    def * = (id.?, category, cost, latitude, longitude, game_id) 
-            <> ((Item.apply _).tupled, Item.unapply)
+    def game_ref = foreignKey("GAME", game_id, Game.table)(_.id)
+    
+    def * = (id.?, category, cost, latitude, longitude, game_id) <> ((Item.apply _).tupled, Item.unapply)
     //cosa fa la funzione <>?
   }
   
