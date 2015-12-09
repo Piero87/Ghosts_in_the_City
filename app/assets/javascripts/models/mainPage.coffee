@@ -4,7 +4,7 @@
 # This class handles most of the user interactions with the buttons/menus/forms on the page, as well as manages
 # the WebSocket connection.  It delegates to other classes to manage everything else.
 #
-define ["knockout", "gps", "mockGps"], (ko, Gps, MockGps) ->
+define ["knockout", "gps"], (ko, Gps) ->
 
   class MainPageModel
     constructor: () ->
@@ -15,8 +15,6 @@ define ["knockout", "gps", "mockGps"], (ko, Gps, MockGps) ->
       @connecting = ko.observable()
       @disconnected = ko.observable(true)
 
-      # The MockGps model
-      @mockGps = ko.observable()
       # The GPS model
       @gps = ko.observable()
 
@@ -55,9 +53,7 @@ define ["knockout", "gps", "mockGps"], (ko, Gps, MockGps) ->
           @disconnected(true)
         @closing = false
         # Destroy everything and clean it all up.
-        @mockGps().destroy() if @mockGps()
         @gps().destroy() if @gps()
-        @mockGps(null)
         @gps(null)
 
       # Handle the stream of feature updates

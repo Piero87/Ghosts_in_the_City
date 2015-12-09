@@ -14,7 +14,7 @@ import actors.ClientConnection.ClientEvent
 class Application  @Inject() (
     clientConnectionFactory: ClientConnection.Factory) extends Controller {
   
-  def index = Action {
+  def index = Action { implicit request =>
     Ok(views.html.index())
   }
   

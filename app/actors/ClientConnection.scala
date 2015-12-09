@@ -8,6 +8,7 @@ import play.extras.geojson._
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import play.api.mvc.WebSocket.FrameFormatter
+import play.api.Logger
 
 object ClientConnection {
 
@@ -27,8 +28,13 @@ object ClientConnection {
    * Event sent from the client when they have moved
    */
   case class UserMoved(position: Point[LatLng]) extends ClientEvent
-  
-    object ClientEvent {
+
+
+  /*
+   * JSON serialisers/deserialisers for the above messages
+   */
+
+  object ClientEvent {
     implicit def clientEventFormat: Format[ClientEvent] = Format(
       (__ \ "event").read[String].flatMap {
         case "user-moved" => UserMoved.userMovedFormat.map(identity)
@@ -50,7 +56,7 @@ object ClientConnection {
       )
     )
   }
-  
+
   object UserMoved {
     implicit def userMovedFormat: Format[UserMoved] = (
       (__ \ "event").format[String] ~
@@ -78,8 +84,6 @@ class ClientConnection @Inject() (@Assisted email: String, @Assisted upstream: A
   def receive = {
     // The users has moved their position, publish to the region
     case UserMoved(point) =>
-      //regionManagerClient ! UserPosition(email, System.currentTimeMillis(), point.coordinates)
-      System.out.println("ciao");
-
+      Logger.debug("email: "+email+" now: "+ System.currentTimeMillis()+" GPS: "+point.coordinates) 
   }
 }

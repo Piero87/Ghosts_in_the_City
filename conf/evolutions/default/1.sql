@@ -93,7 +93,7 @@ CREATE TABLE ghosts (
 
 # --- !Downs
 DROP TABLE IF EXISTS items;
-DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS players;
 DROP TABLE IF EXISTS treasures;
 DROP TABLE IF EXISTS ghosts_levels;
 DROP TABLE IF EXISTS ghosts;
