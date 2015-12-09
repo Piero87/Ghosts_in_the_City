@@ -13,7 +13,7 @@ import play.api.libs.concurrent.Execution.Implicits._
 case class Player(
   id: Option[Long],
   name: String,
-  team_id: Int,
+  team_id: Option[Long],
   money: Int,
   latitude: Float,
   longitude: Float
@@ -29,13 +29,14 @@ object Player{
   class PlayerTable(tag: Tag) extends Table[Player](tag, "PLAYER") {
     def id = column[Long]("ID", O.PrimaryKey, O.AutoInc)
     def name = column[String]("NAME")
-    def team_id = foreignKey("TEAM", id, Team.table)(_.id)
+    def team_id = column[Long]("TEAM_ID")
     def money = column[Int]("MONEY")
     def latitude = column[Float]("LATITUDE")
     def longitude = column[Float]("LONGITUDE")
     
-    def * = (id.?, name, team_id, money, latitude, longitude) 
-            <> ((Player.apply _).tupled, Player.unapply)
+    def team_ref = foreignKey("TEAM", team_id, Team.table)(_.id)
+    
+    def * = (id.?, name, team_id, money, latitude, longitude) <> ((Player.apply _).tupled, Player.unapply)
   }
   
   val table = TableQuery[PlayerTable]
