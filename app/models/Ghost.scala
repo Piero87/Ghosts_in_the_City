@@ -15,7 +15,7 @@ import SlickMapping.jodaDateTimeMapping
 case class Ghost (
   id: Option[Long],
   player_id: Long,
-  item_id: Long,
+  level_id: Long,
   status: Int,
   latitude: Float,
   longitude: Float,
@@ -32,8 +32,8 @@ object Ghost {
   class GhostsTable(tag: Tag) extends Table[Ghost](tag, "GHOSTS") {
 
     def id = column[Int]("ID", O.PrimaryKey, O.AutoInc)
-    def player_id = column[Int]("PLAYER_ID")
-    def item_ide = foreignKey("ITEM", id, Item.table)(_.id)
+    def player_id = foreignKey("PLAYER", id, Player.table)(_.id)
+    def level_id = foreignKey("ITEM", id, Item.table)(_.id)
     def status = column[Int]("STATUS")
     def latitude = column[Float]("LATITUDE")
     def longitude = column[Float]("LONGITUDE")

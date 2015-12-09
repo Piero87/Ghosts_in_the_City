@@ -12,8 +12,7 @@ import SlickMapping.jodaDateTimeMapping
 
 case class Item (
   id: Option[Long],
-  //  da cambiare nome nel db perchè lo vede come un istruzione di scala
-  i_type: String, 
+  category: String, 
   cost: Int,
   latitude: Float,
   longitude: Float,
@@ -29,14 +28,13 @@ object Item{
   
   class ItemTable(tag: Tag) extends Table[Item](tag, "ITEM") {
     def id = column[Long]("ID", O.PrimaryKey, O.AutoInc)
-    def i_type = column[String]("TYPE")
+    def category = column[String]("CATEGORY")
     def cost = column[Int]("COST")
     def latitude = column[Float]("LATITUDE")
     def longitude = column[Float]("LONGITUDE")
     def game_id = foreignKey("GAME", id, Game.table)(_.id)
-    //non ho capito quel "GAME"
     
-    def * = (id.?, i_type, cost, latitude, longitude, game_id) 
+    def * = (id.?, category, cost, latitude, longitude, game_id) 
             <> ((Item.apply _).tupled, Item.unapply)
     //cosa fa la funzione <>?
   }
