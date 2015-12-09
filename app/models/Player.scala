@@ -13,7 +13,7 @@ import play.api.libs.concurrent.Execution.Implicits._
 case class Player(
   id: Option[Long],
   name: String,
-  team_id: Option[Long],
+  team_id: Long,
   money: Int,
   latitude: Float,
   longitude: Float
@@ -41,7 +41,7 @@ object Player{
   
   val table = TableQuery[PlayerTable]
   
-  def list: Future[Seq[Item]] = {
+  def list: Future[Seq[Player]] = {
       val playerList = table.result
       db.run(playerList)
    }

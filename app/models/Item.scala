@@ -16,7 +16,7 @@ case class Item (
   cost: Int,
   latitude: Float,
   longitude: Float,
-  game_id: Option[Long]
+  game_id: Long
 )
 
 object Item{
@@ -37,7 +37,6 @@ object Item{
     def game_ref = foreignKey("GAME", game_id, Game.table)(_.id)
     
     def * = (id.?, category, cost, latitude, longitude, game_id) <> ((Item.apply _).tupled, Item.unapply)
-    //cosa fa la funzione <>?
   }
   
    val table = TableQuery[ItemTable]
