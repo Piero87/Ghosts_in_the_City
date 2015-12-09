@@ -37,7 +37,7 @@ CREATE TABLE players (
 
 CREATE TABLE items (
 	id INTEGER AUTO_INCREMENT PRIMARY KEY,
-	type VARCHAR,
+	category VARCHAR,
 	cost INTEGER,
 	latitude FLOAT,
     longitude FLOAT,
