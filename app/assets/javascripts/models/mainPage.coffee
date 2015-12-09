@@ -51,6 +51,7 @@ define ["knockout", "gps"], (ko, Gps) ->
           @connecting("Reconnecting...")
         else
           @disconnected(true)
+          alert "ws closed"
         @closing = false
         # Destroy everything and clean it all up.
         @gps().destroy() if @gps()
@@ -65,6 +66,7 @@ define ["knockout", "gps"], (ko, Gps) ->
 
     # Disconnect the web socket
     disconnect: ->
+      alert "disconnecting"
       @closing = true
       @ws.close()
 
