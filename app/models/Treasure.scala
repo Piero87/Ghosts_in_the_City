@@ -30,44 +30,46 @@ object Treasure {
   import dbConfig._
   import dbConfig.driver.api._
 
-  class GhostsTable(tag: Tag) extends Table[Ghost](tag, "GHOSTS") {
+  class TreasuresTable(tag: Tag) extends Table[Treasure](tag, "TREASURES") {
 
-    def id = column[Int]("ID", O.PrimaryKey, O.AutoInc)
+    def id = column[Long]("ID", O.PrimaryKey, O.AutoInc)
     def closed = column[Int]("CLOSED")
-    def key_id = foreignKey("KEY", id, Item.table)(_.id)
+    def key_id = column[Long]("KEY_ID")
     def money = column[Int]("MONEY")
-    def item_id = foreignKey("ITEM", id, Item.table)(_.id)
+    def item_id = column[Long]("ITEM_ID")
     def latitude = column[Float]("LATITUDE")
     def longitude = column[Float]("LONGITUDE")
-    def game_id = foreignKey("GAME", id, Game.table)(_.id)
+    def game_id = column[Long]("GAME_ID")
 
-    def key_id = foreignKey("KEY", id, Item.table)(_.id)
+    def key_ref = foreignKey("KEY", key_id, Item.table)(_.id)
+    def item_ref = foreignKey("ITEM", item_id, Item.table)(_.id)
+    def game_ref = foreignKey("GAME", game_id, Game.table)(_.id)
     
-    def * = (id.?, closed, money, latitude, longitude) <>
+    def * = (id.?, closed, key_id, money, item_id, latitude, longitude, game_id) <>
       ((Treasure.apply _).tupled, Treasure.unapply)
   }
 
-  val table = TableQuery[GhostsTable]
+  val table = TableQuery[TreasuresTable]
 
-  def list: Future[Seq[Ghost]] = {
-    val ghostList = table.result
-    db.run(ghostList)
+  def list: Future[Seq[Treasure]] = {
+    val treasureList = table.result
+    db.run(treasureList)
   }
 
-  def getByID(ghostID: Int): Future[Option[Ghost]] = {
-    val ghostByID = table.filter { f =>
-      f.id === ghostID
+  def getByID(treasureID: Long): Future[Option[Treasure]] = {
+    val treasureByID = table.filter { f =>
+      f.id === treasureID
     }.result.headOption
 
-    db.run(ghostByID)
+    db.run(treasureByID)
   }
 
-  def create(newEquipment: Ghost): Future[Ghost] = {
+  def create(newEquipment: Treasure): Future[Treasure] = {
     val insertion = (table returning table.map(_.id)) += newEquipment
 
     val insertedIDFuture = db.run(insertion)
 
-    val createdCopy: Future[Ghost] = insertedIDFuture.map { resultID =>
+    val createdCopy: Future[Treasure] = insertedIDFuture.map { resultID =>
       newEquipment.copy(id = Option(resultID))
     }
 
