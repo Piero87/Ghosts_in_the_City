@@ -28,7 +28,7 @@ define ["knockout", "gps"], (ko, Gps) ->
 
     # The user clicked connect
     submitEmail: ->
-      localStorage.email = @email()
+      localStorage.setItem("email", @email());
       @connect()
 
     # Connect function. Connects to the websocket, and sets up callbacks.
@@ -51,22 +51,22 @@ define ["knockout", "gps"], (ko, Gps) ->
           @connecting("Reconnecting...")
         else
           @disconnected(true)
-          alert "ws closed"
         @closing = false
         # Destroy everything and clean it all up.
         @gps().destroy() if @gps()
         @gps(null)
+        localStorage.removeItem("email");
 
       # Handle the stream of feature updates
       @ws.onmessage = (event) =>
-        json = JSON.parse(event.data)
+        console.log event
+        #json = JSON.parse(event.data)
  #       if json.event == "user-positions"
           # Update all the markers on the map
  #         @map.updateMarkers(json.positions.features)
 
     # Disconnect the web socket
     disconnect: ->
-      alert "disconnecting"
       @closing = true
       @ws.close()
 
