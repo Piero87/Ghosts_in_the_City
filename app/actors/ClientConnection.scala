@@ -50,7 +50,7 @@ object ClientConnection {
     },
     Writes {
       case um: UserMoved => UserMoved.userMovedFormat.writes(um)
-      case um: UserPosition => UserPosition.userPositionFormat.writes(um)
+      case up: UserPosition => UserPosition.userPositionFormat.writes(up)
     }
   )
   
