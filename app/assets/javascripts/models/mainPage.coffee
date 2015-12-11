@@ -59,8 +59,8 @@ define ["knockout", "gps"], (ko, Gps) ->
 
       # Handle the stream of feature updates
       @ws.onmessage = (event) =>
-        console.log event
-        #json = JSON.parse(event.data)
+        json = JSON.parse(event.data)
+        console.log(JSON.stringify(json));
  #       if json.event == "user-positions"
           # Update all the markers on the map
  #         @map.updateMarkers(json.positions.features)
