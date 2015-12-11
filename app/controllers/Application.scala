@@ -8,12 +8,12 @@ import play.api.Play.current
 import akka.actor.Props
 import play.api.Logger
 import actors.ClientConnection
-import play.api.libs.json.JsValue
+import actors.ClientConnection.ClientEvent
 
 class Application extends Controller {
   
   def index = Action { implicit request =>
-    Logger.debug("INDEX STARTED")
+    Logger.info("INDEX STARTED")
     Ok(views.html.index())
     
   }
@@ -21,7 +21,7 @@ class Application extends Controller {
   /**
    * The WebSocket
    */
-  def stream(email: String) = WebSocket.acceptWithActor[String, String] { _ => out =>
-    ClientConnection.props(email,out)
+  def stream(email: String) = WebSocket.acceptWithActor[ClientEvent, ClientEvent] { _ => upstream =>
+    ClientConnection.props(email,upstream)
   }
 }

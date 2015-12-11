@@ -34,7 +34,13 @@ define () ->
         @lastSent = time
 
         # Send the position update through the WebSocket
-        @ws.send "GPS: "+position.coords.longitude+" - "+position.coords.latitude
+        console.log("Sending....")
+        @ws.send(JSON.stringify
+          event: "user-moved"
+          position:
+            type: "Point"
+            coordinates: [position.coords.longitude, position.coords.latitude]
+        )
 
     # Stop sending our position and stop watching for position updates
     destroy: ->
