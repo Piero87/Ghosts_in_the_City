@@ -73,7 +73,7 @@ define ["knockout", "gps"], (ko, Gps) ->
 		console.log("Ti pingo")
 		@ws.send(JSON.stringify
 			event: "user-ping"
-				unused: "ping"
+			unused: "ping"
 		)						
 					    		
   return MainPageModel
