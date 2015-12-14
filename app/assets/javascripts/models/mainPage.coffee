@@ -8,77 +8,73 @@ define ["knockout", "gps"], (ko, Gps) ->
 
   class MainPageModel
     constructor: () ->
-      # the current user
-      @email = ko.observable()
+    	# User name
+    	@username = ko.observable()
+    	
+    	# The Web Socket
+    	@ws = null
+    	
+    	@disconnected = ko.observable(true)
+    	@connected = ko.observable(false)
+    	
+    	@connecting = ko.observable()
+    	@closing = false
+    	
+    	
+    	# Load previously user name if set
+    	if localStorage.username
+    		@username(localStorage.username)
+    		@connect()
 
-      # Contains a message to say that we're either connecting or reconnecting
-      @connecting = ko.observable()
-      @disconnected = ko.observable(true)
-      @connected = ko.observable(true)
-      
-      # The GPS model
-      #@gps = ko.observable()
-
-      # If we're closing
-      @closing = false
-
-      # Load the previously entered email if set
-      if localStorage.email
-        @email(localStorage.email)
-        @connect()
-
-    # The user clicked connect
-    submitEmail: ->
-      localStorage.setItem("email", @email());
-      @connect()
-	
-	pingFrontend: ->
-	  console.log("Ciao")
-#		@ws.send(JSON.stringify
-#         event: "user-ping"
-#          unused: "culo"
-#        )
-        
-    # Connect function. Connects to the websocket, and sets up callbacks.
-    connect: ->
-      email = @email()
-      @connecting("Connecting...")
-      @disconnected(null)
-
-      @ws = new WebSocket(jsRoutes.controllers.Application.stream(email).webSocketURL())
-
-      # When the websocket opens, create a new map and new GPS
-      @ws.onopen = (event) =>
-        @connecting(null)
-        #@gps(new Gps(@ws))
-        @connected(true)
-
-      @ws.onclose = (event) =>
-        # Need to handle reconnects in case of errors
-        if (!event.wasClean && !self.closing)
-          @connect()
-          @connecting("Reconnecting...")
-        else
-          @disconnected(true)
-          @disconnected(false)
-        @closing = false
-        # Destroy everything and clean it all up.
-        #@gps().destroy() if @gps()
-        #@gps(null)
-        localStorage.removeItem("email");
-
-      # Handle the stream of feature updates
-      @ws.onmessage = (event) =>
-        json = JSON.parse(event.data)
-        console.log(JSON.stringify(json));
- #       if json.event == "user-positions"
-          # Update all the markers on the map
- #         @map.updateMarkers(json.positions.features)
-
-    # Disconnect the web socket
-    disconnect: ->
-      @closing = true
-      @ws.close()
-
+	# The user clicked connect
+	submitUsername: ->
+		localStorage.setItem("username", @username())
+		@connect()
+		
+	# Connect
+	connect: ->
+		username = @username()
+		@connecting("Connecting ...")
+		@disconnected(null)
+		
+		# Open Web Socket
+		@ws = new WebSocket(jsRoutes.controllers.Application.stream(username).webSocketURL())
+		
+		# When the websocket opens
+		@ws.onopen = (event) =>
+			@connecting(null)
+			@connected(true)
+			
+		# When the websocket closes
+		@ws.onclose = (event) =>
+			# Handle the reconnection in case of errors
+			if(!event.wasClean && ! self.closing)
+				@connect()
+				@connecting("Reconnecting ...")
+			else
+				@disconnected(true)
+				@connected(false)
+				@closing = false
+				# Destroy everything and clean all
+				localStorage.removeItem("username")
+				
+		# Handle the stream		
+		@ws.onmessage = (event) =>
+			json = JSON.parse(event.data)
+			console.log(JSON.stringify(json))
+			
+	# Disconnect the ws
+	disconnect: ->
+		@closing = true
+		@ws.close()
+		
+	# Ping 
+	userPing: ->
+		console.log("Ti pingo")
+		@ws.send(JSON.stringify
+			event: "user-ping"
+				unused: "ping"
+		)						
+					    		
   return MainPageModel
 
