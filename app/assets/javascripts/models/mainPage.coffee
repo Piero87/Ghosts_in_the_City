@@ -14,9 +14,10 @@ define ["knockout", "gps"], (ko, Gps) ->
       # Contains a message to say that we're either connecting or reconnecting
       @connecting = ko.observable()
       @disconnected = ko.observable(true)
-
+      @connected = ko.observable(true)
+      
       # The GPS model
-      @gps = ko.observable()
+      #@gps = ko.observable()
 
       # If we're closing
       @closing = false
@@ -30,7 +31,14 @@ define ["knockout", "gps"], (ko, Gps) ->
     submitEmail: ->
       localStorage.setItem("email", @email());
       @connect()
-
+	
+	pingFrontend: ->
+	  console.log("Ciao")
+#		@ws.send(JSON.stringify
+#         event: "user-ping"
+#          unused: "culo"
+#        )
+        
     # Connect function. Connects to the websocket, and sets up callbacks.
     connect: ->
       email = @email()
@@ -42,7 +50,8 @@ define ["knockout", "gps"], (ko, Gps) ->
       # When the websocket opens, create a new map and new GPS
       @ws.onopen = (event) =>
         @connecting(null)
-        @gps(new Gps(@ws))
+        #@gps(new Gps(@ws))
+        @connected(true)
 
       @ws.onclose = (event) =>
         # Need to handle reconnects in case of errors
@@ -51,10 +60,11 @@ define ["knockout", "gps"], (ko, Gps) ->
           @connecting("Reconnecting...")
         else
           @disconnected(true)
+          @disconnected(false)
         @closing = false
         # Destroy everything and clean it all up.
-        @gps().destroy() if @gps()
-        @gps(null)
+        #@gps().destroy() if @gps()
+        #@gps(null)
         localStorage.removeItem("email");
 
       # Handle the stream of feature updates

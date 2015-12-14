@@ -18,7 +18,11 @@ libraryDependencies ++= Seq(
   "org.webjars" % "bootstrap" % "3.0.0",
   "org.webjars" % "knockout" % "3.4.0",
   "org.webjars" % "requirejs" % "2.1.22",
-  "org.webjars" % "leaflet" % "0.7.5"
+  "org.webjars" % "leaflet" % "0.7.5",
+  "com.typesafe.akka" %% "akka-actor" % "2.4.1",
+  "com.typesafe.akka" %% "akka-cluster" % "2.4.1",
+  "com.typesafe.akka" %% "akka-cluster-tools" % "2.4.1",
+  "com.typesafe.akka" %% "akka-slf4j" % "2.4.0"
 )
 
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"

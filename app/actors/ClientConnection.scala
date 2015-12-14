@@ -16,6 +16,8 @@ object ClientConnection {
    */
   sealed trait ClientEvent
   
+  case class UserPing(unused: String) extends ClientEvent
+  
   /**
    * Event sent from the client when they have moved
    */
@@ -26,7 +28,7 @@ object ClientConnection {
 	 */
   case class UserPosition(id: String, timestamp: Long, position: Point[LatLng]) extends ClientEvent
 
-  def props(email: String, upstream: ActorRef) = Props(new ClientConnection(email,upstream))
+  def props(email: String, upstream: ActorRef, frontend: ActorRef) = Props(new ClientConnection(email,upstream,frontend))
   
   /**
    * Formats WebSocket frames to be ClientEvents.
@@ -46,11 +48,13 @@ object ClientConnection {
     (__ \ "event").read[String].flatMap {
       case "user-moved" => UserMoved.userMovedFormat.map(identity)
       case "user-position" => UserPosition.userPositionFormat.map(identity)
+      case "user-ping" => UserPing.userPingFormat.map(identity)
       case other => Reads(_ => JsError("Unknown client event: " + other))
     },
     Writes {
       case um: UserMoved => UserMoved.userMovedFormat.writes(um)
       case up: UserPosition => UserPosition.userPositionFormat.writes(up)
+      case pi: UserPing => UserPing.userPingFormat.writes(pi)
     }
   )
   
@@ -74,9 +78,18 @@ object ClientConnection {
     }, userPosition => ("user-position",userPosition.id, userPosition.timestamp, userPosition.position))
   }
   
+  object UserPing {
+    implicit def userPingFormat: Format[UserPing] = (
+      (__ \ "event").format[String] and
+          (__ \ "unused").format[String]
+      ).apply({
+      case ("user-ping", unused) => UserPing(unused)
+    }, (userPing: UserPing) => ("user-ping", userPing.unused))
+  }
+  
 }
 
-class ClientConnection(email: String, upstream: ActorRef) extends Actor {
+class ClientConnection(email: String, upstream: ActorRef,frontend: ActorRef) extends Actor {
   
   import ClientConnection._
   
@@ -84,5 +97,7 @@ class ClientConnection(email: String, upstream: ActorRef) extends Actor {
     case UserMoved(point) =>
       Logger.info("Received event UserMoved from: "+email+" with position: "+point.coordinates.lat+" - "+point.coordinates.lng+" at "+System.currentTimeMillis())
       upstream ! UserPosition(email, System.currentTimeMillis(), point)
+    case UserPing(unused) =>
+      frontend ! Ping
   }
 }
