@@ -11,11 +11,11 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <span class="navbar-brand">Reactive Maps</span>
+                <span class="navbar-brand fedora-font"><img src="/assets/images/favicon.png" alt="" width="64">Treasures Hunters</span>
             </div>
             <div class="collapse navbar-collapse navbar-ex1-collapse">
-                <ul class="nav navbar-nav">
-                    <li data-bind="ifnot: disconnected, click: disconnect"><a href="#">Disconnect</a></li>
+                <ul class="nav navbar-nav navbar-right">
+                    <li data-bind="ifnot: disconnected, click: disconnect"><a href="#">DISCONNECT</a></li>
                 </ul>
             </div>
         </nav>
@@ -23,19 +23,19 @@
         <div data-bind="if: disconnected">
             <form role="form">
                 <div class="form-group">
-                    <input type="email" class="form-control" data-bind="value: email" placeholder="Email address"/>
+                    <input type="username" class="form-control" data-bind="value: username" placeholder="Username"/>
                 </div>
             </form>
-            <button class="btn btn-primary" data-bind="click: submitEmail">Connect</button>
+            <button class="btn fedora-font font-big" data-bind="click: submitUsername">Hunt!</button>
         </div>
 
         <div data-bind="if: connecting">
             <span data-bind="text: connecting"></span>
         </div>
-        
+        <!---
         <div data-bind="if: connected">
         	<button class="btn btn-primary" data-bind="click: pingFrontend">Ping</button>
         </div>
-
+		--->
     </div>
 }
