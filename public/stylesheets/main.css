@@ -7,7 +7,13 @@
 	font-size: 20px;
 }
 
+.btn {
+	margin: 10px;
+}
 
+.btn.fedora-font {
+	padding-top: 15px !important;
+}
 
 .fedora-font {
 	font-family: Fedora;

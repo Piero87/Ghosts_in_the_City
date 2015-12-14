@@ -20,13 +20,23 @@
             </div>
         </nav>
 
+		<div align="center" style="margin-bottom:20px;">
+			<img src="/assets/images/ghost_left.png" alt="" width="64">
+			<img src="/assets/images/ghost_left.png" alt="" width="64">
+			<img src="/assets/images/treasure.png" alt="" width="64">
+			<img src="/assets/images/ghost_right.png" alt="" width="64">
+			<img src="/assets/images/ghost_right.png" alt="" width="64">
+		</div>
+		
         <div data-bind="if: disconnected" align="center">
-            <form role="form" style="max-width: 200px;">
-                <div class="form-group">
-                    <input type="text" class="form-control" data-bind="value: username" placeholder="Username"/>
-                </div>
-            </form>
-            <button class="btn fedora-font font-big" data-bind="click: submitUsername">Hunt!</button>
+        	<div style="max-width: 200px; border: solid 1px grey; border-radius: 5px; padding: 20px;">
+	            <form role="form">
+	                <div class="form-group">
+	                    <input type="text" class="form-control" data-bind="value: username" placeholder="Username"/>
+	                </div>
+	            </form>
+	            <button class="btn fedora-font font-big" data-bind="click: submitUsername">Hunt!</button>
+            </div>
         </div>
 
         <div data-bind="if: connecting">
