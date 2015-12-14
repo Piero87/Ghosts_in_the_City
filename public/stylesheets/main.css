@@ -11,6 +11,12 @@
 	margin: 10px;
 }
 
+.bordered {
+	border: solid 1px grey; 
+	border-radius: 5px; 
+	padding: 20px;
+}
+
 .btn.fedora-font {
 	padding-top: 15px !important;
 }
