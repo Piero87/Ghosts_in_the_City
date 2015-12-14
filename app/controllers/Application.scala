@@ -36,8 +36,8 @@ class Application extends Controller {
   /**
    * The WebSocket
    */
-  def stream(email: String) = WebSocket.acceptWithActor[ClientEvent, ClientEvent] { _ => upstream =>
-    ClientConnection.props(email,upstream,frontend)
+  def stream(username: String) = WebSocket.acceptWithActor[ClientEvent, ClientEvent] { _ => upstream =>
+    ClientConnection.props(username,upstream,frontend)
   }
 //  
 //  def createRecoverFrontendService () {
