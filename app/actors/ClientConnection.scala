@@ -28,7 +28,7 @@ object ClientConnection {
 	 */
   case class UserPosition(id: String, timestamp: Long, position: Point[LatLng]) extends ClientEvent
 
-  def props(email: String, upstream: ActorRef, frontend: ActorRef) = Props(new ClientConnection(email,upstream,frontend))
+  def props(username: String, upstream: ActorRef, frontend: ActorRef) = Props(new ClientConnection(username,upstream,frontend))
   
   /**
    * Formats WebSocket frames to be ClientEvents.
@@ -89,14 +89,14 @@ object ClientConnection {
   
 }
 
-class ClientConnection(email: String, upstream: ActorRef,frontend: ActorRef) extends Actor {
+class ClientConnection(username: String, upstream: ActorRef,frontend: ActorRef) extends Actor {
   
   import ClientConnection._
   
   def receive = {
     case UserMoved(point) =>
-      Logger.info("Received event UserMoved from: "+email+" with position: "+point.coordinates.lat+" - "+point.coordinates.lng+" at "+System.currentTimeMillis())
-      upstream ! UserPosition(email, System.currentTimeMillis(), point)
+      Logger.info("Received event UserMoved from: "+username+" with position: "+point.coordinates.lat+" - "+point.coordinates.lng+" at "+System.currentTimeMillis())
+      upstream ! UserPosition(username, System.currentTimeMillis(), point)
     case UserPing(unused) =>
       frontend ! Ping
   }
