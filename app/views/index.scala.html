@@ -15,15 +15,15 @@
             </div>
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav navbar-right">
-                    <li data-bind="ifnot: disconnected, click: disconnect"><a href="#">DISCONNECT</a></li>
+                    <li data-bind="ifnot: disconnected, click: disconnect"><a class="fedora-font" href="#">Disconnect</a></li>
                 </ul>
             </div>
         </nav>
 
-        <div data-bind="if: disconnected">
-            <form role="form">
+        <div data-bind="if: disconnected" align="center">
+            <form role="form" style="max-width: 200px;">
                 <div class="form-group">
-                    <input type="username" class="form-control" data-bind="value: username" placeholder="Username"/>
+                    <input type="text" class="form-control" data-bind="value: username" placeholder="Username"/>
                 </div>
             </form>
             <button class="btn fedora-font font-big" data-bind="click: submitUsername">Hunt!</button>
@@ -33,7 +33,7 @@
             <span data-bind="text: connecting"></span>
         </div>
         
-        <div data-bind="if: connected">
+        <div data-bind="if: connected" align="center">
         	<button class="btn fedora-font font-big" data-bind="click: userPing">Ping</button>
         </div>
     </div>
