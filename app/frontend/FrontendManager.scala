@@ -6,6 +6,7 @@ import akka.util.Timeout
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import play.api.mvc.WebSocket.FrameFormatter
+import common._
 
 object FrontendManager {
   
@@ -25,8 +26,8 @@ class FrontendManager extends Actor {
 //    case EnterMatch(username) if backends.isEmpty =>
 //      sender() ! JobFailed("Service unavailable, try again later", job)
 
-    case NewGame(name) =>
-      newGame(name)
+    case Msg(name) =>
+      Logger.info("FrontendManager: NewGame request")
       
     case "BackendRegistration" if !backends.contains(sender()) =>
       Logger.info("Backend Received"+sender.path)

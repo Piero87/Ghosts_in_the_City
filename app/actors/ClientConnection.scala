@@ -13,6 +13,7 @@ import scala.concurrent.duration._
 import akka.util.Timeout
 import akka.pattern.ask
 import scala.util.{Failure, Success}
+import common._
 
 object ClientConnection {
   
@@ -90,14 +91,15 @@ class ClientConnection(username: String, upstream: ActorRef,frontendManager: Act
 //      upstream ! UserPosition(username, System.currentTimeMillis(), point)
     case NewGame(name) =>
       Logger.info("ClientConnection: NewGame request")
-      implicit val timeout = Timeout(5 seconds)
-      implicit val ec = context.dispatcher
-      frontendManager ? NewGame(name) andThen {
-        case Success(_) => 
-          managerClient = sender()
-          upstream ! NewGame(name)
-        case Failure(_) => Logger.info("Errore ClientConnection Creazione Partita")
-      }
+      frontendManager ! Msg(name)
+//      implicit val timeout = Timeout(5 seconds)
+//      implicit val ec = context.dispatcher
+//      frontendManager ? NewGame(name) andThen {
+//        case Success(_) => 
+//          managerClient = sender()
+//          upstream ! NewGame(name)
+//        case Failure(_) => Logger.info("Errore ClientConnection Creazione Partita")
+//      }
       
       //managerClient = frontendManager ? NewGame(name) //Qui mi aspetterò l'actorRef di ManagerClient con cui parlerò 
   }
