@@ -20,11 +20,11 @@ object Player {
   /**
    * Actor Props 
    */
-  def props(area: Polygon[LatLng], starting_position: Point[LatLng]): Props = Props(new Player(area, starting_position))
+  def props(area: Polygon[LatLng], starting_position: Point[LatLng], id: Long): Props = Props(new Player(area, starting_position, id))
   
 }
 
-class Player(area: Polygon[LatLng], starting_position: Point[LatLng]) extends Actor{
+class Player(area: Polygon[LatLng], starting_position: Point[LatLng], id: Long) extends Actor{
   
   import Player._
   
