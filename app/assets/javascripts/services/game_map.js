@@ -50,6 +50,10 @@ function startGame() {
 
 }
 
+function getBusterList() {
+	return busters;
+}
+
 function addBuster(id, name, x, y) {
 
 	var buster = {};
@@ -116,6 +120,7 @@ function ghostMove(id, x, y) {
 }
 
 function doGameLoop() {
+	
 	// redraw busters positions
 	for (var i = 0; i < busters.length; i++) {
 		ctx.putImageData(emptyBack, busters[i].old_x, busters[i].old_y);
