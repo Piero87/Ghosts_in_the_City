@@ -50,10 +50,6 @@ function startGame() {
 
 }
 
-function getBusterList() {
-	return busters;
-}
-
 function addBuster(id, name, x, y) {
 
 	var buster = {};
