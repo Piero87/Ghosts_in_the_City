@@ -7,6 +7,7 @@ import play.api.libs.functional.syntax._
 import play.api.mvc.WebSocket.FrameFormatter
 import scala.math._
 import play.api.Logger
+import scala.concurrent.duration._
 
 
 object Ghost{
@@ -19,27 +20,29 @@ object Ghost{
   /**
    * Event sent from the Ghost when move itself
    */
-  case class UpdateGhostPosition(position: Point[LatLng])
+  case object UpdateGhostPosition
   
   def props(area: Polygon[LatLng], position: Point[LatLng]) = Props(new Ghost(area,position))
 }
 
 class Ghost(area :Polygon[LatLng], position: Point[LatLng]) extends Actor {
   
+  import context._
   import Ghost._
   
   var pos: Point[LatLng] = position
+  // riferimento game manager : ActorRef
+  // cerca comando per capire di chi sei figlio e farti restituire il riferimento
   
   def receive = {
-    case Start => start_move(pos)
-    case UpdateGhostPosition(position) => 
+    case Start => scheduler()
+    case UpdateGhostPosition => 
       Logger.info("Ghost: Updated position received")
-      pos = position
-      // Qui farò qualcosa con la nuova posizione. 
-      sender ! "Done"
+      random_move(pos)
+      system.scheduler.scheduleOnce(500 millis, self, UpdateGhostPosition)
   }
   
-  def start_move(position: Point[LatLng]) = {
+  def random_move(position: Point[LatLng]) = {
      val delta_time = 3
      val speed = 10.0
      
@@ -56,6 +59,12 @@ class Ghost(area :Polygon[LatLng], position: Point[LatLng]) extends Actor {
      pos = new_position
      
      // invia la nuova posizione
+  }
+  
+  //schedulo tramite il tick per richiamare il metodo
+  def scheduler() = {
+     system.scheduler.scheduleOnce(500 millis, self, UpdateGhostPosition)
+     
   }
   
   
