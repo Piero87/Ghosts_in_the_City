@@ -9,26 +9,29 @@ import play.extras.geojson.LatLng
 import play.extras.geojson.Point
 import play.api.libs.functional.syntax._
 
+import scala.concurrent.duration._
+import akka.util.Timeout
+import akka.pattern.ask
+import scala.util.{Failure, Success}
+
 object ClientConnection {
+  
+  def props(username: String, upstream: ActorRef, frontend: ActorRef) = Props(new ClientConnection(username,upstream,frontend))
   
   /**
    * Events to/from the client side
    */
   sealed trait ClientEvent
   
-  case class UserPing(unused: String) extends ClientEvent
+  /**
+   * Event sent from the client when they have moved
+   */
+  case class NewGame(name: String) extends ClientEvent
   
   /**
    * Event sent from the client when they have moved
    */
   case class UserMoved(position: Point[LatLng]) extends ClientEvent
-  
-  /**
-	 * Event sent from the server when position is received
-	 */
-  case class UserPosition(id: String, timestamp: Long, position: Point[LatLng]) extends ClientEvent
-
-  def props(username: String, upstream: ActorRef, frontend: ActorRef) = Props(new ClientConnection(username,upstream,frontend))
   
   /**
    * Formats WebSocket frames to be ClientEvents.
@@ -47,14 +50,12 @@ object ClientConnection {
   implicit def clientEventFormat: Format[ClientEvent] = Format(
     (__ \ "event").read[String].flatMap {
       case "user-moved" => UserMoved.userMovedFormat.map(identity)
-      case "user-position" => UserPosition.userPositionFormat.map(identity)
-      case "user-ping" => UserPing.userPingFormat.map(identity)
+      case "new-game" => NewGame.newGameFormat.map(identity)
       case other => Reads(_ => JsError("Unknown client event: " + other))
     },
     Writes {
       case um: UserMoved => UserMoved.userMovedFormat.writes(um)
-      case up: UserPosition => UserPosition.userPositionFormat.writes(up)
-      case pi: UserPing => UserPing.userPingFormat.writes(pi)
+      case ng: NewGame => NewGame.newGameFormat.writes(ng)
     }
   )
   
@@ -67,37 +68,37 @@ object ClientConnection {
     }, (userMoved: UserMoved) => ("user-moved", userMoved.position))
   }
   
-  object UserPosition {
-    implicit def userPositionFormat: Format[UserPosition] = (
-      (__ \ "event").format[String] and 
-        (__ \ "id").format[String] and
-          (__ \ "timestamp").format[Long] and
-            (__ \ "position").format[Point[LatLng]]
-      ).apply({
-      case ("user-position",id,timestamp,position) => UserPosition(id, timestamp, position)
-    }, userPosition => ("user-position",userPosition.id, userPosition.timestamp, userPosition.position))
-  }
-  
-  object UserPing {
-    implicit def userPingFormat: Format[UserPing] = (
+  object NewGame {
+    implicit def newGameFormat: Format[NewGame] = (
       (__ \ "event").format[String] and
-          (__ \ "unused").format[String]
+          (__ \ "name").format[String]
       ).apply({
-      case ("user-ping", unused) => UserPing(unused)
-    }, (userPing: UserPing) => ("user-ping", userPing.unused))
+      case ("new-game", name) => NewGame(name)
+    }, (newGame: NewGame) => ("new-game", newGame.name))
   }
-  
 }
 
-class ClientConnection(username: String, upstream: ActorRef,frontend: ActorRef) extends Actor {
+class ClientConnection(username: String, upstream: ActorRef,frontendManager: ActorRef) extends Actor {
   
   import ClientConnection._
   
+  var managerClient: ActorRef = _
+  
   def receive = {
-    case UserMoved(point) =>
-      Logger.info("Received event UserMoved from: "+username+" with position: "+point.coordinates.lat+" - "+point.coordinates.lng+" at "+System.currentTimeMillis())
-      upstream ! UserPosition(username, System.currentTimeMillis(), point)
-    case UserPing(unused) =>
-      frontend ! Ping
+//    case UserMoved(point) =>
+//      Logger.info("Received event UserMoved from: "+username+" with position: "+point.coordinates.lat+" - "+point.coordinates.lng+" at "+System.currentTimeMillis())
+//      upstream ! UserPosition(username, System.currentTimeMillis(), point)
+    case NewGame(name) =>
+      Logger.info("ClientConnection: NewGame request")
+      implicit val timeout = Timeout(5 seconds)
+      implicit val ec = context.dispatcher
+      frontendManager ? NewGame(name) andThen {
+        case Success(_) => 
+          managerClient = sender()
+          upstream ! NewGame(name)
+        case Failure(_) => Logger.info("Errore ClientConnection Creazione Partita")
+      }
+      
+      //managerClient = frontendManager ? NewGame(name) //Qui mi aspetterò l'actorRef di ManagerClient con cui parlerò 
   }
 }
