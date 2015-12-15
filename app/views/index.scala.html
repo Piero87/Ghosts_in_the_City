@@ -37,16 +37,22 @@
 	                    <input type="text" class="form-control" data-bind="value: username" placeholder="Username"/>
 	                </div>
 	            </form>
-	            <button class="btn fedora-font font-big" data-bind="click: submitUsername">Hunt!</button>
+	            <button class="btn fedora-font font-big" data-bind="click: submitUsername">Search Game</button>
             </div>
         </div>
 
         <div data-bind="if: connecting">
-            <span data-bind="text: connecting"></span>
+            <span data-bind="text: connecting" class="font-big">Connecting...</span>
         </div>
         
         <div data-bind="if: connected" align="center">
-        	<button class="btn fedora-font font-big" data-bind="click: userPing">Ping</button>
+        	<div data-bind="ifnot: game" align="center">
+        		<button class="btn fedora-font font-big" data-bind="click: newGame">New Game</button>
+        	</div>
+        	<div data-bind="if: game" align="center">
+        		<h1 class="fedora-font font-big">Nuova Partita</h1>
+        		<canvas id="gameArena" width="500" height="500"></canvas>
+        	</div>
         </div>
     </div>
 }

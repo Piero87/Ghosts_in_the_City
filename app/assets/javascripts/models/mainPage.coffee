@@ -20,6 +20,8 @@ define ["knockout", "gps"], (ko, Gps) ->
     	@connecting = ko.observable()
     	@closing = false
     	
+    	@game = ko.observable(false)
+    	
     	# Load previously user name if set
     	if localStorage.username
     		@username(localStorage.username)
@@ -56,19 +58,24 @@ define ["knockout", "gps"], (ko, Gps) ->
     	@ws.onmessage = (event) =>
     		json = JSON.parse(event.data)
     		console.log(JSON.stringify(json))	
-    
+    		if json.event == "user-positions"
+    			console.log('user-positions')
+         		# Update all the markers on the map
+          		#@map.updateMarkers(json.positions.features)
+			else if json.event == "new-game"
+          		@game(true)
     
     # The user clicked connect
     submitUsername: ->
     	localStorage.setItem("username", @username())
     	@connect()
     
-    # Ping 
-    userPing: ->
-    	console.log("Ti pingo")
+    # New Game 
+    newGame: ->
+    	console.log("New Game")
     	@ws.send(JSON.stringify
-    		event: "user-ping"
-    		unused: "ping"
+    		event: "new-game"
+    		name: "culo"
     	)
     
     # Disconnect the ws
