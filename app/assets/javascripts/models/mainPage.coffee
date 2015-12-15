@@ -58,9 +58,9 @@ define ["knockout", "gps"], (ko, Gps) ->
     	@ws.onmessage = (event) =>
     		json = JSON.parse(event.data)
     		console.log(JSON.stringify(json))	
-    		if json.event == "user-positions"
-    			console.log('user-positions')
-         		# Update all the markers on the map
+			if json.event == "user-positions"
+				console.log('user-positions')
+				# Update all the markers on the map
           		#@map.updateMarkers(json.positions.features)
 			else if json.event == "new-game"
           		@game(true)
