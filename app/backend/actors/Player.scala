@@ -12,11 +12,10 @@ import play.extras.geojson.LatLng
 object Player {
   
   /**
-   * UpdatePlayerPosition Events to/from the client side
+   * UpdatePlayerPosition Events from the client side
    */
   case class UpdatePlayerPosition(position: Point[LatLng])
-  
-  
+
   /**
    * Actor Props 
    */
@@ -34,7 +33,7 @@ class Player(area: Polygon[LatLng], starting_position: Point[LatLng], id: Long) 
    case UpdatePlayerPosition(position) => 
       Logger.info("Updated position received")
       pos = position
-      // Qui farò qualcosa con la nuova posizione. 
+      // Qui farò qualcosa con la nuova posizione o me ne sbatto dopo averla salvata? 
       sender ! "Done"
   }
   
