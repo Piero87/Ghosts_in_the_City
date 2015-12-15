@@ -31,8 +31,6 @@ class Ghost(area :Polygon[LatLng], position: Point[LatLng]) extends Actor {
   import Ghost._
   
   var pos: Point[LatLng] = position
-  // riferimento game manager : ActorRef
-  // cerca comando per capire di chi sei figlio e farti restituire il riferimento
   
   def receive = {
     case Start => scheduler()
@@ -58,7 +56,8 @@ class Ghost(area :Polygon[LatLng], position: Point[LatLng]) extends Actor {
      
      pos = new_position
      
-     // invia la nuova posizione
+     context.parent ! pos
+     
   }
   
   //schedulo tramite il tick per richiamare il metodo

@@ -9,8 +9,7 @@ import akka.actor.Props
 import play.api.Logger
 import com.typesafe.config.ConfigFactory
 import akka.actor._
-import actors.RecoverFrontend
-import actors.Frontend
+import frontend.FrontendManager
 import actors.ClientConnection
 import actors.ClientConnection.ClientEvent
 
@@ -23,7 +22,7 @@ class Application extends Controller {
       withFallback(ConfigFactory.parseString("akka.cluster.roles = [frontend]")).
       withFallback(ConfigFactory.load())
   val system = ActorSystem("TreasuresSystem", config)
-  val frontend = system.actorOf(Props[Frontend], name = "frontend")
+  val frontendManager = system.actorOf(Props[FrontendManager], name = "frontend")
   
   Logger.info("Application Started")
   
@@ -37,7 +36,7 @@ class Application extends Controller {
    * The WebSocket
    */
   def stream(username: String) = WebSocket.acceptWithActor[ClientEvent, ClientEvent] { _ => upstream =>
-    ClientConnection.props(username,upstream,frontend)
+    ClientConnection.props(username,upstream,frontendManager)
   }
 //  
 //  def createRecoverFrontendService () {

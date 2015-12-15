@@ -21,13 +21,28 @@
 	padding-top: 15px !important;
 }
 
+.btn.ghostbuster-font {
+	padding-top: 15px !important;
+}
+
 .fedora-font {
 	font-family: Fedora;
+}
+
+.ghostbuster-font {
+	font-family: Ghostbuster;
 }
 
 @font-face {
   font-family: 'Fedora';
   src: url('fedora.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Ghostbuster';
+  src: url('ghostbuster.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
