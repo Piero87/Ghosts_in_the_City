@@ -4,7 +4,6 @@ import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
 import com.typesafe.config.ConfigFactory
 import akka.actor._
-import actors.Frontend
 import akka.cluster.MemberStatus
 import akka.cluster.Member
 case object BackendRegistration
