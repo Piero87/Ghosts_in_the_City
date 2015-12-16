@@ -116,6 +116,7 @@ function ghostMove(id, x, y) {
 }
 
 function doGameLoop() {
+	
 	// redraw busters positions
 	for (var i = 0; i < busters.length; i++) {
 		ctx.putImageData(emptyBack, busters[i].old_x, busters[i].old_y);
