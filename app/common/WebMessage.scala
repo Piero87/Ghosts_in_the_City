@@ -3,7 +3,8 @@ package common
 import play.api.libs.json._
 import play.api.mvc.WebSocket.FrameFormatter
 
-case class _NewGame(name: String)
+case class NewGame(name: String)
+
 
 /**
  * Contains all of the web socket messages and their json formats
@@ -15,22 +16,22 @@ object WebMessage {
    /**
    * Sent by the client init New Game
    */
-  case class NewGame(
+  case class _NewGame(
     name:   String
   ) extends WebMessage
-  implicit val newGameFormat = Json.format[NewGame]
+  implicit val newGameFormat = Json.format[_NewGame]
   
   /**
    * Converts json into WebSocketMessages
    */
-  implicit val reads: Reads[WebMessage] = (JsPath \ "new_game").read[NewGame].map(identity[WebMessage])
+  implicit val reads: Reads[WebMessage] = (JsPath \ "new_game").read[_NewGame].map(identity[WebMessage])
     
   /**
    * Converts WebSocketMessages into Json
    */
   implicit object writes extends Writes[WebMessage] {
     override def writes(o: WebMessage): JsValue = o match {
-      case ng: NewGame       => (JsPath \ "new_game").write(newGameFormat).writes(ng)
+      case ng: _NewGame       => (JsPath \ "new_game").write(newGameFormat).writes(ng)
     }
   }
   

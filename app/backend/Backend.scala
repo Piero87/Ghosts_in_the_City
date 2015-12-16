@@ -11,8 +11,6 @@ import common._
 
 object Backend {
   
-  case class NewGame(name: String)
-  
   def main(args: Array[String]): Unit = {
     // Override the configuration of the port when specified as program argument
     val port = if (args.isEmpty) "0" else args(0)
@@ -42,7 +40,7 @@ class Backend extends Actor {
       state.members.filter(_.status == MemberStatus.Up) foreach register
     case MemberUp(m) => register(m)
     
-    case _NewGame(name) =>
+    case NewGame(name) =>
       Logger.info("Backend: NewGame request")
       newGame(name)
       
@@ -52,7 +50,7 @@ class Backend extends Actor {
     val gm_backend = context.actorOf(Props[GameManagerBackend], name = name)
     game_manager_backends = game_manager_backends :+ gm_backend
     Logger.info("Backend: Actor created, forward message...")
-    gm_backend forward _NewGame(name)
+    gm_backend forward NewGame(name)
     
   }
   

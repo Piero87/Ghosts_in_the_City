@@ -14,7 +14,7 @@ class GameManagerBackend () extends Actor {
   var game_name = ""
   
   def receive = {
-    case _NewGame(name) =>
+    case NewGame(name) =>
       Logger.info("GameManagerBackend: NewGame request")
       game_name = name
       gameManagerClient = sender()

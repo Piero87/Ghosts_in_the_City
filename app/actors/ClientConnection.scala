@@ -22,11 +22,11 @@ class ClientConnection(username: String, upstream: ActorRef,frontendManager: Act
   var gameManagerClient: ActorRef = _
   
   def receive = {
-    case NewGame(name) => 
+    case _NewGame(name) => 
       Logger.info("ClientConnection: NewGame received")
       implicit val timeout = Timeout(5 seconds)
       implicit val ec = context.dispatcher
-      val future = frontendManager ? _NewGame(name.replaceAll(" ", "_"))
+      val future = frontendManager ? NewGame(name.replaceAll(" ", "_"))
       future.onSuccess { 
         case result: ActorRef => 
           Logger.info ("ClientConnection NewGame result: "+result.path)

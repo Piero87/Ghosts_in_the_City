@@ -25,14 +25,14 @@ class GameManagerClient (backend: ActorRef) extends Actor {
   var game_name = ""
   
   def receive = {
-    case _NewGame(name) =>
+    case NewGame(name) =>
       Logger.info("GameManagerClient: NewGame request")
       game_name = name
       clientConnection = sender()
       sender() ! self
       implicit val timeout = Timeout(5 seconds)
       implicit val ec = context.dispatcher
-      val future = backend ? _NewGame(name)
+      val future = backend ? NewGame(name)
       future.onSuccess { 
         case result: ActorRef => 
           Logger.info ("result: "+result.path)
