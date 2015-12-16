@@ -61,9 +61,11 @@ define ["knockout", "gps"], (ko, Gps) ->
 				if json.event == "user-positions"
 					console.log('user-positions')
 					# Update all the markers on the map
-								#@map.updateMarkers(json.positions.features)
-				else if json.event == "new-game"
-								@game(true)
+					#@map.updateMarkers(json.positions.features)
+				else if "new_game" of json
+					@game(true)
+					location.href = "start"
+					
 		
 		# The user clicked connect
 		submitUsername: ->
