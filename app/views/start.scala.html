@@ -1,0 +1,48 @@
+@()(implicit req: RequestHeader)
+
+@main {
+
+    <div class="container">
+        <nav class="navbar navbar-default" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <span class="navbar-brand fedora-font"><img src="/assets/images/favicon.png" alt="" width="64">Treasures Hunters</span>
+            </div>
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li data-bind="ifnot: disconnected, click: disconnect"><a class="fedora-font" href="#">Disconnect</a></li>
+                </ul>
+            </div>
+        </nav>
+        <br>
+        <br>
+        <div class="container">
+        	<form>
+        		<fieldset>
+        			<legend> Nuova Partita </legend>
+        			Nome: <input type="text"/> N° giocatori <input type="number" name="quantity" min="1" max="50"> <button type="button" onclick="">Crea</button>
+        		</fieldset>
+        	</form>
+        </div>
+        <br>
+        <div class="container">
+        	<form>
+        		<fieldset>
+        			<legend> Partite in attesa </legend>
+        		</fieldset>
+        	</form>
+        </div>
+        
+    
+    
+    
+    
+    
+    
+    
+    </div>
