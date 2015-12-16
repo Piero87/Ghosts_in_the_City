@@ -37,15 +37,3 @@ class ClientConnection(username: String, upstream: ActorRef,frontendManager: Act
       }
   }
 }
-
-      /*
-      implicit val timeout = Timeout(5 seconds)
-      implicit val ec = context.dispatcher
-      frontendManager ? NewGame(name) andThen {
-        case Success(_) => 
-          managerClient = sender()
-          upstream ! NewGame(name)
-        case Failure(_) => Logger.info("Errore ClientConnection Creazione Partita")
-      }
-      */
-      //managerClient = frontendManager ? NewGame(name) //Qui mi aspetterò l'actorRef di ManagerClient con cui parlerò 

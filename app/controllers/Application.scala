@@ -26,8 +26,14 @@ class Application extends Controller {
   Logger.info("Application Started")
   
   def index = Action { implicit request =>
-    Logger.info("INDEX STARTED")
+    Logger.info("INDEX LOADED")
     Ok(views.html.index())
+    
+  }
+  
+  def start = Action { implicit request =>
+    Logger.info("START PAGE LOADED")
+    Ok(views.html.start())
     
   }
   
