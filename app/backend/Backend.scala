@@ -7,6 +7,7 @@ import akka.actor._
 import akka.cluster.MemberStatus
 import akka.cluster.Member
 import play.api.Logger
+import common._
 
 object Backend {
   
@@ -41,7 +42,7 @@ class Backend extends Actor {
       state.members.filter(_.status == MemberStatus.Up) foreach register
     case MemberUp(m) => register(m)
     
-    case NewGame(name) =>
+    case _NewGame(name) =>
       Logger.info("Backend: NewGame request")
       newGame(name)
       
@@ -50,7 +51,8 @@ class Backend extends Actor {
   def newGame (name: String) = {
     val gm_backend = context.actorOf(Props[GameManagerBackend], name = name)
     game_manager_backends = game_manager_backends :+ gm_backend
-    gm_backend forward NewGame(name)
+    Logger.info("Backend: Actor created, forward message...")
+    gm_backend forward _NewGame(name)
     
   }
   

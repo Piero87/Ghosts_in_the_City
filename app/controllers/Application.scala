@@ -11,9 +11,8 @@ import com.typesafe.config.ConfigFactory
 import akka.actor._
 import frontend.FrontendManager
 import actors.ClientConnection
-import actors.ClientConnection.ClientEvent
-
-
+import play.api.libs.json.JsValue
+import common._
 
 class Application extends Controller {
   
@@ -35,7 +34,7 @@ class Application extends Controller {
   /**
    * The WebSocket
    */
-  def stream(username: String) = WebSocket.acceptWithActor[ClientEvent, ClientEvent] { _ => upstream =>
+  def stream(username: String) = WebSocket.acceptWithActor[WebMessage, WebMessage] { _ => upstream =>
     ClientConnection.props(username,upstream,frontendManager)
   }
 //  

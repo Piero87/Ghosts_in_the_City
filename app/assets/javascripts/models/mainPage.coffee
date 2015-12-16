@@ -74,8 +74,9 @@ define ["knockout", "gps"], (ko, Gps) ->
 		newGame: ->
 			console.log("New Game")
 			@ws.send(JSON.stringify
-				event: "new-game"
-				name: "culo"
+				new_game: 
+				 name: "first match"
+				
 			)
 		
 		# Disconnect the ws
