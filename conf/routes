@@ -5,9 +5,6 @@
 # Home page
 GET     /                           controllers.Application.index
 
-# Start page
-GET     /start                          controllers.Application.start
-
 # The websocket
 GET        /stream/:username       controllers.Application.stream(username)
 
