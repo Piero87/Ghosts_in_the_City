@@ -48,12 +48,12 @@
         <div data-bind="if: connected" align="center">
         	<div data-bind="ifnot: game" align="center" class="bordered" style="max-width: 500px;">
         		<div class="container">
-        			<form data-bind="submit: newGame">
+        			<form>
         				<fieldset>
         					<legend><span class="fedora-font font-big">New Game</span></legend>
         					Name: <input type="text" data-bind="value: gamename"/> 
         					Players: <input type="number" name="quantity" min="1" max="4"> 
-        					<button class="btn fedora-font font-big" type="submit">Create</button>
+        					<button class="btn fedora-font font-big" data-bind="click: newGame">Create</button>
         				</fieldset>
         			</form>
         		</div>
