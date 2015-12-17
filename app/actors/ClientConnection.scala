@@ -29,10 +29,10 @@ class ClientConnection(username: String, upstream: ActorRef,frontendManager: Act
           val newGameResult: JsResult[NewGameJSON] = msg.validate[NewGameJSON](CommonMessages.newGameReads)
           newGameResult match {
             case s: JsSuccess[NewGameJSON] => Logger.info("Name: " + s.get.name)
-            case e: JsError => Logger.info("Ops") 
+            case e: JsError => Logger.info("Ops")
           }
         case _ =>
-          Logger.info("quello che va per la maggiore")
+          Logger.info(msg.toString())
       }
 //    case NewGame(id,name) => 
 //      Logger.info("ClientConnection: NewGame received")

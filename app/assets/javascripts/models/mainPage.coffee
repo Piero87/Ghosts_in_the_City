@@ -96,8 +96,7 @@ define ["knockout", "gps"], (ko, Gps) ->
 			console.log("New Game")
 			@ws.send(JSON.stringify
 				event: "new_game"
-				game: 
-					name: gamename
+				name: gamename
 			)
 		
 		# Games list
