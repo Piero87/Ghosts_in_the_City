@@ -4,14 +4,11 @@ import akka.actor._
 import play.api.Logger
 import common._
 
-/*
- * JSSSSSOOOOONNN
- */
-
 class GameManagerBackend () extends Actor {
   
   var gameManagerClient: ActorRef = _
   var game_name = ""
+  var game_id = java.util.UUID.randomUUID.toString
   
   def receive = {
     case NewGame(name) =>

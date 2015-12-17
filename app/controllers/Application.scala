@@ -31,20 +31,10 @@ class Application extends Controller {
     
   }
   
-  def start = Action { implicit request =>
-    Logger.info("START PAGE LOADED")
-    Ok(views.html.start())
-    
-  }
-  
   /**
    * The WebSocket
    */
   def stream(username: String) = WebSocket.acceptWithActor[WebMessage, WebMessage] { _ => upstream =>
     ClientConnection.props(username,upstream,frontendManager)
   }
-//  
-//  def createRecoverFrontendService () {
-//    actorSystem.actorOf(Props[RecoverFrontend], "recoverFrontend")
-//  }
 }

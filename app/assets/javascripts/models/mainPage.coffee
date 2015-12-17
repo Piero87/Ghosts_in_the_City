@@ -11,6 +11,12 @@ define ["knockout", "gps"], (ko, Gps) ->
 			# User name
 			@username = ko.observable()
 			
+			# Game name
+			@gamename = ko.observable()
+			
+			# Games list
+			@gameslist = ko.observable()
+			
 			# The Web Socket
 			@ws = null
 			
@@ -58,13 +64,18 @@ define ["knockout", "gps"], (ko, Gps) ->
 			@ws.onmessage = (event) =>
 				json = JSON.parse(event.data)
 				console.log(JSON.stringify(json))	
-				if json.event == "user-positions"
+				if "user-positions" of json
 					console.log('user-positions')
 					# Update all the markers on the map
 					#@map.updateMarkers(json.positions.features)
 				else if "new_game" of json
 					@game(true)
-					location.href = "start"
+					@gameid = json.new_game.id
+					localStorage.setItem("gameid", @gameid())
+					@gamename = json.new_game.name
+				else if "games_list" of json
+					console.log('games_list')
+					@gameslist = json.games_list	
 					
 		
 		# The user clicked connect
@@ -74,11 +85,20 @@ define ["knockout", "gps"], (ko, Gps) ->
 		
 		# New Game 
 		newGame: ->
+			gamename = @gamename
 			console.log("New Game")
 			@ws.send(JSON.stringify
 				new_game: 
-				 name: "first match"
-				
+					gamename: gamename
+			)
+		
+		# Games list
+		gamesList: ->
+			username = @username()
+			console.log("Games List")
+			@ws.send(JSON.stringify
+				games_list: 
+					username: username
 			)
 		
 		# Disconnect the ws
