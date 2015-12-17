@@ -46,9 +46,33 @@
         </div>
         
         <div data-bind="if: connected" align="center">
-        	<div data-bind="ifnot: game" align="center">
-        		<button class="btn fedora-font font-big" data-bind="click: newGame">New Game</button>
+        	<div data-bind="ifnot: game" align="center" class="bordered" style="max-width: 200px;">
+        		<div class="container">
+        			<form>
+        				<fieldset>
+        					<legend><span class=fedora-font">New Game</span></legend>
+        					Name: <input type="text" data-bind="value: gamename"/> Players: <input type="number" name="quantity" min="1" max="50"> <button type="button" onclick="">Create</button>
+        				</fieldset>
+        			</form>
+        		</div>
+        		<br>
+        		<div class="container">
+        			<form>
+        				<fieldset>
+        					<legend><span class=fedora-font">Ongoing games</span></legend>
+        					<div data-bind="template: { name: 'game-template', foreach: gameslist }"></div>
+        						<script type="text/html" id="game-template">
+								<h3 data-bind="text: name"></h3>
+									<div class="form-group">
+	                    							<input type="hidden" class="form-control" data-bind="value: id"/>
+	                						</div>
+								<button class="btn fedora-font font-big" data-bind="click: joinGame">Join this game!</button>
+						<hr>
+				</script>
         	</div>
+        				</fieldset>
+        			</form>
+        		</div>
         	<div data-bind="if: game" align="center">
         		<h1 class="fedora-font font-big">Nuova Partita</h1>
         		<canvas id="gameArena" width="500" height="500"></canvas>
