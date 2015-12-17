@@ -9,6 +9,7 @@ import akka.util.Timeout
 import akka.pattern.ask
 import scala.util.{Failure, Success}
 import play.api.libs.json._
+
 import common._
 
 object ClientConnection {
@@ -25,7 +26,7 @@ class ClientConnection(username: String, upstream: ActorRef,frontendManager: Act
     case msg: JsValue =>
       ((__ \ "event").read[String]).reads(msg) map {
         case "new_game" =>
-          val placeResult: JsResult[NewGame] = msg.validate[NewGame]
+          val newGameResult: JsResult[NewGame] = msg.validate[NewGame](CommonMessages.newGameReads)
       }
 //    case NewGame(id,name) => 
 //      Logger.info("ClientConnection: NewGame received")
