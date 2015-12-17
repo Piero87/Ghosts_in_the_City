@@ -50,7 +50,7 @@ define ["knockout", "gps"], (ko, Gps) ->
 			@ws.onopen = (event) =>
 				@connecting(null)
 				@connected(true)
-				@interval = setInterval(gamesList, 500)
+				@interval = setInterval(gamesList(), 500)
 				
 			# When the websocket closes
 			@ws.onclose = (event) =>
