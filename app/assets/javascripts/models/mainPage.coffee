@@ -69,17 +69,17 @@ define ["knockout", "gps"], (ko, Gps) ->
 			@ws.onmessage = (event) =>
 				json = JSON.parse(event.data)
 				console.log(JSON.stringify(json))	
-				if "user-positions" of json
-					console.log('user-positions')
+				if json.event = "user-positions"
+					console.log('User Position Received!')
 					# Update all the markers on the map
 					#@map.updateMarkers(json.positions.features)
-				else if ["new_game", "game_joined"] of json
+				else if json.event in ["new_game", "game_joined"]
 					clearInterval(@interval) if(@interval)
 					@game(true)
-					@gameid(json.new_game.id)
+					@gameid(json.game.id)
 					localStorage.setItem("gameid", @gameid())
-					@gamename(json.new_game.name)
-				else if "games_list" of json
+					@gamename(json.game.name)
+				else if json.event = "games_list"
 					console.log('games_list')
 					@gameslist.removeAll()
 					for game in json.games_list
@@ -95,8 +95,9 @@ define ["knockout", "gps"], (ko, Gps) ->
 			gamename = @gamename()
 			console.log("New Game")
 			@ws.send(JSON.stringify
-				new_game: 
-					gamename: gamename
+				event: "new_game"
+				game: 
+					name: gamename
 			)
 		
 		# Games list
@@ -104,8 +105,8 @@ define ["knockout", "gps"], (ko, Gps) ->
 			username = @username()
 			console.log("Games List")
 			@ws.send(JSON.stringify
-				games_list: 
-					username: username
+				event: "games_list"
+				list: []
 			)
 		
 		# Join Game 
@@ -113,7 +114,8 @@ define ["knockout", "gps"], (ko, Gps) ->
 			alert(gameid)
 			console.log("Join Game")
 			@ws.send(JSON.stringify
-				join_game: 
+				event: "join_game"
+				game: 
 					id: gameid
 			)
 		
