@@ -32,12 +32,12 @@
 		
         <div data-bind="if: disconnected" align="center">
         	<div class="bordered" style="max-width: 200px;">
-	            <form role="form">
+	            <form role="form" data-bind="submit: submitUsername">
 	                <div class="form-group">
 	                    <input type="text" class="form-control" data-bind="value: username" placeholder="Username"/>
+	                    <button class="btn fedora-font font-big" type="submit">Join</button>
 	                </div>
 	            </form>
-	            <button class="btn fedora-font font-big" data-bind="click: submitUsername">Join</button>
             </div>
         </div>
 
@@ -48,33 +48,27 @@
         <div data-bind="if: connected" align="center">
         	<div data-bind="ifnot: game" align="center" class="bordered" style="max-width: 200px;">
         		<div class="container">
-        			<form>
+        			<form data-bind="submit: newGame">
         				<fieldset>
-        					<legend><span class=fedora-font">New Game</span></legend>
-        					Name: <input type="text" data-bind="value: gamename"/> Players: <input type="number" name="quantity" min="1" max="50"> <button type="button" onclick="">Create</button>
+        					<legend><span class="fedora-font font-big">New Game</span></legend>
+        					Name: <input type="text" data-bind="value: gamename"/> 
+        					Players: <input type="number" name="quantity" min="1" max="4"> 
+        					<button class="btn fedora-font font-big" type="submit">Create</button>
         				</fieldset>
         			</form>
         		</div>
         		<br>
         		<div class="container">
-        			<form>
-        				<fieldset>
-        					<legend><span class=fedora-font">Ongoing games</span></legend>
-        					<div data-bind="template: { name: 'game-template', foreach: gameslist }"></div>
-        						<script type="text/html" id="game-template">
-								<h3 data-bind="text: name"></h3>
-									<div class="form-group">
-	                    							<input type="hidden" class="form-control" data-bind="value: id"/>
-	                						</div>
-								<button class="btn fedora-font font-big" data-bind="click: joinGame">Join this game!</button>
-						<hr>
-				</script>
-        	</div>
-        				</fieldset>
-        			</form>
+        			<p class="fedora-font font-big">Available Games</p>
+        			<ul data-bind="foreach: gameslist">
+					    <li>
+					        <span class="fedora-font font-big" data-bind="text: name"></span> 
+					        <button class="btn fedora-font font-big" data-bind="click: joinGame.bind($data.id)">Join this game!</button>
+					    </li>
+					</ul>
         		</div>
         	<div data-bind="if: game" align="center">
-        		<h1 class="fedora-font font-big">Nuova Partita</h1>
+        		<h1 class="fedora-font font-big" data-bind="text: gamename"></h1>
         		<canvas id="gameArena" width="500" height="500"></canvas>
         	</div>
         </div>
