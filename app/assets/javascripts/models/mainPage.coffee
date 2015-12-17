@@ -80,7 +80,7 @@ define ["knockout", "gps"], (ko, Gps) ->
 					localStorage.setItem("gameid", @gameid())
 					@gamename(json.game.name)
 				else if json.event = "games_list"
-					console.log('games_list')
+					console.log('games list received!')
 					@gameslist.removeAll()
 					for game in json.games_list
 						@gameslist.push(game)
@@ -102,7 +102,6 @@ define ["knockout", "gps"], (ko, Gps) ->
 		
 		# Games list
 		gamesList: ->
-			username = @username()
 			console.log("Games List")
 			@ws.send(JSON.stringify
 				event: "games_list"
