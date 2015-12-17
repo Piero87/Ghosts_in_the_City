@@ -26,6 +26,7 @@ class ClientConnection(username: String, upstream: ActorRef,frontendManager: Act
     case msg: JsValue =>
       ((__ \ "event").read[String]).reads(msg) map {
         case "new_game" =>
+          Logger.info("New Game request received")
           val newGameResult: JsResult[NewGameJSON] = msg.validate[NewGameJSON](CommonMessages.newGameReads)
           newGameResult match {
             case s: JsSuccess[NewGameJSON] => Logger.info("Name: " + s.get.name)
