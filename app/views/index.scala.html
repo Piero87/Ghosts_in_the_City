@@ -46,8 +46,17 @@
         </div>
         
         <div data-bind="if: connected" align="center">
-        	<div data-bind="ifnot: game" align="center">
+        	<div data-bind="ifnot: game" align="center" class="bordered" style="max-width: 200px;">
         		<button class="btn fedora-font font-big" data-bind="click: newGame">New Game</button>
+        		<div data-bind="template: { name: 'game-template', foreach: gameslist }"></div>
+        		<script type="text/html" id="game-template">
+					<h3 data-bind="text: name"></h3>
+					<div class="form-group">
+	                    <input type="hidden" class="form-control" data-bind="value: id"/>
+	                </div>
+					<button class="btn fedora-font font-big" data-bind="click: joinGame">Join this game!</button>
+					<hr>
+				</script>
         	</div>
         	<div data-bind="if: game" align="center">
         		<h1 class="fedora-font font-big">Nuova Partita</h1>
