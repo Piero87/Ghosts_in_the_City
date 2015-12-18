@@ -8,6 +8,10 @@ import akka.cluster.MemberStatus
 import akka.cluster.Member
 import play.api.Logger
 import common._
+import akka.pattern.ask
+import scala.concurrent.duration._
+import scala.concurrent.Future
+import akka.util.Timeout
 
 object Backend {
   
@@ -28,7 +32,7 @@ class Backend extends Actor {
   import Backend._
   
   val cluster = Cluster(context.system)
-  var game_manager_backends = IndexedSeq.empty[ActorRef]
+  var game_manager_backends: List[ActorRef] = List()
   
   // subscribe to cluster changes, MemberUp
   // re-subscribe when restart
@@ -43,6 +47,8 @@ class Backend extends Actor {
     case NewGame(name,n_players) =>
       Logger.info("Backend: NewGame request")
       newGame(name,n_players)
+    case GamesList =>
+      gamesList(sender)
       
   }
 
@@ -54,6 +60,22 @@ class Backend extends Actor {
     
   }
   
+  def gamesList (origin: ActorRef) = {
+    implicit val ec = context.dispatcher
+    val taskFutures: List[Future[Game]] = game_manager_backends map { gm_be =>
+        implicit val timeout = Timeout(5 seconds)
+        (gm_be ? GameStatus).mapTo[Game]
+    }
+    
+    //The call to Future.sequence is necessary to transform the List of Future[(String, Int)] into a Future of List[(String, Int)].
+    val searchFuture = Future sequence taskFutures
+    
+    searchFuture.onSuccess {
+      case results: List[Game] => origin ! results
+    }
+    
+  }
+    
   def register(member: Member): Unit =
     if (member.hasRole("frontend"))
       context.actorSelection(RootActorPath(member.address) / "user" / "frontend") !
