@@ -5,10 +5,12 @@ case class Game(id: String, name: String, n_players: Int, status: Int)
 case class GamesList(list: List[Game])
 case object GamesList
 case object GameStatus
+case class JoinGame(id: String, username: String)
 
 case class NewGameJSON(event: String, name: String, n_players: Int, source: String)
 case class GameJSON(event: String, game: Game, source: String)
 case class GamesListJSON(event: String, list: List[Game], source: String)
+case class JoinGameJSON(event: String, id: String)
 
 import play.api.libs.json._
 
@@ -25,6 +27,9 @@ object CommonMessages {
   
   implicit val gamesListReads = Json.reads[GamesListJSON]
   implicit val gamesListWrites = Json.writes[GamesListJSON]
+  
+  implicit val joinGameReads = Json.reads[JoinGameJSON]
+  implicit val joinGameWrites = Json.writes[JoinGameJSON]
   
   //SCRIVI
   //val json = Json.toJson(place)
