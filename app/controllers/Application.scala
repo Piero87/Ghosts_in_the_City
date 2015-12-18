@@ -33,7 +33,7 @@ class Application extends Controller {
   /**
    * The WebSocket
    */
-  def stream(username: String) = WebSocket.acceptWithActor[JsValue, JsValue] { _ => upstream =>
-    ClientConnection.props(username,upstream,frontendManager)
+  def stream(username: String, uuid: String) = WebSocket.acceptWithActor[JsValue, JsValue] { _ => upstream =>
+    ClientConnection.props(username,uuid,upstream,frontendManager)
   }
 }

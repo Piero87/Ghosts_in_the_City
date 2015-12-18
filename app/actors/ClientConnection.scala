@@ -14,11 +14,11 @@ import common._
 
 object ClientConnection {
   
-  def props(username: String, upstream: ActorRef, frontend: ActorRef) = Props(new ClientConnection(username,upstream,frontend))
+  def props(username: String, uuid: String, upstream: ActorRef, frontend: ActorRef) = Props(new ClientConnection(username,uuid,upstream,frontend))
   
 }
 
-class ClientConnection(username: String, upstream: ActorRef,frontendManager: ActorRef) extends Actor {
+class ClientConnection(username: String, uuid: String, upstream: ActorRef,frontendManager: ActorRef) extends Actor {
   
   var gameManagerClient: ActorRef = _
   
