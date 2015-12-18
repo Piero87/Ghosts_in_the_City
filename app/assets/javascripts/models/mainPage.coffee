@@ -23,6 +23,7 @@ define ["knockout", "gps"], (ko, Gps) ->
 			@interval = null
 			
 			# Games list
+			@gamesavailable = ko.observable(false)
 			@gameslist = ko.observableArray()
 			
 			# The Web Socket
@@ -81,8 +82,12 @@ define ["knockout", "gps"], (ko, Gps) ->
 				else if json.event = "games_list"
 					console.log('Games list received!')
 					@gameslist.removeAll()
-					for game in json.games_list
-						@gameslist.push(game)
+					if json.games_list.length > 0
+						@gamesavailable(true)
+						for game in json.games_list
+							@gameslist.push(game)
+					else
+						@gamesavailable(false)
 				else if json.event = "game_ready"
 					console.log('Ready!')
 					clearInterval(@interval) if(@interval)

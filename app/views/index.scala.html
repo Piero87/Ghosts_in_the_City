@@ -41,8 +41,8 @@
             </div>
         </div>
 
-        <div data-bind="if: connecting">
-            <span data-bind="text: connecting" class="font-big">Connecting...</span>
+        <div data-bind="if: connecting" align="center">
+            <span data-bind="text: connecting" class="ghostbuster-font font-big">Connecting...</span>
         </div>
         
         <div data-bind="if: connected" align="center">
@@ -50,7 +50,7 @@
         		<div class="container">
         			<form>
         				<fieldset>
-        					<legend><span class="ghostbuster-font font-big">New Game</span></legend>
+        					<legend><span class="ghostbuster-font font-big">Create New Game</span></legend>
         					Name: <input type="text" data-bind="value: gamename" placeholder="Game name"/> 
         					Players: <input type="number" name="quantity" min="2" max="8" step="2" value="4" data-bind="value: gameplayers"> 
         					<button class="btn ghostbuster-font font-big" data-bind="click: newGame">Create New Game</button>
@@ -59,7 +59,7 @@
         		</div>
         		<br>
         		<hr>
-        		<div class="container">
+        		<div class="container" data-bind="if: gamesavailable">
         			<p class="ghostbuster-font font-big">Available Games</p>
         			<ul data-bind="foreach: gameslist">
 					    <li>
@@ -67,6 +67,9 @@
 					        <button class="btn ghostbuster-font font-big" data-bind="click: joinGame.bind($data.id)">Join this game!</button>
 					    </li>
 					</ul>
+        		</div>
+        		<div class="container" data-bind="ifnot: gamesavailable">
+        			<p class="ghostbuster-font font-big"><i>there are no games available</i></p>
         		</div>
         	</div>
         	<div data-bind="if: gameready" align="center">
