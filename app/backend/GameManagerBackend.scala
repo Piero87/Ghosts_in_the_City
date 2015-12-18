@@ -17,7 +17,7 @@ class GameManagerBackend () extends Actor {
       game_name = name
       game_n_players = n_players
       gameManagerClient = sender()
-      sender() ! Game(game_id,name,n_players)
+      gameManagerClient ! Game(game_id,name,n_players)
   }
   
   def newGame () = {
