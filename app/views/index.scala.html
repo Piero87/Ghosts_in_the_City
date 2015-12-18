@@ -11,11 +11,11 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <span class="navbar-brand fedora-font"><img src="/assets/images/favicon.png" alt="" width="64">Treasures Hunters</span>
+                <span class="navbar-brand ghostbuster-font text-black"><img src="/assets/images/favicon.png" alt="" width="64">Gh<span class="text-red">O</span>sts in the City</span>
             </div>
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav navbar-right">
-                    <li data-bind="ifnot: disconnected, click: disconnect"><a class="fedora-font" href="#">Disconnect</a></li>
+                    <li data-bind="ifnot: disconnected, click: disconnect"><a class="ghostbuster-font" href="#">Disconnect</a></li>
                 </ul>
             </div>
         </nav>
@@ -28,14 +28,14 @@
 			<img src="/assets/images/ghost_right.png" alt="" width="64">
 		</div>
 		
-		<audio src="/assets/images/Indy.mp3" preload="auto" autoplay="autoplay"></audio>
+		<audio src="/assets/images/Ghostbusters_8bit.mp3" preload="auto" autoplay="autoplay"></audio>
 		
         <div data-bind="if: disconnected" align="center">
         	<div class="bordered" style="max-width: 200px;">
 	            <form role="form" data-bind="submit: submitUsername">
 	                <div class="form-group">
 	                    <input type="text" class="form-control" data-bind="value: username" placeholder="Username"/>
-	                    <button class="btn fedora-font font-big" type="submit">Join</button>
+	                    <button class="btn ghostbuster-font font-big" type="submit">Join</button>
 	                </div>
 	            </form>
             </div>
@@ -50,25 +50,25 @@
         		<div class="container">
         			<form>
         				<fieldset>
-        					<legend><span class="fedora-font font-big">New Game</span></legend>
+        					<legend><span class="ghostbuster-font font-big">New Game</span></legend>
         					Name: <input type="text" data-bind="value: gamename"/> 
         					Players: <input type="number" name="quantity" min="1" max="4"> 
-        					<button class="btn fedora-font font-big" data-bind="click: newGame">Create</button>
+        					<button class="btn ghostbuster-font font-big" data-bind="click: newGame">Create</button>
         				</fieldset>
         			</form>
         		</div>
         		<br>
         		<div class="container">
-        			<p class="fedora-font font-big">Available Games</p>
+        			<p class="ghostbuster-font font-big">Available Games</p>
         			<ul data-bind="foreach: gameslist">
 					    <li>
-					        <span class="fedora-font font-big" data-bind="text: name"></span> 
-					        <button class="btn fedora-font font-big" data-bind="click: joinGame.bind($data.id)">Join this game!</button>
+					        <span class="ghostbuster-font font-big" data-bind="text: name"></span> 
+					        <button class="btn ghostbuster-font font-big" data-bind="click: joinGame.bind($data.id)">Join this game!</button>
 					    </li>
 					</ul>
         		</div>
         	<div data-bind="if: game" align="center">
-        		<h1 class="fedora-font font-big" data-bind="text: gamename"></h1>
+        		<h1 class="ghostbuster-font font-big" data-bind="text: gamename"></h1>
         		<canvas id="gameArena" width="500" height="500"></canvas>
         	</div>
         </div>
