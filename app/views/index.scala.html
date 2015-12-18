@@ -15,7 +15,8 @@
             </div>
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav navbar-right">
-                    <li data-bind="ifnot: disconnected, click: disconnect"><a class="ghostbuster-font" href="#">Disconnect</a></li>
+                	<li data-bind="ifnot: disconnected"><a class="ghostbuster-font" href="javascript:void(0);">Hello <span data-bind="text: username"></span>!</a></li>
+                    <li data-bind="ifnot: disconnected, click: disconnect"><a class="ghostbuster-font" href="javascript:void(0);">Disconnect</a></li>
                 </ul>
             </div>
         </nav>
@@ -28,7 +29,7 @@
 			<img src="/assets/images/ghost_right.png" alt="" width="64">
 		</div>
 		 -->
-		<div align="center" style="margin-bottom:20px;">
+		<div align="center" style="margin-bottom:20px;" data-bind="ifnot: gamestarted">
 			<img src="/assets/images/Ghostbuster_banner.png" alt="" height="128">
 		</div>
 		<audio src="/assets/images/Ghostbusters_8bit.mp3" preload="auto" autoplay="autoplay"></audio>
@@ -54,13 +55,12 @@
         			<form>
         				<fieldset>
         					<legend><span class="ghostbuster-font font-big">Create New Game</span></legend>
-        					Name: <input type="text" data-bind="value: gamename" placeholder="Game name"/> 
-        					Players: <input type="number" name="quantity" min="2" max="8" step="2" value="4" data-bind="value: gameplayers"> 
+        					<span class="ghostbuster-font">Game Name:</span> <input type="text" data-bind="value: gamename"/> 
+        					<span class="ghostbuster-font">Players:</span> <input type="number" name="quantity" min="2" max="8" step="2" value="4" data-bind="value: gameplayers"> 
         					<button class="btn ghostbuster-font font-big" data-bind="click: newGame">Create New Game</button>
         				</fieldset>
         			</form>
         		</div>
-        		<br>
         		<hr>
         		<div class="container" data-bind="if: gamesavailable">
         			<p class="ghostbuster-font font-big">Available Games</p>
