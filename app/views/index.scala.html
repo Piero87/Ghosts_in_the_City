@@ -67,7 +67,7 @@
         			<ul data-bind="foreach: gameslist">
 					    <li>
 					        <span class="ghostbuster-font font-big" data-bind="text: name"></span> 
-					        <button class="btn ghostbuster-font font-big" data-bind="click: joinGame.bind($data.id)">Join this game!</button>
+					        <button class="btn ghostbuster-font font-big" data-bind="click: function(data, event) { joinGame(id(), data, event) }">Join this game!</button>
 					    </li>
 					</ul>
         		</div>
