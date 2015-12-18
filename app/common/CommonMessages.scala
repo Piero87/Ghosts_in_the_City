@@ -1,10 +1,11 @@
 package common
 
-case class NewGame(name: String)
-case class Game(id: Long, name: String)
+case class NewGame(name: String, n_players: Int)
+case class Game(id: String, name: String, n_players: Int)
 case class GamesList(list: Seq[Game])
 
-case class NewGameJSON(event: String, name: String)
+case class NewGameJSON(event: String, name: String, n_players: Int)
+case class GameJSON(event: String, game: Game)
 case class GamesListJSON(event: String, list: Seq[Game])
 
 import play.api.libs.json._
@@ -13,6 +14,9 @@ object CommonMessages {
 
   implicit val gameReads = Json.reads[Game]
   implicit val gameWrites = Json.writes[Game]
+  
+  implicit val gameJSONReads = Json.reads[GameJSON]
+  implicit val gameJSONWrites = Json.writes[GameJSON]
   
   implicit val newGameReads = Json.reads[NewGameJSON]
   implicit val newGameWrites = Json.writes[NewGameJSON]

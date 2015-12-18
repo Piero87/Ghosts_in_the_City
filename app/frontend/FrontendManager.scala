@@ -16,9 +16,9 @@ class FrontendManager extends Actor {
 //    case EnterMatch(username) if backends.isEmpty =>
 //      sender() ! JobFailed("Service unavailable, try again later", job)
 
-    case NewGame(name) =>
+    case NewGame(name,n_players) =>
       Logger.info("FrontendManager: NewGame request")
-      newGame(name)
+      newGame(name,n_players)
       
     case "BackendRegistration" if !backends.contains(sender()) =>
       Logger.info("Backend Received "+sender.path)
@@ -28,13 +28,13 @@ class FrontendManager extends Actor {
       backends = backends.filterNot(_ == a)
   }
   
-  def newGame (name: String) = {
+  def newGame (name: String,n_players: Int) = {
     backendCounter += 1
     var b = backends(backendCounter % backends.size)
     val gm_client = context.actorOf(Props(new GameManagerClient(b)), name = name)
     game_manager_frontends = game_manager_frontends :+ gm_client
     Logger.info("FrontendManager: Backend selected and Actor created, forward message...")
-    gm_client forward NewGame(name)
+    gm_client forward NewGame(name,n_players)
     
   }
 }
