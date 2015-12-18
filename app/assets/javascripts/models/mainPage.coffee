@@ -128,7 +128,7 @@ define ["knockout", "gps"], (ko, Gps) ->
 				event: "new_game"
 				source: username
 				name: gamename
-				n_players: gameplayers
+				n_players: parseInt( gameplayers, 10 )
 			)
 		
 		# Games list
