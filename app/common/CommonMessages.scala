@@ -1,8 +1,10 @@
 package common
 
 case class NewGame(name: String, n_players: Int)
-case class Game(id: String, name: String, n_players: Int)
-case class GamesList(list: Seq[Game])
+case class Game(id: String, name: String, n_players: Int, status: Int)
+case class GamesList(list: List[Game])
+case object GamesList
+case object GameStatus
 
 case class NewGameJSON(event: String, name: String, n_players: Int)
 case class GameJSON(event: String, game: Game)
