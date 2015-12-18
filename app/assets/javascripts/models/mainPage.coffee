@@ -8,16 +8,20 @@ define ["knockout", "gps"], (ko, Gps) ->
 	class MainPageModel
 		constructor: () ->
 		
-			# User name
+			# User data
+			@uuid
 			@username = ko.observable()
 			
 			# Game data
 			@gameready = ko.observable(false)
 			@gamestarted = ko.observable(false)
+			@gamepaused = ko.observable(false)
 			@gameended  = ko.observable(false)
 			@gameid = ko.observable()
 			@gamename = ko.observable()
-			@gameplayers = ko.observable()
+			@gamemaxplayers = ko.observable(0)
+			@gamewaitingforplayers = ko.observable(0)
+			@gameplayers = ko.observableArray()
 			
 			# Interval to send a lot of request for available games
 			@interval = null
@@ -38,16 +42,18 @@ define ["knockout", "gps"], (ko, Gps) ->
 			# Load previously user name if set
 			if localStorage.username
 				@username(localStorage.username)
+				@uuid = localStorage.uuid
 				@connect()
 		
 		# Connect
 		connect: ->
+			@uuid = generateUUID
 			username = @username()
 			@connecting("Connecting...")
 			@disconnected(null)
 			
 			# Open Web Socket
-			@ws = new WebSocket(jsRoutes.controllers.Application.stream(username).webSocketURL())
+			@ws = new WebSocket(jsRoutes.controllers.Application.stream(@uuid, username).webSocketURL())
 			
 			# When the websocket opens
 			@ws.onopen = (event) =>
@@ -69,6 +75,7 @@ define ["knockout", "gps"], (ko, Gps) ->
 					@disconnected(true)
 					@connected(false)
 					@closing = false
+					localStorage.removeItem("uuid")
 					localStorage.removeItem("username")
 			
 			# Handle the stream
@@ -95,40 +102,77 @@ define ["knockout", "gps"], (ko, Gps) ->
 					@gameid(json.game.id)
 					localStorage.setItem("gameid", @gameid())
 					@gamename(json.game.name)
-					@gameplayers(json.game.n_players)
+					@gamemaxplayers(json.game.n_players)
 					# Update status variables
 					@gameready(true)
 					@gamestarted(false)
 					@gameended(false)
-				else if json.event == "game_start"
-					console.log('Fight!')
-					# Update status variables
-					@gameready(false)
-					@gamestarted(true)
-					@gameended(false)
-				else if json.event == "game_over"
-					console.log('Game Over!')
-					# Update status variables
-					@gameready(false)
-					@gamestarted(false)
-					@gameended(true)
+				else if json.event == "game_status"
+					# {event: "game_status", game: {id: [Int], name: [String], n_players: [Int], players [Array of String], status: [Int]}}
+					switch json.game.status
+						when 0 # game waiting
+							console.log('Wait!')
+							
+							# Set system status variables
+							@gameready(true)
+							@gamestarted(false)
+							@gamepaused(false)
+							@gameended(false)
+							
+							# Compute missing players
+							@gamemaxplayers(json.game.n_players)
+							@gamewaitingforplayers(json.game.n_players - json.game.players.length)
+							@gameplayers.removeAll()
+							if json.game.players.length > 0
+								for player in json.game.players
+									@gameplayers.push(player)
+						when 1 # game started
+							console.log('Fight!')
+							
+							# Set system status variables
+							@gameready(false)
+							@gamestarted(true)
+							@gamepaused(false)
+							@gameended(false)
+							
+							@gameplayers.removeAll()
+							if json.game.players.length > 0
+								for player in json.game.players
+									@gameplayers.push(player)
+							
+						when 2 # game paused
+							console.log('Hold on!')
+							@gameready(false)
+							@gamestarted(false)
+							@gamepaused(true)
+							@gameended(false)
+						when 3 # game ended
+							console.log('Game Over!')
+							
+							localStorage.removeItem("gameid")
+							
+							@gameready(false)
+							@gamestarted(false)
+							@gamepaused(false)
+							@gameended(true)
 		
 		# The user clicked connect
 		submitUsername: ->
 			localStorage.setItem("username", @username())
+			localStorage.setItem("uuid", @uuid)
 			@connect()
 		
 		# New Game 
 		newGame: ->
 			username = @username()
 			gamename = @gamename()
-			gameplayers = @gameplayers()
+			gamemaxplayers = @gamemaxplayers()
 			console.log("New Game")
 			@ws.send(JSON.stringify
 				event: "new_game"
 				source: username
 				name: gamename
-				n_players: parseInt( gameplayers, 10 )
+				n_players: parseInt( gamemaxplayers, 10 )
 			)
 		
 		# Games list
@@ -156,6 +200,15 @@ define ["knockout", "gps"], (ko, Gps) ->
 		disconnect: ->
 			@closing = true
 			@ws.close()
+		
+		generateUUID = ->
+			d = (new Date).getTime()
+			uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) ->
+				r = (d + Math.random() * 16) % 16 | 0
+				d = Math.floor(d / 16)
+				(if c == 'x' then r else r & 0x3 | 0x8).toString 16
+			)
+			uuid
 							
 	return MainPageModel
 

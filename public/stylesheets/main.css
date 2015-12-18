@@ -3,6 +3,10 @@
 	line-height: 60px;
 }
 
+.font-medium {
+	font-size: 15px;
+}
+
 .font-big {
 	font-size: 20px;
 }
