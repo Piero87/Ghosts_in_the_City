@@ -26,12 +26,26 @@ class ClientConnection(username: String, upstream: ActorRef,frontendManager: Act
     case msg: JsValue =>
       ((__ \ "event").read[String]).reads(msg) map {
         case "new_game" =>
-          Logger.info("New Game request received")
+          Logger.info("ClientConnection: NewGame received")
+          implicit val timeout = Timeout(5 seconds)
+          implicit val ec = context.dispatcher
           val newGameResult: JsResult[NewGameJSON] = msg.validate[NewGameJSON](CommonMessages.newGameReads)
           newGameResult match {
-            case s: JsSuccess[NewGameJSON] => Logger.info("Name: " + s.get.name)
+            case s: JsSuccess[NewGameJSON] => 
+              val future = frontendManager ? NewGame(s.get.name.replaceAll(" ", "_")+"_"+System.currentTimeMillis(),s.get.n_players)
+              future.onSuccess {
+                case Game(id,name,n_players) => 
+                  Logger.info ("ClientConnection: Frontend Game Manager path: "+sender.path)
+                  gameManagerClient = sender
+                  var g = new Game(id,name,n_players)
+                  var g_json = new GameJSON("game_ready",g)
+                  val json = Json.toJson(g_json)(CommonMessages.gameJSONWrites)
+                  upstream ! json
+              }
             case e: JsError => Logger.info("Ops")
           }
+          
+          
         case _ =>
           Logger.info(msg.toString())
       }

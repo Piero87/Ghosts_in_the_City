@@ -25,18 +25,18 @@ class GameManagerClient (backend: ActorRef) extends Actor {
   var game_name = ""
   
   def receive = {
-    case NewGame(name) =>
+    case NewGame(name,n_players) =>
       Logger.info("GameManagerClient: NewGame request")
       game_name = name
       clientConnection = sender()
-      sender() ! self
       implicit val timeout = Timeout(5 seconds)
       implicit val ec = context.dispatcher
-      val future = backend ? NewGame(name)
+      val future = backend ? NewGame(name,n_players)
       future.onSuccess { 
-        case result: ActorRef => 
-          Logger.info ("result: "+result.path)
-          gameManagerBackend = result
+        case Game(id,name,n_players) => 
+          Logger.info ("GameManagerClient: Backend Game Manager path: "+sender.path)
+          gameManagerBackend = sender
+          clientConnection ! Game(id,name,n_players)
       }
       future onFailure {
         case e: Exception => Logger.info("****** ERRORE ******")
