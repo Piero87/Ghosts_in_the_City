@@ -12,8 +12,12 @@ define ["knockout", "gps"], (ko, Gps) ->
 			@username = ko.observable()
 			
 			# Game data
+			@gameready = ko.observable(false)
+			@gamestarted = ko.observable(false)
+			@gameended  = ko.observable(false)
 			@gameid = ko.observable()
 			@gamename = ko.observable()
+			@gameplayers = ko.observable()
 			
 			# Interval to send a lot of request for available games
 			@interval = null
@@ -29,8 +33,6 @@ define ["knockout", "gps"], (ko, Gps) ->
 			
 			@connecting = ko.observable()
 			@closing = false
-			
-			@game = ko.observable(false)
 			
 			# Load previously user name if set
 			if localStorage.username
@@ -76,17 +78,35 @@ define ["knockout", "gps"], (ko, Gps) ->
 					console.log('User Position Received!')
 					# Update all the markers on the map
 					#@map.updateMarkers(json.positions.features)
-				else if json.event in ["new_game", "game_joined"]
-					clearInterval(@interval) if(@interval)
-					@game(true)
-					@gameid(json.game.id)
-					localStorage.setItem("gameid", @gameid())
-					@gamename(json.game.name)
 				else if json.event = "games_list"
-					console.log('games list received!')
+					console.log('Games list received!')
 					@gameslist.removeAll()
 					for game in json.games_list
 						@gameslist.push(game)
+				else if json.event = "game_ready"
+					console.log('Ready!')
+					clearInterval(@interval) if(@interval)
+					@gameready(true)
+					@gameid(json.game.id)
+					localStorage.setItem("gameid", @gameid())
+					@gamename(json.game.name)
+					@gameplayers(json.game.n_players)
+					# Update status variables
+					@gameready(true)
+					@gamestarted(false)
+					@gameended(false)
+				else if json.event = "game_start"
+					console.log('Fight!')
+					# Update status variables
+					@gameready(false)
+					@gamestarted(true)
+					@gameended(false)
+				else if json.event = "game_over"
+					console.log('Game Over!')
+					# Update status variables
+					@gameready(false)
+					@gamestarted(false)
+					@gameended(true)
 		
 		# The user clicked connect
 		submitUsername: ->
@@ -96,10 +116,12 @@ define ["knockout", "gps"], (ko, Gps) ->
 		# New Game 
 		newGame: ->
 			gamename = @gamename()
+			gameplayers = @gameplayers()
 			console.log("New Game")
 			@ws.send(JSON.stringify
 				event: "new_game"
 				name: gamename
+				n_players: gameplayers
 			)
 		
 		# Games list

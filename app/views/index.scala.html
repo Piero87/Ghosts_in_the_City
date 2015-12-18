@@ -46,18 +46,19 @@
         </div>
         
         <div data-bind="if: connected" align="center">
-        	<div data-bind="ifnot: game" align="center" class="bordered" style="max-width: 500px;">
+        	<div data-bind="if: (!gameready() && !gamestarted() && !gameended())" align="center" class="bordered" style="max-width: 500px;">
         		<div class="container">
         			<form>
         				<fieldset>
         					<legend><span class="ghostbuster-font font-big">New Game</span></legend>
-        					Name: <input type="text" data-bind="value: gamename"/> 
-        					Players: <input type="number" name="quantity" min="1" max="4"> 
-        					<button class="btn ghostbuster-font font-big" data-bind="click: newGame">Create</button>
+        					Name: <input type="text" data-bind="value: gamename" placeholder="Game name"/> 
+        					Players: <input type="number" name="quantity" min="2" max="8" step="2" value="4" data-bind="value: gameplayers"> 
+        					<button class="btn ghostbuster-font font-big" data-bind="click: newGame">Create New Game</button>
         				</fieldset>
         			</form>
         		</div>
         		<br>
+        		<hr>
         		<div class="container">
         			<p class="ghostbuster-font font-big">Available Games</p>
         			<ul data-bind="foreach: gameslist">
@@ -67,10 +68,17 @@
 					    </li>
 					</ul>
         		</div>
-        	<div data-bind="if: game" align="center">
-        		<h1 class="ghostbuster-font font-big" data-bind="text: gamename"></h1>
-        		<canvas id="gameArena" width="500" height="500"></canvas>
         	</div>
-        </div>
-    </div>
+        	<div data-bind="if: gameready" align="center">
+	        	<h1 class="ghostbuster-font font-big">You have joined the game "<span data-bind="text: gamename"></span>"</h1>
+	        	<p class="ghostbuster-font">waiting for other players...</p>
+	        </div>
+	        <div data-bind="if: gamestarted" align="center">
+	        	<h1 class="ghostbuster-font font-big" data-bind="text: gamename"></h1>
+	        	<canvas id="gameArena" width="500" height="500"></canvas>
+	        </div>
+	        <div data-bind="if: gameended" align="center">
+	        	<h1 class="ghostbuster-font font-huge">GAME OVER</h1>
+	        </div>
+    	</div>
 }

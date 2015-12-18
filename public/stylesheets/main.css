@@ -7,6 +7,10 @@
 	font-size: 20px;
 }
 
+.font-huge {
+	font-size: 60px;
+}
+
 .text-black {
 	color: black !important;
 }
