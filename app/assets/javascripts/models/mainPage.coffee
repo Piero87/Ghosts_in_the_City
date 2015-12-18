@@ -53,7 +53,7 @@ define ["knockout", "gps"], (ko, Gps) ->
 			@disconnected(null)
 			
 			# Open Web Socket
-			@ws = new WebSocket(jsRoutes.controllers.Application.stream(@uuid, username).webSocketURL())
+			@ws = new WebSocket(jsRoutes.controllers.Application.stream(username, @uuid()).webSocketURL())
 			
 			# When the websocket opens
 			@ws.onopen = (event) =>
