@@ -75,11 +75,11 @@ define ["knockout", "gps"], (ko, Gps) ->
 			@ws.onmessage = (event) =>
 				json = JSON.parse(event.data)
 				console.log(JSON.stringify(json))	
-				if json.event = "user-positions"
+				if json.event == "user-positions"
 					console.log('User Position Received!')
 					# Update all the markers on the map
 					#@map.updateMarkers(json.positions.features)
-				else if json.event = "games_list"
+				else if json.event == "games_list"
 					console.log('Games list received!')
 					@gameslist.removeAll()
 					if json.games_list.length > 0
@@ -88,7 +88,7 @@ define ["knockout", "gps"], (ko, Gps) ->
 							@gameslist.push(game)
 					else
 						@gamesavailable(false)
-				else if json.event = "game_ready"
+				else if json.event == "game_ready"
 					console.log('Ready!')
 					clearInterval(@interval) if(@interval)
 					@gameready(true)
@@ -100,13 +100,13 @@ define ["knockout", "gps"], (ko, Gps) ->
 					@gameready(true)
 					@gamestarted(false)
 					@gameended(false)
-				else if json.event = "game_start"
+				else if json.event == "game_start"
 					console.log('Fight!')
 					# Update status variables
 					@gameready(false)
 					@gamestarted(true)
 					@gameended(false)
-				else if json.event = "game_over"
+				else if json.event == "game_over"
 					console.log('Game Over!')
 					# Update status variables
 					@gameready(false)
@@ -120,29 +120,34 @@ define ["knockout", "gps"], (ko, Gps) ->
 		
 		# New Game 
 		newGame: ->
+			username = @username()
 			gamename = @gamename()
 			gameplayers = @gameplayers()
 			console.log("New Game")
 			@ws.send(JSON.stringify
 				event: "new_game"
+				source: username
 				name: gamename
 				n_players: gameplayers
 			)
 		
 		# Games list
 		gamesList: ->
+			username = @username()
 			console.log("Games List")
 			@ws.send(JSON.stringify
 				event: "games_list"
+				source: username
 				list: []
 			)
 		
 		# Join Game 
 		joinGame: (gameid) ->
-			alert(gameid)
+			username = @username()
 			console.log("Join Game")
 			@ws.send(JSON.stringify
 				event: "join_game"
+				source: username
 				game: 
 					id: gameid
 			)

@@ -6,9 +6,9 @@ case class GamesList(list: List[Game])
 case object GamesList
 case object GameStatus
 
-case class NewGameJSON(event: String, name: String, n_players: Int)
-case class GameJSON(event: String, game: Game)
-case class GamesListJSON(event: String, list: Seq[Game])
+case class NewGameJSON(event: String, name: String, n_players: Int, source: String)
+case class GameJSON(event: String, game: Game, source: String)
+case class GamesListJSON(event: String, list: List[Game], source: String)
 
 import play.api.libs.json._
 
