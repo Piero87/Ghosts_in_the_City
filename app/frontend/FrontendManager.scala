@@ -4,10 +4,14 @@ import akka.actor._
 import play.api.Logger
 import akka.util.Timeout
 import common._
+import akka.pattern.ask
+import scala.concurrent.duration._
+import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 class FrontendManager extends Actor {
   
-  var backends = IndexedSeq.empty[ActorRef]
+  var backends: List[ActorRef] = List()
   var game_manager_frontends = IndexedSeq.empty[ActorRef]
   
   var backendCounter = 0
@@ -19,7 +23,9 @@ class FrontendManager extends Actor {
     case NewGame(name,n_players) =>
       Logger.info("FrontendManager: NewGame request")
       newGame(name,n_players)
-      
+    case GamesList =>
+      //backends foreach register
+      gamesList(sender)
     case "BackendRegistration" if !backends.contains(sender()) =>
       Logger.info("Backend Received "+sender.path)
       context watch sender()
@@ -35,6 +41,19 @@ class FrontendManager extends Actor {
     game_manager_frontends = game_manager_frontends :+ gm_client
     Logger.info("FrontendManager: Backend selected and Actor created, forward message...")
     gm_client forward NewGame(name,n_players)
+  }
+  
+  def gamesList (origin: ActorRef) = {
     
+    val taskFutures: List[Future[List[Game]]] = backends map { be =>
+        implicit val timeout = Timeout(5 seconds)
+        (be ? GamesList).mapTo[List[Game]]
+    }
+    implicit val ec = context.dispatcher
+    val searchFuture = Future sequence taskFutures
+    
+     searchFuture.onSuccess {
+      case results: List[List[Game]] => origin ! GamesList(results.flatten)
+    }
   }
 }
