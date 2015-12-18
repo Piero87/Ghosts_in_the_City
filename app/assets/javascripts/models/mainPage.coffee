@@ -82,9 +82,9 @@ define ["knockout", "gps"], (ko, Gps) ->
 				else if json.event == "games_list"
 					console.log('Games list received!')
 					@gameslist.removeAll()
-					if json.games_list.length > 0
+					if json.list.length > 0
 						@gamesavailable(true)
-						for game in json.games_list
+						for game in json.list
 							@gameslist.push(game)
 					else
 						@gamesavailable(false)

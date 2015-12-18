@@ -42,7 +42,9 @@ class ClientConnection(username: String, upstream: ActorRef,frontendManager: Act
                   val json = Json.toJson(g_json)(CommonMessages.gameJSONWrites)
                   upstream ! json
               }
-            case e: JsError => Logger.info("Ops")
+            case e: JsError => 
+              Logger.info("Ops")
+              Logger.info(e.toString())
           }
           
         case "games_list" =>
@@ -51,7 +53,7 @@ class ClientConnection(username: String, upstream: ActorRef,frontendManager: Act
           val future = frontendManager ? GamesList
           future.onSuccess {
             case GamesList(list) => 
-              var games_list_json = new GamesListJSON("game_ready",list,"")
+              var games_list_json = new GamesListJSON("games_list",list,"")
               val json = Json.toJson(games_list_json)(CommonMessages.gamesListWrites)
               upstream ! json
           }
