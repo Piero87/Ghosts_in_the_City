@@ -49,19 +49,5 @@ class ClientConnection(username: String, upstream: ActorRef,frontendManager: Act
         case _ =>
           Logger.info(msg.toString())
       }
-//    case NewGame(id,name) => 
-//      Logger.info("ClientConnection: NewGame received")
-//      implicit val timeout = Timeout(5 seconds)
-//      implicit val ec = context.dispatcher
-//      val future = frontendManager ? NewGame(id,name.replaceAll(" ", "_")+"_"+System.currentTimeMillis())
-//      future.onSuccess { 
-//        case result: ActorRef => 
-//          Logger.info ("ClientConnection NewGame result: "+result.path)
-//          gameManagerClient = result
-//          upstream ! NewGame(id,name)
-//      }
-//      future onFailure {
-//        case e: Exception => Logger.info("****** ERRORE ******")
-//      }
   }
 }
