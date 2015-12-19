@@ -21,35 +21,32 @@ object ClientConnection {
 class ClientConnection(username: String, uuid: String, upstream: ActorRef,frontendManager: ActorRef) extends Actor {
   
   var gameManagerClient: ActorRef = _
+  implicit val timeout = Timeout(5 seconds)
+  implicit val ec = context.dispatcher
   
   def receive = {
     case msg: JsValue =>
       Logger.info(msg.toString())
       ((__ \ "event").read[String]).reads(msg) map {
         case "new_game" =>
-          implicit val timeout = Timeout(5 seconds)
-          implicit val ec = context.dispatcher
           val newGameResult: JsResult[NewGameJSON] = msg.validate[NewGameJSON](CommonMessages.newGameReads)
           newGameResult match {
             case s: JsSuccess[NewGameJSON] => 
-              val future = frontendManager ? NewGame(s.get.name.replaceAll(" ", "_")+"_"+System.currentTimeMillis(),s.get.n_players)
+              val future = frontendManager ? NewGame(s.get.name.replaceAll(" ", "_")+"_"+System.currentTimeMillis(),s.get.n_players,uuid,username)
               future.onSuccess {
-                case Game(id,name,n_players,status) => 
+                case Game(id,name,n_players,status,players) => 
                   Logger.info ("ClientConnection: Frontend Game Manager path: "+sender.path)
                   gameManagerClient = sender
-                  var g = new Game(id,name,n_players,status)
+                  var g = new Game(id,name,n_players,status,players)
                   var g_json = new GameJSON("game_ready",g,"")
                   val json = Json.toJson(g_json)(CommonMessages.gameJSONWrites)
                   upstream ! json
               }
             case e: JsError => 
-              Logger.info("Ops")
-              Logger.info(e.toString())
+              Logger.info("Ops NewGame: "+e.toString())
           }
           
         case "games_list" =>
-          implicit val timeout = Timeout(5 seconds)
-          implicit val ec = context.dispatcher
           val future = frontendManager ? GamesList
           future.onSuccess {
             case GamesList(list) => 
@@ -57,6 +54,27 @@ class ClientConnection(username: String, uuid: String, upstream: ActorRef,fronte
               val json = Json.toJson(games_list_json)(CommonMessages.gamesListWrites)
               upstream ! json
           }
+        case "join_game" =>
+          val joinGameResult: JsResult[JoinGameJSON] = msg.validate[JoinGameJSON](CommonMessages.joinGameReads)
+          joinGameResult match {
+            case s: JsSuccess[JoinGameJSON] =>
+              val future = frontendManager ? JoinGame(s.get.id,username,uuid)
+              future.onSuccess {
+                case Game(id,name,n_players,status,players) => 
+                  Logger.info ("ClientConnection: Frontend Game Manager path: "+sender.path)
+                  var g = new Game(id,name,n_players,status,players)
+                  var g_json = new GameJSON("game_ready",g,"")
+                  val json = Json.toJson(g_json)(CommonMessages.gameJSONWrites)
+                  upstream ! json
+              }
+            case e: JsError => 
+              Logger.info("Ops JoinGame: "+e.toString())
+          }
       }
+    case GameStatusBroadcast(game: Game) =>
+      var g = new Game(game.id,game.name,game.n_players,game.status,game.players)
+      var g_json = new GameJSON("game_status",g,"")
+      val json = Json.toJson(g_json)(CommonMessages.gameJSONWrites)
+      upstream ! json
   }
 }
