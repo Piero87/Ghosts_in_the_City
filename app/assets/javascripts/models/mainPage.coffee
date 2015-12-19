@@ -200,6 +200,7 @@ define ["knockout", "gps"], (ko, Gps) ->
 		
 		# Disconnect the ws
 		disconnect: ->
+			clearInterval(@interval) if(@interval)
 			@closing = true
 			@ws.close()
 		
