@@ -47,13 +47,12 @@ define ["knockout", "gps"], (ko, Gps) ->
 		
 		# Connect
 		connect: ->
-			@uuid = generateUUID
 			username = @username()
 			@connecting("Connecting...")
 			@disconnected(null)
 			
 			# Open Web Socket
-			@ws = new WebSocket(jsRoutes.controllers.Application.stream(username, @uuid()).webSocketURL())
+			@ws = new WebSocket(jsRoutes.controllers.Application.stream(username, @uuid).webSocketURL())
 			
 			# When the websocket opens
 			@ws.onopen = (event) =>
@@ -158,6 +157,7 @@ define ["knockout", "gps"], (ko, Gps) ->
 		
 		# The user clicked connect
 		submitUsername: ->
+			@uuid = generateUUID
 			localStorage.setItem("username", @username())
 			localStorage.setItem("uuid", @uuid)
 			@connect()
@@ -171,6 +171,8 @@ define ["knockout", "gps"], (ko, Gps) ->
 			@ws.send(JSON.stringify
 				event: "new_game"
 				source: username
+				user_name: username
+				uuid: @uuid
 				name: gamename
 				n_players: parseInt( gamemaxplayers, 10 )
 			)

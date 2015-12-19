@@ -34,6 +34,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       var client_creator = sender
       var p = new PlayerInfo(uuid_user,username,"")
       clientsConnections = clientsConnections :+ Tuple2(p,sender)
+//      context watch sender
       val future = backend ? NewGame(name,n_players,uuid_user, username)
       future.onSuccess { 
         case Game(id,name,n_players, status,players) => 
@@ -65,5 +66,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       for (i <- 0 to clientsConnections.size) {
         clientsConnections(i)._2 forward game
       }
+//    case Terminated(a) =>
+//      Logger.info("******un ClientConnection è mooooorto*********")
   }
 }
