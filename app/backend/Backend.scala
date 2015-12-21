@@ -52,7 +52,7 @@ class Backend extends Actor {
       
   }
 
-  def newGame (name: String, n_players: Int, user: PlayerInfo) = {
+  def newGame (name: String, n_players: Int, user: UserInfo) = {
     val gm_backend = context.actorOf(Props[GameManagerBackend], name = name)
     game_manager_backends = game_manager_backends :+ gm_backend
     Logger.info("Backend: Actor created, forward message...")

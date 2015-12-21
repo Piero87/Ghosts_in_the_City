@@ -7,7 +7,7 @@ import common._
 class GameManagerBackend () extends Actor {
   
   var gameManagerClient: ActorRef = _
-  var players: List[PlayerInfo] = List()
+  var players: List[UserInfo] = List()
   var game_name = ""
   var game_id = java.util.UUID.randomUUID.toString
   var game_n_players = 0
@@ -31,7 +31,7 @@ class GameManagerBackend () extends Actor {
       gameManagerClient ! Game(game_id,name,n_players,game_status,players)
     case GameStatus =>
       sender() ! Game(game_id,game_name,game_n_players,game_status,players)
-    case JoinGame(id,user) =>
+    case JoinGame(game,user) =>
       if (players.size < game_n_players) {
         var p = user
         players = players :+ p

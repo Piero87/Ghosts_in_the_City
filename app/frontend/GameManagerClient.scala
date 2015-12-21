@@ -20,9 +20,9 @@ class GameManagerClient (backend: ActorRef) extends Actor {
   implicit val ec = context.dispatcher
   
   var gameManagerBackend: ActorRef = _
-  var clientsConnections: List[Tuple2[PlayerInfo, ActorRef]] = List()
+  var clientsConnections: List[Tuple2[UserInfo, ActorRef]] = List()
   var game_name = ""
-  var game_id = java.util.UUID.randomUUID.toString
+  var game_id = ""
   var game_n_players = 0
   var game_status = 0
   
@@ -47,12 +47,12 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       future onFailure {
         case e: Exception => Logger.info("****** ERRORE ******")
       }
-    case JoinGame(id,user) =>
-      if (game_status == 0 && game_id == id) {
+    case JoinGame(game,user) =>
+      if (game_status == 0 && game_id == game.id) {
         var p = user
         clientsConnections = clientsConnections :+ Tuple2(p,sender)
         var origin = sender
-        val future = gameManagerBackend ? JoinGame(id,user)
+        val future = gameManagerBackend ? JoinGame(game,user)
         future.onSuccess { 
           case Game(id,name,n_players, status,players) => 
             Logger.info ("GameManagerClient: Backend Game Manager path: "+sender.path)

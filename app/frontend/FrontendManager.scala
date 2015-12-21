@@ -25,9 +25,9 @@ class FrontendManager extends Actor {
       newGame(name,n_players,user)
     case GamesList =>
       gamesList(sender)
-    case JoinGame(id,user) =>
+    case JoinGame(game,user) =>
       for (i <- 0 to game_manager_frontends.size) {
-        game_manager_frontends(i) forward JoinGame(id,user)
+        game_manager_frontends(i) forward JoinGame(game,user)
       }
     
     case "BackendRegistration" if !backends.contains(sender()) =>
@@ -38,7 +38,7 @@ class FrontendManager extends Actor {
       backends = backends.filterNot(_ == a)
   }
   
-  def newGame (name: String,n_players: Int, user: PlayerInfo) = {
+  def newGame (name: String,n_players: Int, user: UserInfo) = {
     backendCounter += 1
     var b = backends(backendCounter % backends.size)
     val gm_client = context.actorOf(Props(new GameManagerClient(b)), name = name)
