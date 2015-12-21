@@ -9,8 +9,8 @@ define ["knockout", "gps"], (ko, Gps) ->
 		constructor: () ->
 		
 			# User data
-			@uuid
 			@username = ko.observable()
+			@user = {uid: "", name: "", team: ""}
 			
 			# Game data
 			@gameready = ko.observable(false)
@@ -41,18 +41,18 @@ define ["knockout", "gps"], (ko, Gps) ->
 			
 			# Load previously user name if set
 			if localStorage.username
-				@username(localStorage.username)
-				@uuid = localStorage.uuid
+				@user.name = localStorage.username
+				@user.uid = localStorage.uuid
 				@connect()
 		
 		# Connect
 		connect: ->
-			username = @username()
 			@connecting("Connecting...")
 			@disconnected(null)
 			
 			# Open Web Socket
-			@ws = new WebSocket(jsRoutes.controllers.Application.stream(username, @uuid).webSocketURL())
+
+			@ws = new WebSocket(jsRoutes.controllers.Application.stream(@user.name, @user.id).webSocketURL())
 			
 			# When the websocket opens
 			@ws.onopen = (event) =>
@@ -157,43 +157,40 @@ define ["knockout", "gps"], (ko, Gps) ->
 		
 		# The user clicked connect
 		submitUsername: ->
-			@uuid = generateUUID
-			localStorage.setItem("username", @username())
-			localStorage.setItem("uuid", @uuid)
+			@user.uid = generateUID()
+			@user.name = @username()
+			console.log(@user)
+			localStorage.setItem("uuid", @user.uid)
+			localStorage.setItem("username", @user.name)
 			@connect()
 		
 		# New Game 
 		newGame: ->
-			username = @username()
 			gamename = @gamename()
 			gamemaxplayers = @gamemaxplayers()
 			console.log("New Game")
 			@ws.send(JSON.stringify
 				event: "new_game"
-				source: username
-				user_name: username
-				uuid: @uuid
+				user: @user
 				name: gamename
 				n_players: parseInt( gamemaxplayers, 10 )
 			)
 		
 		# Games list
 		gamesList: ->
-			username = @username()
 			console.log("Games List")
 			@ws.send(JSON.stringify
 				event: "games_list"
-				source: username
+				user: @user
 				list: []
 			)
 		
 		# Join Game 
 		joinGame: (gameid) ->
-			username = @username()
 			console.log("Join Game")
 			@ws.send(JSON.stringify
 				event: "join_game"
-				source: username
+				user: @user
 				game: 
 					id: gameid
 			)
@@ -204,14 +201,10 @@ define ["knockout", "gps"], (ko, Gps) ->
 			@closing = true
 			@ws.close()
 		
-		generateUUID = ->
-			d = (new Date).getTime()
-			uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) ->
-				r = (d + Math.random() * 16) % 16 | 0
-				d = Math.floor(d / 16)
-				(if c == 'x' then r else r & 0x3 | 0x8).toString 16
-			)
-			uuid
+		generateUID = ->
+  			id = ""
+  			id += Math.random().toString(36).substr(2) while id.length < 8
+  			id.substr 0, 8
 							
 	return MainPageModel
 
