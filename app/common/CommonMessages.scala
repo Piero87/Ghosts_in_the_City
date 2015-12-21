@@ -12,7 +12,7 @@ case class JoinGame(id: String, user: PlayerInfo)
 case class NewGameJSON(event: String, name: String, n_players: Int, user: PlayerInfo)
 case class GameJSON(event: String, game: Game, source: String)
 case class GamesListJSON(event: String, list: List[Game], user: PlayerInfo)
-case class JoinGameJSON(event: String, id: String)
+case class JoinGameJSON(event: String, user: PlayerInfo, game: Game)
 
 import play.api.libs.json._
 
