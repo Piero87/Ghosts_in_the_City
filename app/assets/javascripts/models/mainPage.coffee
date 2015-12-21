@@ -186,15 +186,12 @@ define ["knockout", "gps"], (ko, Gps) ->
 			)
 		
 		# Join Game 
-		joinGame: (gameid, gamename, gamelist) ->
+		joinGame: (game) ->
 			console.log("Join Game")
 			@ws.send(JSON.stringify
 				event: "join_game"
 				user: @user
-				game: 
-					id: gameid
-					name: gamename
-					list: gamelist
+				game: game
 			)
 		
 		# Disconnect the ws
