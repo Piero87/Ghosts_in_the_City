@@ -1,20 +1,17 @@
 package common
 
-case class NewGame(name: String, n_players: Int, uuid_user: String, user_name: String)
-case class PlayerInfo(uuid: String, username: String, team: String)
+case class PlayerInfo(id: String, name: String, team: String)
+case class NewGame(name: String, n_players: Int, user: PlayerInfo)
 case class Game(id: String, name: String, n_players: Int, status: Int, players: List[PlayerInfo])
 case class GamesList(list: List[Game])
 case object GamesList
 case object GameStatus
 case class GameStatusBroadcast(game: Game)
-case class JoinGame(id: String, username: String, uuid: String)
+case class JoinGame(id: String, user: PlayerInfo)
 
-
-
-
-case class NewGameJSON(event: String, name: String, n_players: Int, source: String)
+case class NewGameJSON(event: String, name: String, n_players: Int, user: PlayerInfo)
 case class GameJSON(event: String, game: Game, source: String)
-case class GamesListJSON(event: String, list: List[Game], source: String)
+case class GamesListJSON(event: String, list: List[Game], user: PlayerInfo)
 case class JoinGameJSON(event: String, id: String)
 
 import play.api.libs.json._
@@ -38,11 +35,4 @@ object CommonMessages {
   
   implicit val joinGameReads = Json.reads[JoinGameJSON]
   implicit val joinGameWrites = Json.writes[JoinGameJSON]
-  
-
-  
-  //SCRIVI
-  //val json = Json.toJson(place)
-  //LEGGI
-  //val placeResult: JsResult[Place] = json.validate[Place]
 }
