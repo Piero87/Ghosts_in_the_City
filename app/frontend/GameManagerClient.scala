@@ -27,15 +27,15 @@ class GameManagerClient (backend: ActorRef) extends Actor {
   var game_status = 0
   
   def receive = {
-    case NewGame(name,n_players,uuid_user,username) =>
+    case NewGame(name,n_players,user) =>
       Logger.info("GameManagerClient: NewGame request")
       game_name = name
       game_n_players = n_players
       var client_creator = sender
-      var p = new PlayerInfo(uuid_user,username,"")
+      var p = user
       clientsConnections = clientsConnections :+ Tuple2(p,sender)
 //      context watch sender
-      val future = backend ? NewGame(name,n_players,uuid_user, username)
+      val future = backend ? NewGame(name,n_players,user)
       future.onSuccess { 
         case Game(id,name,n_players, status,players) => 
           Logger.info ("GameManagerClient: Backend Game Manager path: "+sender.path)
@@ -47,12 +47,12 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       future onFailure {
         case e: Exception => Logger.info("****** ERRORE ******")
       }
-    case JoinGame(id,username,uuid) =>
+    case JoinGame(id,user) =>
       if (game_status == 0 && game_id == id) {
-        var p = new PlayerInfo(uuid,username,"")
+        var p = user
         clientsConnections = clientsConnections :+ Tuple2(p,sender)
         var origin = sender
-        val future = gameManagerBackend ? JoinGame(id,username,uuid)
+        val future = gameManagerBackend ? JoinGame(id,user)
         future.onSuccess { 
           case Game(id,name,n_players, status,players) => 
             Logger.info ("GameManagerClient: Backend Game Manager path: "+sender.path)
