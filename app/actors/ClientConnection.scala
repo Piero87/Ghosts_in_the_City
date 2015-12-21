@@ -59,7 +59,7 @@ class ClientConnection(username: String, uuid: String, upstream: ActorRef,fronte
           val joinGameResult: JsResult[JoinGameJSON] = msg.validate[JoinGameJSON](CommonMessages.joinGameReads)
           joinGameResult match {
             case s: JsSuccess[JoinGameJSON] =>
-              val future = frontendManager ? JoinGame(s.get.id,s.get.user)
+              val future = frontendManager ? JoinGame(s.get.id,s.get.game,s.get.user)
               future.onSuccess {
                 case Game(id,name,n_players,status,players) => 
                   Logger.info ("ClientConnection: Frontend Game Manager path: "+sender.path)

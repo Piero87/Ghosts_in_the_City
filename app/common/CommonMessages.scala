@@ -7,7 +7,7 @@ case class GamesList(list: List[Game])
 case object GamesList
 case object GameStatus
 case class GameStatusBroadcast(game: Game)
-case class JoinGame(id: String, user: PlayerInfo)
+case class JoinGame(id: String, game: Game, user: PlayerInfo)
 
 case class NewGameJSON(event: String, name: String, n_players: Int, user: PlayerInfo)
 case class GameJSON(event: String, game: Game, source: String)
