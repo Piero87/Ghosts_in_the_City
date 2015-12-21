@@ -41,6 +41,7 @@ define ["knockout", "gps"], (ko, Gps) ->
 			
 			# Load previously user name if set
 			if localStorage.username
+				@username(localStorage.username)
 				@user.name = localStorage.username
 				@user.uid = localStorage.uuid
 				@connect()
@@ -61,7 +62,7 @@ define ["knockout", "gps"], (ko, Gps) ->
 				
 				# Setting the interval for refresha games list
 				callback = @gamesList.bind(this)
-				@interval = setInterval(callback, 500)
+				@interval = setInterval(callback, 1000)
 				
 			# When the websocket closes
 			@ws.onclose = (event) =>
@@ -159,7 +160,6 @@ define ["knockout", "gps"], (ko, Gps) ->
 		submitUsername: ->
 			@user.uid = generateUID()
 			@user.name = @username()
-			console.log(@user)
 			localStorage.setItem("uuid", @user.uid)
 			localStorage.setItem("username", @user.name)
 			@connect()
@@ -186,13 +186,15 @@ define ["knockout", "gps"], (ko, Gps) ->
 			)
 		
 		# Join Game 
-		joinGame: (gameid) ->
+		joinGame: (gameid, gamename, gamelist) ->
 			console.log("Join Game")
 			@ws.send(JSON.stringify
 				event: "join_game"
 				user: @user
 				game: 
 					id: gameid
+					name: gamename
+					list: gamelist
 			)
 		
 		# Disconnect the ws
