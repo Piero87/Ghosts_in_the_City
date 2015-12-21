@@ -10,7 +10,7 @@ case class GameStatusBroadcast(game: Game)
 case class JoinGame(game: Game, user: UserInfo)
 
 case class NewGameJSON(event: String, name: String, n_players: Int, user: UserInfo)
-case class GameJSON(event: String, game: Game, source: String)
+case class GameJSON(event: String, game: Game, user: UserInfo)
 case class GamesListJSON(event: String, list: List[Game], user: UserInfo)
 case class JoinGameJSON(event: String, game: Game,user: UserInfo)
 
