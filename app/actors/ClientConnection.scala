@@ -50,7 +50,7 @@ class ClientConnection(username: String, uuid: String, upstream: ActorRef,fronte
           val future = frontendManager ? GamesList
           future.onSuccess {
             case GamesList(list) => 
-              var player_info_fake = new PlayerInfo("0","server","")
+              var player_info_fake = new UserInfo("0","server","")
               var games_list_json = new GamesListJSON("games_list",list,player_info_fake)
               val json = Json.toJson(games_list_json)(CommonMessages.gamesListWrites)
               upstream ! json
