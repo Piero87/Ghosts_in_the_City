@@ -1,6 +1,6 @@
 package common
 
-case class PlayerInfo(id: String, name: String, team: String)
+case class PlayerInfo(uid: String, name: String, team: String)
 case class NewGame(name: String, n_players: Int, user: PlayerInfo)
 case class Game(id: String, name: String, n_players: Int, status: Int, players: List[PlayerInfo])
 case class GamesList(list: List[Game])
