@@ -3,6 +3,8 @@ package backend
 import akka.actor._
 import play.api.Logger
 import common._
+import scala.concurrent.duration.Duration;
+import java.util.concurrent.TimeUnit;
 
 class GameManagerBackend () extends Actor {
   
@@ -20,31 +22,36 @@ class GameManagerBackend () extends Actor {
   // 3 = finished
   
   def receive = {
-    case NewGame(name,n_players,user) =>
+    case NewGame(name,n_players,user,ref) =>
       Logger.info("GameManagerBackend: NewGame request")
       game_name = name
       game_n_players = n_players
       game_status = 0
-      gameManagerClient = sender()
+      Logger.info("GMBackend NewGame From: "+ref.toString())
+      gameManagerClient = ref
       var p = user
       players = players :+ p
-      gameManagerClient ! Game(game_id,name,n_players,game_status,players)
+      var g = new Game(game_id,name,n_players,game_status,players)
+      sender ! GameHandler(g,self)
     case GameStatus =>
-      sender() ! Game(game_id,game_name,game_n_players,game_status,players)
-    case JoinGame(game,user) =>
+      sender ! Game(game_id,game_name,game_n_players,game_status,players)
+    case JoinGame(game,user,ref) =>
+      Logger.info("GMBackend richiesta join ricevuta")
       if (players.size < game_n_players) {
+        Logger.info("GMBackend richeista join accettata")
         var p = user
         players = players :+ p
-        gameManagerClient ! Game(game_id,game_name,game_n_players,game_status,players)
+        sender ! Game(game_id,game_name,game_n_players,game_status,players)
         //Ora mandiamo il messaggio di update game status a tutti i giocatori (***Dobbiamo evitare di mandarlo a quello che si è
         //appena Joinato?
         gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players))
-        if (players.size == game_n_players)
-        {
+        //if (players.size == game_n_players)
+        //{
           //Se è l'ultimo giocatore allora mandiamo il messaggio di star a tutti i giocatori
-        }
+        //}
       } else {
         //***Failure message
+        Logger.info("GMB: non ci sono più posti per la partita, attaccati al cazzo")
       }
   }
   

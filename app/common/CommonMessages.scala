@@ -1,13 +1,16 @@
 package common
 
+import akka.actor._
+
 case class UserInfo(uid: String, name: String, team: String)
-case class NewGame(name: String, n_players: Int, user: UserInfo)
+case class NewGame(name: String, n_players: Int, user: UserInfo, ref: ActorRef = null)
 case class Game(id: String, name: String, n_players: Int, status: Int, players: List[UserInfo])
 case class GamesList(list: List[Game])
 case object GamesList
 case object GameStatus
 case class GameStatusBroadcast(game: Game)
-case class JoinGame(game: Game, user: UserInfo)
+case class JoinGame(game: Game, user: UserInfo, ref: ActorRef = null)
+case class GameHandler(game: Game, ref: ActorRef = null)
 
 case class NewGameJSON(event: String, name: String, n_players: Int, user: UserInfo)
 case class GameJSON(event: String, game: Game, user: UserInfo)
