@@ -12,7 +12,7 @@ import scala.util.{Failure, Success}
 class FrontendManager extends Actor {
   
   var backends: List[ActorRef] = List()
-  var game_manager_frontends = IndexedSeq.empty[ActorRef]
+  var game_manager_frontends :List[ActorRef] = List()
   
   var backendCounter = 0
   

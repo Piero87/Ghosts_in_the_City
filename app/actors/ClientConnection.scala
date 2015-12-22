@@ -34,12 +34,11 @@ class ClientConnection(username: String, uuid: String, upstream: ActorRef,fronte
             case s: JsSuccess[NewGameJSON] => 
               val future = frontendManager ? NewGame(s.get.name.replaceAll(" ", "_")+"_"+System.currentTimeMillis(),s.get.n_players,s.get.user)
               future.onSuccess {
-                case Game(id,name,n_players,status,players) => 
+                case GameHandler(game,ref) => 
                   Logger.info ("ClientConnection: Frontend Game Manager path: "+sender.path)
-                  gameManagerClient = sender
-                  var g = new Game(id,name,n_players,status,players)
+                  if (ref != null) gameManagerClient = ref
                   var player_info_fake = new UserInfo("0","server","")
-                  var g_json = new GameJSON("game_ready",g,player_info_fake)
+                  var g_json = new GameJSON("game_ready",game,player_info_fake)
                   val json = Json.toJson(g_json)(CommonMessages.gameJSONWrites)
                   upstream ! json
               }

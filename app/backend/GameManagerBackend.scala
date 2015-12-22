@@ -25,14 +25,17 @@ class GameManagerBackend () extends Actor {
       game_name = name
       game_n_players = n_players
       game_status = 0
-      gameManagerClient = sender()
+      gameManagerClient = sender
       var p = user
       players = players :+ p
-      gameManagerClient ! Game(game_id,name,n_players,game_status,players)
+      var g = new Game(game_id,name,n_players,game_status,players)
+      gameManagerClient ! GameHandler(g,self)
     case GameStatus =>
-      sender() ! Game(game_id,game_name,game_n_players,game_status,players)
+      sender ! Game(game_id,game_name,game_n_players,game_status,players)
     case JoinGame(game,user) =>
+      Logger.info("GMBackend richiesta join ricevuta")
       if (players.size < game_n_players) {
+        Logger.info("GMBackend richeista join accettata")
         var p = user
         players = players :+ p
         gameManagerClient ! Game(game_id,game_name,game_n_players,game_status,players)
