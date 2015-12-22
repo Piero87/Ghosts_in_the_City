@@ -74,9 +74,8 @@ class ClientConnection(username: String, uuid: String, upstream: ActorRef,fronte
           }
       }
     case GameStatusBroadcast(game: Game) =>
-      var g = new Game(game.id,game.name,game.n_players,game.status,game.players)
       var player_info_fake = new UserInfo("0","server","")
-      var g_json = new GameJSON("game_status",g,player_info_fake)
+      var g_json = new GameJSON("game_status",game,player_info_fake)
       val json = Json.toJson(g_json)(CommonMessages.gameJSONWrites)
       upstream ! json
   }

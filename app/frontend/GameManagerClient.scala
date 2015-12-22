@@ -66,7 +66,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       }
     case GameStatusBroadcast(game: Game) =>
       clientsConnections.map {cc =>
-        cc._2 forward game
+        cc._2 forward GameStatusBroadcast(game)
       }
 //    case Terminated(a) =>
 //      Logger.info("******un ClientConnection è mooooorto*********")
