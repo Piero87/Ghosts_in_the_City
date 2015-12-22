@@ -79,8 +79,9 @@
         	</div>
         	<div data-bind="if: gameready" align="center">
 	        	<h1 class="ghostbuster-font font-big">You have joined the game "<span data-bind="text: gamename"></span>"</h1>
-	        	<p class="ghostbuster-font">waiting for <span data-bind="text: gamewaitingforplayers"></span> more player<span data-bind="if: gamewaitingforplayers != 1">s</span>...</p>
-	        	<br>
+	        	<p class="ghostbuster-font">[max <span data-bind="text: gamemaxplayers"></span> players]</p>
+	        	<p class="ghostbuster-font font-medium">waiting for <span data-bind="text: gamewaitingforplayers"></span> more player<span data-bind="if: gamewaitingforplayers != 1">s</span>...</p>
+	        	<hr>
 	        	<h1 class="ghostbuster-font font-medium">Players:</h1>
 	        	<ul data-bind="foreach: gameplayers">
 				    <li>

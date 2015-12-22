@@ -19,8 +19,8 @@ define ["knockout", "gps"], (ko, Gps) ->
 			@gameended  = ko.observable(false)
 			@gameid = ko.observable()
 			@gamename = ko.observable()
-			@gamemaxplayers = ko.observable(0)
-			@gamewaitingforplayers = ko.observable(0)
+			@gamemaxplayers = ko.observable()
+			@gameplayersmissing = ko.observable()
 			@gameplayers = ko.observableArray()
 			
 			# Interval to send a lot of request for available games
@@ -81,7 +81,6 @@ define ["knockout", "gps"], (ko, Gps) ->
 			# Handle the stream
 			@ws.onmessage = (event) =>
 				json = JSON.parse(event.data)
-				console.log(JSON.stringify(json))	
 				if json.event == "user-positions"
 					console.log('User Position Received!')
 					# Update all the markers on the map
@@ -121,10 +120,12 @@ define ["knockout", "gps"], (ko, Gps) ->
 							
 							# Compute missing players
 							@gamemaxplayers(json.game.n_players)
-							@gamewaitingforplayers(json.game.n_players - json.game.players.length)
+							playersmissing = json.game.n_players - json.game.players.length
+							@gameplayersmissing(playersmissing)
 							@gameplayers.removeAll()
 							if json.game.players.length > 0
 								for player in json.game.players
+									console.log("giocatore in attesa:" + player.name)
 									@gameplayers.push(player)
 						when 1 # game started
 							console.log('Fight!')
