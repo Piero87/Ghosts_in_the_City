@@ -198,6 +198,18 @@ define ["knockout", "gps"], (ko, Gps) ->
 			@closing = true
 			@ws.close()
 		
+		# Leave Game
+		leaveGame: ->
+			@gameready(false)
+			@gamestarted(false)
+			@gamepaused(false)
+			@gameended(false)
+			@ws.send(JSON.stringify
+				event: "leave_game"
+				user: @user
+				game_id: @gameid
+			)
+		
 		generateUID = ->
   			id = ""
   			id += Math.random().toString(36).substr(2) while id.length < 8
