@@ -44,7 +44,7 @@ class GameManagerBackend () extends Actor {
         sender ! Game(game_id,game_name,game_n_players,game_status,players)
         //Ora mandiamo il messaggio di update game status a tutti i giocatori (***Dobbiamo evitare di mandarlo a quello che si è
         //appena Joinato?
-        gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players))
+        //gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players))
         if (players.size == game_n_players)
         {
           //Se è l'ultimo giocatore allora mandiamo il messaggio di star a tutti i giocatori

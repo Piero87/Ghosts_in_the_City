@@ -106,6 +106,9 @@ define ["knockout", "gps"], (ko, Gps) ->
 					@gameready(true)
 					@gamestarted(false)
 					@gameended(false)
+					
+					@refreshPlayerList(json)
+					
 				else if json.event == "game_status"
 					# {event: "game_status", game: {id: [Int], name: [String], n_players: [Int], players [Array of String], status: [Int]}}
 					switch json.game.status
@@ -119,15 +122,8 @@ define ["knockout", "gps"], (ko, Gps) ->
 							@gamepaused(false)
 							@gameended(false)
 							
-							# Compute missing players
-							@gamemaxplayers(json.game.n_players)
-							playersmissing = json.game.n_players - json.game.players.length
-							@gameplayersmissing(playersmissing)
-							@gameplayers.removeAll()
-							if json.game.players.length > 0
-								for player in json.game.players
-									console.log("giocatore in attesa:" + player.name)
-									@gameplayers.push(player)
+							@refreshPlayerList(json)
+							
 						when 1 # game started
 							console.log('Fight!')
 							
@@ -206,6 +202,17 @@ define ["knockout", "gps"], (ko, Gps) ->
   			id = ""
   			id += Math.random().toString(36).substr(2) while id.length < 8
   			id.substr 0, 8
-							
+  		
+  		refreshPlayerList: (json) ->
+  			# Compute missing players
+  			@gamemaxplayers(json.game.n_players)
+  			playersmissing = json.game.n_players - json.game.players.length
+  			@gameplayersmissing(playersmissing)
+  			@gameplayers.removeAll()
+  			if json.game.players.length > 0
+  				for player in json.game.players
+  					console.log("giocatore in attesa:" + player.name)
+  					@gameplayers.push(player)
+  									
 	return MainPageModel
 
