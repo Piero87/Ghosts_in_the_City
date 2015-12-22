@@ -26,7 +26,7 @@ class GameManagerBackend () extends Actor {
       Logger.info("GameManagerBackend: NewGame request")
       game_name = name
       game_n_players = n_players
-      game_status = 0
+      game_status = StatusGame.WAITING
       Logger.info("GMBackend NewGame From: "+ref.toString())
       gameManagerClient = ref
       var p = user
@@ -48,7 +48,7 @@ class GameManagerBackend () extends Actor {
         if (players.size == game_n_players)
         {
           //Se è l'ultimo giocatore allora mandiamo il messaggio di star a tutti i giocatori
-          game_status = 1
+          game_status = StatusGame.STARTED
           gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players))
         }
       } else {

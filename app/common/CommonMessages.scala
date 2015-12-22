@@ -2,6 +2,19 @@ package common
 
 import akka.actor._
 
+//ENUM GAME STATUS
+  // 0 = waiting
+  // 1 = started
+  // 2 = paused
+  // 3 = finished
+object StatusGame extends Enumeration {
+  type StatusGame = Int
+   val WAITING = 0
+   val STARTED = 1
+   val PAUSED = 2
+   val FINISHED = 3
+} 
+
 case class UserInfo(uid: String, name: String, team: String)
 case class NewGame(name: String, n_players: Int, user: UserInfo, ref: ActorRef = null)
 case class Game(id: String, name: String, n_players: Int, status: Int, players: List[UserInfo])
