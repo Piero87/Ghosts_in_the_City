@@ -111,6 +111,7 @@ define ["knockout", "gps"], (ko, Gps) ->
 					switch json.game.status
 						when 0 # game waiting
 							console.log('Wait!')
+							console.log(json.game.players)
 							
 							# Set system status variables
 							@gameready(true)

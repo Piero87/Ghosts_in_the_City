@@ -91,7 +91,13 @@
 	        </div>
 	        <div data-bind="if: gamestarted" align="center">
 	        	<h1 class="ghostbuster-font font-big" data-bind="text: gamename"></h1>
-	        	<canvas id="gameArena" width="500" height="500"></canvas>
+	        	<!-- <canvas id="gameArena" width="500" height="500"></canvas> -->
+	        	<ul data-bind="foreach: gameplayers">
+				    <li>
+				        <span class="ghostbuster-font" data-bind="text: name"></span>
+				    </li>
+				</ul>
+				<!-- BUTTA QUI IL PULSANTONE -->
 	        </div>
 	        <div data-bind="if: gameended" align="center">
 	        	<h1 class="ghostbuster-font font-huge">GAME OVER</h1>
