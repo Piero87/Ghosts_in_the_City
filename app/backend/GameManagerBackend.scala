@@ -45,10 +45,12 @@ class GameManagerBackend () extends Actor {
         //Ora mandiamo il messaggio di update game status a tutti i giocatori (***Dobbiamo evitare di mandarlo a quello che si è
         //appena Joinato?
         gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players))
-        //if (players.size == game_n_players)
-        //{
+        if (players.size == game_n_players)
+        {
           //Se è l'ultimo giocatore allora mandiamo il messaggio di star a tutti i giocatori
-        //}
+          game_status = 1
+          gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players))
+        }
       } else {
         //***Failure message
         Logger.info("GMB: non ci sono più posti per la partita, attaccati al cazzo")
