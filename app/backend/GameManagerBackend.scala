@@ -13,7 +13,7 @@ class GameManagerBackend () extends Actor {
   var game_name = ""
   var game_id = java.util.UUID.randomUUID.toString
   var game_n_players = 0
-  var game_status = 0
+  var game_status = StatusGame.WAITING
   
   //ENUM GAME STATUS
   // 0 = waiting

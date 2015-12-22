@@ -24,7 +24,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
   var game_name = ""
   var game_id = ""
   var game_n_players = 0
-  var game_status = 0
+  var game_status = StatusGame.WAITING
   
   def receive = {
     case NewGame(name,n_players,user,ref) =>
@@ -65,6 +65,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
         }
       }
     case GameStatusBroadcast(game: Game) =>
+      game_status = game.status
       clientsConnections.map {cc =>
         cc._2 forward GameStatusBroadcast(game)
       }
