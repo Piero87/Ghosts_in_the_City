@@ -49,6 +49,7 @@ class FrontendManager extends Actor {
   
   def gamesList (origin: ActorRef) = {
     
+    //il timeout è relativa al tempo di attesa della risposta all ask(?)
     val taskFutures: List[Future[List[Game]]] = backends map { be =>
         implicit val timeout = Timeout(5 seconds)
         (be ? GamesList).mapTo[List[Game]]
