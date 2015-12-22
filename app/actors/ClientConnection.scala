@@ -32,7 +32,7 @@ class ClientConnection(username: String, uuid: String, upstream: ActorRef,fronte
           val newGameResult: JsResult[NewGameJSON] = msg.validate[NewGameJSON](CommonMessages.newGameReads)
           newGameResult match {
             case s: JsSuccess[NewGameJSON] => 
-              val future = frontendManager ? NewGame(s.get.name.replaceAll(" ", "_")+"_"+System.currentTimeMillis(),s.get.n_players,s.get.user)
+              val future = frontendManager ? NewGame(s.get.name.replaceAll(" ", "_")+"_"+System.currentTimeMillis(),s.get.n_players,s.get.user,self)
               future.onSuccess {
                 case GameHandler(game,ref) => 
                   Logger.info ("ClientConnection: Frontend Game Manager path: "+sender.path)
@@ -59,7 +59,7 @@ class ClientConnection(username: String, uuid: String, upstream: ActorRef,fronte
           val joinGameResult: JsResult[JoinGameJSON] = msg.validate[JoinGameJSON](CommonMessages.joinGameReads)
           joinGameResult match {
             case s: JsSuccess[JoinGameJSON] =>
-              val future = frontendManager ? JoinGame(s.get.game,s.get.user)
+              val future = frontendManager ? JoinGame(s.get.game,s.get.user,self)
               future.onSuccess {
                 case Game(id,name,n_players,status,players) => 
                   Logger.info ("ClientConnection: Frontend Game Manager path: "+sender.path)

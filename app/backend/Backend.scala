@@ -44,19 +44,20 @@ class Backend extends Actor {
       state.members.filter(_.status == MemberStatus.Up) foreach register
     case MemberUp(m) => register(m)
     
-    case NewGame(name,n_players,user) =>
+    case NewGame(name,n_players,user,ref) =>
       Logger.info("Backend: NewGame request")
-      newGame(name,n_players,user)
+      newGame(name,n_players,user,ref)
     case GamesList =>
       gamesList(sender)
       
   }
 
-  def newGame (name: String, n_players: Int, user: UserInfo) = {
+  def newGame (name: String, n_players: Int, user: UserInfo, ref: ActorRef) = {
     val gm_backend = context.actorOf(Props[GameManagerBackend], name = name)
     game_manager_backends = game_manager_backends :+ gm_backend
     Logger.info("Backend: Actor created, forward message...")
-    gm_backend forward NewGame(name,n_players,user)
+    Logger.info("Backend PreForward: "+ref.toString())
+    gm_backend forward NewGame(name,n_players,user,ref)
     
   }
   
