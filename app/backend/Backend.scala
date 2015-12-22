@@ -72,7 +72,7 @@ class Backend extends Actor {
     val searchFuture = Future sequence taskFutures
     
     searchFuture.onSuccess {
-      case results: List[Game] => origin ! results.filter( _.status == 0 )
+      case results: List[Game] => origin ! results.filter( _.status == StatusGame.WAITING )
     }
     
   }
