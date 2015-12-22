@@ -38,7 +38,7 @@ class GameManagerBackend () extends Actor {
     case JoinGame(game,user,ref) =>
       Logger.info("GMBackend richiesta join ricevuta")
       if (players.size < game_n_players) {
-        Logger.info("GMBackend richeista join accettata")
+        Logger.info("GMBackend richiesta join accettata")
         var p = user
         players = players :+ p
         sender ! Game(game_id,game_name,game_n_players,game_status,players)
