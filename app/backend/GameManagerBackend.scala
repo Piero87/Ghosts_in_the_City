@@ -22,12 +22,6 @@ class GameManagerBackend () extends Actor {
   implicit val timeout = Timeout(5 seconds)
   implicit val ec = context.dispatcher
   
-  //ENUM GAME STATUS
-  // 0 = waiting
-  // 1 = started
-  // 2 = paused
-  // 3 = finished
-  
   def receive = {
     case NewGame(name,n_players,user,ref) =>
       Logger.info("GameManagerBackend: NewGame request")
