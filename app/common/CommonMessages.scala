@@ -7,6 +7,7 @@ import akka.actor._
   // 1 = started
   // 2 = paused
   // 3 = finished
+
 object StatusGame extends Enumeration {
   type StatusGame = Int
    val WAITING = 0
