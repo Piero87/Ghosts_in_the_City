@@ -21,6 +21,8 @@ case class Game(id: String, name: String, n_players: Int, status: Int, players: 
 case class GamesList(list: List[Game])
 case object GamesList
 case object GameStatus
+case object KillYourself
+
 case class GameStatusBroadcast(game: Game)
 case class JoinGame(game: Game, user: UserInfo, ref: ActorRef = null)
 case class GameHandler(game: Game, ref: ActorRef = null)
