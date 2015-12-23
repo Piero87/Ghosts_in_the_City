@@ -58,7 +58,8 @@ class GameManagerClient (backend: ActorRef) extends Actor {
         future.onSuccess { 
           case Game(id,name,n_players, status,players) => 
             Logger.info ("GameManagerClient: Backend Game Manager path: "+sender.path)
-            origin ! Game(id,name,n_players, status,players)
+            var g = new Game(id,name,n_players,status,players)
+            origin ! GameHandler(g,self)
         }
         future onFailure {
           case e => Logger.info("****** GAME MANAGER CLIENT JOIN ERRORE ****** =>"+e.getMessage)
