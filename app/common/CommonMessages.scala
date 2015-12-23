@@ -22,6 +22,7 @@ case class GamesList(list: List[Game])
 case object GamesList
 case object GameStatus
 case object KillYourself
+case object KillMyself
 
 case class GameStatusBroadcast(game: Game)
 case class JoinGame(game: Game, user: UserInfo, ref: ActorRef = null)

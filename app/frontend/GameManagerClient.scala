@@ -7,6 +7,7 @@ import akka.pattern.ask
 import scala.util.{Failure, Success}
 import play.api.Logger
 import common._
+import akka.actor.PoisonPill
 
 object GameManagerClient {
   
@@ -76,5 +77,9 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       gameManagerBackend ! LeaveGame(user)
 //    case Terminated(a) =>
 //      Logger.info("******un ClientConnection è mooooorto*********")
+    case KillYourself =>
+      gameManagerBackend ! KillMyself
+      
+      self ! PoisonPill    
   }
 }
