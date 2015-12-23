@@ -43,7 +43,7 @@ define ["knockout", "gps"], (ko, Gps) ->
 			if localStorage.username
 				@username(localStorage.username)
 				@user.name = localStorage.username
-				@user.uid = localStorage.uuid
+				@user.uid = localStorage.uid
 				@connect()
 		
 		# Connect
@@ -53,7 +53,7 @@ define ["knockout", "gps"], (ko, Gps) ->
 			
 			# Open Web Socket
 
-			@ws = new WebSocket(jsRoutes.controllers.Application.stream(@user.name, @user.id).webSocketURL())
+			@ws = new WebSocket(jsRoutes.controllers.Application.stream(@user.name, @user.uid).webSocketURL())
 			
 			# When the websocket opens
 			@ws.onopen = (event) =>
@@ -75,7 +75,7 @@ define ["knockout", "gps"], (ko, Gps) ->
 					@disconnected(true)
 					@connected(false)
 					@closing = false
-					localStorage.removeItem("uuid")
+					localStorage.removeItem("uid")
 					localStorage.removeItem("username")
 			
 			# Handle the stream
@@ -158,7 +158,7 @@ define ["knockout", "gps"], (ko, Gps) ->
 		submitUsername: ->
 			@user.uid = generateUID()
 			@user.name = @username()
-			localStorage.setItem("uuid", @user.uid)
+			localStorage.setItem("uid", @user.uid)
 			localStorage.setItem("username", @user.name)
 			@connect()
 		
@@ -206,8 +206,6 @@ define ["knockout", "gps"], (ko, Gps) ->
 			@gameended(false)
 			@ws.send(JSON.stringify
 				event: "leave_game"
-				user: @user
-				game_id: @gameid
 			)
 		
 		generateUID = ->

@@ -24,19 +24,23 @@ case object GameStatus
 case class GameStatusBroadcast(game: Game)
 case class JoinGame(game: Game, user: UserInfo, ref: ActorRef = null)
 case class GameHandler(game: Game, ref: ActorRef = null)
-
+case class LeaveGame(user: UserInfo)
 case class NewGameJSON(event: String, name: String, n_players: Int, user: UserInfo)
 case class GameJSON(event: String, game: Game, user: UserInfo)
 case class GamesListJSON(event: String, list: List[Game], user: UserInfo)
 case class JoinGameJSON(event: String, game: Game,user: UserInfo)
+case class LeaveGameJSON(event: String)
 
 import play.api.libs.json._
 
 object CommonMessages {
-
+  
   implicit val playerInfoReads = Json.reads[UserInfo]
   implicit val playerInfoWrites = Json.writes[UserInfo]
-    
+  
+  implicit val leaveGameReads = Json.reads[LeaveGameJSON]
+  implicit val leaveGameWrites = Json.writes[LeaveGameJSON]
+  
   implicit val gameReads = Json.reads[Game]
   implicit val gameWrites = Json.writes[Game]
   

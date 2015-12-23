@@ -18,7 +18,7 @@ object ClientConnection {
   
 }
 
-class ClientConnection(username: String, uuid: String, upstream: ActorRef,frontendManager: ActorRef) extends Actor {
+class ClientConnection(username: String, uid: String, upstream: ActorRef,frontendManager: ActorRef) extends Actor {
   
   var gameManagerClient: ActorRef = _
   implicit val timeout = Timeout(5 seconds)
@@ -73,14 +73,8 @@ class ClientConnection(username: String, uuid: String, upstream: ActorRef,fronte
               Logger.info("Ops JoinGame: "+e.toString())
           }
          case "leave_game" =>
-          val future = frontendManager ? GamesList
-          future.onSuccess {
-            case GamesList(list) => 
-              var player_info_fake = new UserInfo("0","server","")
-              var games_list_json = new GamesListJSON("games_list",list,player_info_fake)
-              val json = Json.toJson(games_list_json)(CommonMessages.gamesListWrites)
-              upstream ! json
-          }
+           var userInfo = new UserInfo(uid,username,"")
+           gameManagerClient ! LeaveGame(userInfo)
       }
     case GameStatusBroadcast(game: Game) =>
       var player_info_fake = new UserInfo("0","server","")
