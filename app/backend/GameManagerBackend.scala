@@ -83,6 +83,7 @@ class GameManagerBackend () extends Actor {
         gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players))
       }
     case "tick" =>
+      Logger.info("Tick")
       //qui
       //context.system.scheduler.scheduleOnce(1000 millis, self, "tick")
       
