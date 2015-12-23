@@ -204,6 +204,8 @@ define ["knockout", "gps"], (ko, Gps) ->
 			@gamestarted(false)
 			@gamepaused(false)
 			@gameended(false)
+			@gamename()
+			@gamemaxplayers()
 			@ws.send(JSON.stringify
 				event: "leave_game"
 			)
