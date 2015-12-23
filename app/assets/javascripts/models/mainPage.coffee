@@ -220,7 +220,7 @@ define ["knockout", "gps"], (ko, Gps) ->
   			@gamemaxplayers(json.game.n_players)
   			playersmissing = json.game.n_players - json.game.players.length
   			@gameplayersmissing(playersmissing)
-  			@gameslist.removeAll()
+  			@gameplayers.removeAll()
   			if json.game.players.length > 0
   				for player in json.game.players
   					console.log("giocatore in attesa:" + player.name)
