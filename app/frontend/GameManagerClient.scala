@@ -52,6 +52,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       Logger.info("GMClient, richiesta JOIN ricevuta")
       if (game_status == 0 && game_id == game.id) {
         Logger.info("GMClient, richiesta JOIN accettata, id: "+game_id)
+        // Per sicurezza ci salviamo i dati del client connection che ci ha mandato la richiesta di join
         var p = user
         var ccref = ref
         val origin = sender
