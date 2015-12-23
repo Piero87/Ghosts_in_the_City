@@ -19,7 +19,7 @@ define ["knockout", "gps"], (ko, Gps) ->
 			@gameended  = ko.observable(false)
 			@gameid = ko.observable()
 			@gamename = ko.observable()
-			@gamemaxplayers = ko.observable()
+			@gamemaxplayers = ko.observable(2)
 			@gameplayersmissing = ko.observable()
 			@gameplayers = ko.observableArray()
 			
@@ -60,7 +60,7 @@ define ["knockout", "gps"], (ko, Gps) ->
 				@connecting(null)
 				@connected(true)
 				
-				# Setting the interval for refresha games list
+				# Setting the interval for refresh games list
 				callback = @gamesList.bind(this)
 				@interval = setInterval(callback, 1000)
 				
@@ -111,52 +111,21 @@ define ["knockout", "gps"], (ko, Gps) ->
 					
 				else if json.event == "game_status"
 					# {event: "game_status", game: {id: [Int], name: [String], n_players: [Int], players [Array of String], status: [Int]}}
+					@changeGameStatus(json.game.status)
 					switch json.game.status
 						when 0 # game waiting
-							console.log('Wait!')
-							console.log(json.game.players)
-							
-							# Set system status variables
-							@gameready(true)
-							@gamestarted(false)
-							@gamepaused(false)
-							@gameended(false)
-							
 							@refreshPlayerList(json)
-							
 						when 1 # game started
-							console.log('Fight!')
-							
-							# Set system status variables
-							@gameready(false)
-							@gamestarted(true)
-							@gamepaused(false)
-							@gameended(false)
-							
-							@gameplayers.removeAll()
-							if json.game.players.length > 0
-								for player in json.game.players
-									@gameplayers.push(player)
-							
+							@refreshPlayerList(json)
 						when 2 # game paused
 							console.log('Hold on!')
-							@gameready(false)
-							@gamestarted(false)
-							@gamepaused(true)
-							@gameended(false)
 						when 3 # game ended
 							console.log('Game Over!')
-							
 							localStorage.removeItem("gameid")
 							
-							@gameready(false)
-							@gamestarted(false)
-							@gamepaused(false)
-							@gameended(true)
-		
 		# The user clicked connect
 		submitUsername: ->
-			@user.uid = generateUID()
+			@user.uid = @generateUID()
 			@user.name = @username()
 			localStorage.setItem("uid", @user.uid)
 			localStorage.setItem("username", @user.name)
@@ -200,18 +169,48 @@ define ["knockout", "gps"], (ko, Gps) ->
 		
 		# Leave Game
 		leaveGame: ->
-			@gameready(false)
-			@gamestarted(false)
-			@gamepaused(false)
-			@gameended(false)
+			@changeGameStatus(-1)
 			@gamename("")
 			@gamemaxplayers(2)
 			@gameplayers.removeAll()
+			
+			callback = @gamesList.bind(this)
+			@interval = setInterval(callback, 1000)
+			
 			@ws.send(JSON.stringify
 				event: "leave_game"
 			)
 		
-		generateUID = ->
+		changeGameStatus: (s) ->
+			status = s
+			switch status
+				when -1 # game leaved
+					@gameready(false)
+					@gamestarted(false)
+					@gamepaused(false)
+					@gameended(false)
+				when 0 # game ready - wait for other players
+					@gameready(true)
+					@gamestarted(false)
+					@gamepaused(false)
+					@gameended(false)
+				when 1 # game started
+					@gameready(false)
+					@gamestarted(true)
+					@gamepaused(false)
+					@gameended(false)
+				when 2 # game paused
+					@gameready(false)
+					@gamestarted(false)
+					@gamepaused(true)
+					@gameended(false)
+				when 3 # game ended
+					@gameready(false)
+					@gamestarted(false)
+					@gamepaused(false)
+					@gameended(true)
+		
+		generateUID: ->
   			id = ""
   			id += Math.random().toString(36).substr(2) while id.length < 8
   			id.substr 0, 8
@@ -226,6 +225,6 @@ define ["knockout", "gps"], (ko, Gps) ->
   				for player in json.game.players
   					console.log("giocatore in attesa:" + player.name)
   					@gameplayers.push(player)
-  									
+  					
 	return MainPageModel
 
