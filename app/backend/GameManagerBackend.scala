@@ -45,8 +45,7 @@ class GameManagerBackend () extends Actor {
         //Ora mandiamo il messaggio di update game status a tutti i giocatori (***Dobbiamo evitare di mandarlo a quello che si è
         //appena Joinato?
         gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players))
-        if (players.size == game_n_players)
-        {
+        if (players.size == game_n_players) {
           //Se è l'ultimo giocatore allora mandiamo il messaggio di star a tutti i giocatori
           game_status = StatusGame.STARTED
           gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players))
@@ -58,7 +57,13 @@ class GameManagerBackend () extends Actor {
     case LeaveGame(user: UserInfo) =>
       Logger.info("GMBackend: LeaveGame Request") 
       players = players.filterNot(elm => elm.uid == user.uid)
-      gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players))
+      // Se non abbiamo più giocatori dobbiamo dire al GameManager Client  di uccidersi
+      if (players.size == 0) {
+        
+      } else {
+        gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players))
+      }
+      
   }
   
   def newGame () = {
