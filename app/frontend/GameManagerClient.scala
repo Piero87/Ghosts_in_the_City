@@ -53,12 +53,13 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       if (game_status == 0 && game_id == game.id) {
         Logger.info("GMClient, richiesta JOIN accettata, id: "+game_id)
         var p = user
-        clientsConnections = clientsConnections :+ Tuple2(p,ref)
+        var ccref = ref
         val origin = sender
         val future = gameManagerBackend ? JoinGame(game,user)
         future.onSuccess { 
           case Game(id,name,n_players, status,players) => 
             Logger.info ("GameManagerClient: Backend Game Manager path: "+sender.path)
+            clientsConnections = clientsConnections :+ Tuple2(p,ccref)
             var g = new Game(id,name,n_players,status,players)
             origin ! GameHandler(g,self)
         }
@@ -73,13 +74,18 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       }
     case LeaveGame(user: UserInfo) =>
       Logger.info("GMClient: LeaveGame Request")
-      clientsConnections = clientsConnections.filterNot(elm => elm._1.uid == user.uid)
-      gameManagerBackend ! LeaveGame(user)
-//    case Terminated(a) =>
-//      Logger.info("******un ClientConnection è mooooorto*********")
-    case KillYourself =>
-      gameManagerBackend ! KillMyself
-      
-      self ! PoisonPill    
+      val future = gameManagerBackend ? LeaveGame(user)
+      future.onSuccess { 
+        case Success =>
+          clientsConnections = clientsConnections.filterNot(elm => elm._1.uid == user.uid)       
+      }
+      future onFailure {
+        case e: Exception => Logger.info("******GAME MANAGER BACKEND KILL ERROR ******")
+      }
+    case KillYourself => 
+       Logger.info ("GameManagerBackend: GMClient will die")
+       sender ! KillMyself
+       self ! PoisonPill
+        
   }
 }

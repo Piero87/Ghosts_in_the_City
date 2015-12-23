@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit
 import scala.concurrent.duration._
 import akka.util.Timeout
 import akka.pattern.ask
+import scala.util.{Failure, Success}
 
 class GameManagerBackend () extends Actor {
   
@@ -63,6 +64,8 @@ class GameManagerBackend () extends Actor {
     case LeaveGame(user: UserInfo) =>
       Logger.info("GMBackend: LeaveGame Request") 
       players = players.filterNot(elm => elm.uid == user.uid)
+      sender ! Success
+     
       // Se non abbiamo più giocatori dobbiamo dire al GameManager Client  di uccidersi
       if (players.size == 0) {
         val future = gameManagerClient ? KillYourself
@@ -75,6 +78,7 @@ class GameManagerBackend () extends Actor {
             case e: Exception => Logger.info("******GAME MANAGER BACKEND KILL ERROR ******")
           }
       } else {
+        // Ci sono ancora giocatori nella lista quindi aggiorna lo stato
         gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players))
       }
       
