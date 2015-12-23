@@ -83,4 +83,9 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
       val json = Json.toJson(g_json)(CommonMessages.gameJSONWrites)
       upstream ! json
   }
+  
+  override def postStop() = {
+    var userInfo = new UserInfo(uid,username,"")
+    gameManagerClient ! LeaveGame(userInfo)
+  }
 }
