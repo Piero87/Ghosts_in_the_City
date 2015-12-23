@@ -39,7 +39,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
                   Logger.info ("ClientConnection: Frontend Game Manager path: "+sender.path)
                   if (ref != null) gameManagerClient = ref
                   game_id = game.id
-                  var player_info_fake = new UserInfo("0","server","")
+                  var player_info_fake = new UserInfo("0","server","", 0,0)
                   var g_json = new GameJSON("game_ready",game,player_info_fake)
                   val json = Json.toJson(g_json)(CommonMessages.gameJSONWrites)
                   upstream ! json
@@ -52,7 +52,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
           val future = frontendManager ? GamesList
           future.onSuccess {
             case GamesList(list) => 
-              var player_info_fake = new UserInfo("0","server","")
+              var player_info_fake = new UserInfo("0","server","", 0,0)
               var games_list_json = new GamesListJSON("games_list",list,player_info_fake)
               val json = Json.toJson(games_list_json)(CommonMessages.gamesListWrites)
               upstream ! json
@@ -67,7 +67,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
                   Logger.info ("ClientConnection: Frontend Game Manager path: "+sender.path)
                   if (ref != null) gameManagerClient = ref
                   game_id = game.id
-                  var player_info_fake = new UserInfo("0","server","")
+                  var player_info_fake = new UserInfo("0","server","", 0,0)
                   var g_json = new GameJSON("game_ready",game,player_info_fake)
                   val json = Json.toJson(g_json)(CommonMessages.gameJSONWrites)
                   upstream ! json
@@ -78,11 +78,11 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
          case "leave_game" =>
            Logger.info("CC: LeaveGame request")
            game_id = ""
-           var userInfo = new UserInfo(uid,username,"")
+           var userInfo = new UserInfo("0","server","", 0,0)
            gameManagerClient ! LeaveGame(userInfo)
       }
     case GameStatusBroadcast(game: Game) =>
-      var player_info_fake = new UserInfo("0","server","")
+      var player_info_fake = new UserInfo("0","server","", 0,0)
       var g_json = new GameJSON("game_status",game,player_info_fake)
       val json = Json.toJson(g_json)(CommonMessages.gameJSONWrites)
       upstream ! json
@@ -90,7 +90,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
   
   override def postStop() = {
     if (game_id != "") {
-      var userInfo = new UserInfo(uid,username,"")
+      var userInfo = new UserInfo("0","server","", 0,0)
       gameManagerClient ! LeaveGame(userInfo)
     }
   }

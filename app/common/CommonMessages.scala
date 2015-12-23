@@ -10,7 +10,7 @@ object StatusGame extends Enumeration {
    val FINISHED = 3
 } 
 
-case class UserInfo(uid: String, name: String, team: String)
+case class UserInfo(uid: String, name: String, team: String, x: Int, y: Int)
 case class NewGame(name: String, n_players: Int, user: UserInfo, ref: ActorRef = null)
 case class Game(id: String, name: String, n_players: Int, status: Int, players: List[UserInfo])
 case class GamesList(list: List[Game])
@@ -18,6 +18,7 @@ case object GamesList
 case object GameStatus
 case object KillYourself
 case object KillMyself
+//case class PlayerInfo(uid: String, name: String, team: String, x: Int, y: Int )
 
 
 case class GameStatusBroadcast(game: Game)

@@ -9,6 +9,7 @@ import scala.concurrent.duration._
 import akka.util.Timeout
 import akka.pattern.ask
 import scala.util.{Failure, Success}
+import scala.util.Random
 
 class GameManagerBackend () extends Actor {
   
@@ -78,8 +79,15 @@ class GameManagerBackend () extends Actor {
       }
     case "tick" =>
       Logger.info("Tick")
-      //qui
-      //context.system.scheduler.scheduleOnce(1000 millis, self, "tick")
+//      //qui
+//      players = players.map{ player => 
+//        val rnd = new scala.util.Random
+//        val range = 100 to 500
+//        player.x = 0
+//        player.y = range(rnd.nextInt(range length))
+//        
+//      }
+//      context.system.scheduler.scheduleOnce(1000 millis, self, "tick")
       
   }
   
