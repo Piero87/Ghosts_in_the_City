@@ -204,8 +204,9 @@ define ["knockout", "gps"], (ko, Gps) ->
 			@gamestarted(false)
 			@gamepaused(false)
 			@gameended(false)
-			@gamename()
-			@gamemaxplayers()
+			@gamename("")
+			@gamemaxplayers(2)
+			@gameplayers.removeAll()
 			@ws.send(JSON.stringify
 				event: "leave_game"
 			)
@@ -220,7 +221,7 @@ define ["knockout", "gps"], (ko, Gps) ->
   			@gamemaxplayers(json.game.n_players)
   			playersmissing = json.game.n_players - json.game.players.length
   			@gameplayersmissing(playersmissing)
-  			@gameplayers.removeAll()
+  			@gameslist.removeAll()
   			if json.game.players.length > 0
   				for player in json.game.players
   					console.log("giocatore in attesa:" + player.name)
