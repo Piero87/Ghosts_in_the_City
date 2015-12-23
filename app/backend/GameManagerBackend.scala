@@ -3,8 +3,11 @@ package backend
 import akka.actor._
 import play.api.Logger
 import common._
-import scala.concurrent.duration.Duration;
-import java.util.concurrent.TimeUnit;
+import scala.concurrent.duration.Duration
+import java.util.concurrent.TimeUnit
+import scala.concurrent.duration._
+import akka.util.Timeout
+import akka.pattern.ask
 
 class GameManagerBackend () extends Actor {
   
@@ -14,6 +17,9 @@ class GameManagerBackend () extends Actor {
   var game_id = java.util.UUID.randomUUID.toString
   var game_n_players = 0
   var game_status = StatusGame.WAITING
+  
+  implicit val timeout = Timeout(5 seconds)
+  implicit val ec = context.dispatcher
   
   //ENUM GAME STATUS
   // 0 = waiting
@@ -59,7 +65,15 @@ class GameManagerBackend () extends Actor {
       players = players.filterNot(elm => elm.uid == user.uid)
       // Se non abbiamo più giocatori dobbiamo dire al GameManager Client  di uccidersi
       if (players.size == 0) {
-        
+        val future = gameManagerClient ? KillYourself
+          future.onSuccess { 
+            case KillMyself => 
+              Logger.info ("GameManagerBackend: GMClient will die")
+              self ! PoisonPill
+          }
+          future onFailure {
+            case e: Exception => Logger.info("******GAME MANAGER BACKEND KILL ERROR ******")
+          }
       } else {
         gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players))
       }
