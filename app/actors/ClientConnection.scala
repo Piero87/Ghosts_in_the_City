@@ -73,6 +73,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
               Logger.info("Ops JoinGame: "+e.toString())
           }
          case "leave_game" =>
+           Logger.info("CC: LeaveGame request")
            var userInfo = new UserInfo(uid,username,"")
            gameManagerClient ! LeaveGame(userInfo)
       }

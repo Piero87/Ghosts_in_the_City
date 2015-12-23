@@ -71,7 +71,8 @@ class GameManagerClient (backend: ActorRef) extends Actor {
         cc._2 forward GameStatusBroadcast(game)
       }
     case LeaveGame(user: UserInfo) =>
-      clientsConnections.filterNot(elm => elm._1.uid == user.uid)
+      Logger.info("GMClient: LeaveGame Request")
+      clientsConnections = clientsConnections.filterNot(elm => elm._1.uid == user.uid)
       gameManagerBackend ! LeaveGame(user)
 //    case Terminated(a) =>
 //      Logger.info("******un ClientConnection è mooooorto*********")

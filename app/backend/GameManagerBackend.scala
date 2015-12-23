@@ -56,7 +56,8 @@ class GameManagerBackend () extends Actor {
         Logger.info("GMB: non ci sono più posti per la partita, attaccati al cazzo")
       }
     case LeaveGame(user: UserInfo) =>
-      players.filterNot(elm => elm.uid == user.uid)
+      Logger.info("GMBackend: LeaveGame Request") 
+      players = players.filterNot(elm => elm.uid == user.uid)
       gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players))
   }
   
