@@ -4,13 +4,15 @@
 # This class handles most of the user interactions with the buttons/menus/forms on the page, as well as manages
 # the WebSocket connection.	It delegates to other classes to manage everything else.
 #
-define ["knockout", "gps"], (ko, Gps) ->
+define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 	class MainPageModel
 		constructor: () ->
 		
 			# User data
 			@username = ko.observable()
-			@user = {uid: "", name: "", team: ""}
+			pos_x = Math.round(Math.random()*500)
+			pos_y = Math.round(Math.random()*500)
+			@user = {uid: "", name: "", team: "", x: pos_x, y: pos_y}
 			
 			# Game data
 			@gameready = ko.observable(false)
@@ -86,7 +88,7 @@ define ["knockout", "gps"], (ko, Gps) ->
 					# Update all the markers on the map
 					#@map.updateMarkers(json.positions.features)
 				else if json.event == "games_list"
-					console.log('Games list received!')
+					#console.log('Games list received!')
 					@gameslist.removeAll()
 					if json.list.length > 0
 						@gamesavailable(true)
@@ -116,7 +118,10 @@ define ["knockout", "gps"], (ko, Gps) ->
 						when 0 # game waiting
 							@refreshPlayerList(json)
 						when 1 # game started
+							console.log(JSON.stringify(json))
 							@refreshPlayerList(json)
+							@game_map = new GameMap(@user.uid, json.game.players, "gameArena", 500, 500, @ws)
+							@game_map.startGame()
 						when 2 # game paused
 							console.log('Hold on!')
 						when 3 # game ended
@@ -145,7 +150,7 @@ define ["knockout", "gps"], (ko, Gps) ->
 		
 		# Games list
 		gamesList: ->
-			console.log("Games List")
+			#console.log("Games List")
 			@ws.send(JSON.stringify
 				event: "games_list"
 				user: @user
@@ -164,6 +169,7 @@ define ["knockout", "gps"], (ko, Gps) ->
 		# Disconnect the ws
 		disconnect: ->
 			clearInterval(@interval) if(@interval)
+			@changeGameStatus(-1)
 			@closing = true
 			@ws.close()
 		

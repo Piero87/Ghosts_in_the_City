@@ -5,6 +5,7 @@ require.config {
   paths: {
     mainPage: "./models/mainPage"
     gps: "./services/gps"
+    gameMap: "./services/gameMap"
     md5: "./md5.min"
     bootstrap: "../lib/bootstrap/js/bootstrap"
     jquery: "../lib/jquery/jquery"
