@@ -51,7 +51,7 @@ class GameManagerBackend () extends Actor {
           //Se è l'ultimo giocatore allora mandiamo il messaggio di star a tutti i giocatori
           game_status = StatusGame.STARTED
           gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players))
-          //context.system.scheduler.scheduleOnce(1000 millis, self, "tick")
+          // context.system.scheduler.scheduleOnce(1000 millis, self, "tick")
         }
       } else {
         //***Failure message
