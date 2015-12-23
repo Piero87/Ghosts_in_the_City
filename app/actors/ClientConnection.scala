@@ -23,6 +23,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
   var gameManagerClient: ActorRef = _
   implicit val timeout = Timeout(5 seconds)
   implicit val ec = context.dispatcher
+  var game_id = ""
   
   def receive = {
     case msg: JsValue =>
@@ -37,6 +38,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
                 case GameHandler(game,ref) => 
                   Logger.info ("ClientConnection: Frontend Game Manager path: "+sender.path)
                   if (ref != null) gameManagerClient = ref
+                  game_id = game.id
                   var player_info_fake = new UserInfo("0","server","")
                   var g_json = new GameJSON("game_ready",game,player_info_fake)
                   val json = Json.toJson(g_json)(CommonMessages.gameJSONWrites)
@@ -64,6 +66,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
                 case GameHandler(game,ref) =>  
                   Logger.info ("ClientConnection: Frontend Game Manager path: "+sender.path)
                   if (ref != null) gameManagerClient = ref
+                  game_id = game.id
                   var player_info_fake = new UserInfo("0","server","")
                   var g_json = new GameJSON("game_ready",game,player_info_fake)
                   val json = Json.toJson(g_json)(CommonMessages.gameJSONWrites)
@@ -74,6 +77,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
           }
          case "leave_game" =>
            Logger.info("CC: LeaveGame request")
+           game_id = ""
            var userInfo = new UserInfo(uid,username,"")
            gameManagerClient ! LeaveGame(userInfo)
       }
@@ -85,7 +89,9 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
   }
   
   override def postStop() = {
-    var userInfo = new UserInfo(uid,username,"")
-    gameManagerClient ! LeaveGame(userInfo)
+    if (game_id != "") {
+      var userInfo = new UserInfo(uid,username,"")
+      gameManagerClient ! LeaveGame(userInfo)
+    }
   }
 }
