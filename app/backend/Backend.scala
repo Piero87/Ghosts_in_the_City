@@ -49,11 +49,14 @@ class Backend extends Actor {
       newGame(name,n_players,user,ref)
     case GamesList =>
       gamesList(sender)
+    case Terminated(a) =>
+      game_manager_backends = game_manager_backends.filterNot(_ == a)
       
   }
 
   def newGame (name: String, n_players: Int, user: UserInfo, ref: ActorRef) = {
     val gm_backend = context.actorOf(Props[GameManagerBackend], name = name)
+    context watch gm_backend
     game_manager_backends = game_manager_backends :+ gm_backend
     Logger.info("Backend: Actor created, forward message...")
     Logger.info("Backend PreForward: "+ref.toString())

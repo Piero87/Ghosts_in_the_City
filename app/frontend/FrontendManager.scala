@@ -8,6 +8,7 @@ import akka.pattern.ask
 import scala.concurrent.duration._
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
+import backend.Backend
 
 class FrontendManager extends Actor {
   
@@ -35,13 +36,22 @@ class FrontendManager extends Actor {
       context watch sender()
       backends = backends :+ sender()
     case Terminated(a) =>
-      backends = backends.filterNot(_ == a)
+      if (a.actorRef == GameManagerClient) {
+        Logger.info("FRONTEND: Ho eliminato un GMBackend")
+        game_manager_frontends = game_manager_frontends.filterNot(_ == a)
+        
+      } else if (a.actorRef == Backend) {
+        Logger.info("FRONTEND: Ho eliminato un Backend")
+        backends = backends.filterNot(_ == a)
+      }
+      
   }
   
   def newGame (name: String,n_players: Int, user: UserInfo, ref: ActorRef) = {
     backendCounter += 1
     var b = backends(backendCounter % backends.size)
     val gm_client = context.actorOf(Props(new GameManagerClient(b)), name = name)
+    context watch gm_client
     game_manager_frontends = game_manager_frontends :+ gm_client
     Logger.info("FrontendManager: Backend selected and Actor created, forward message...")
     gm_client forward NewGame(name,n_players, user,ref)

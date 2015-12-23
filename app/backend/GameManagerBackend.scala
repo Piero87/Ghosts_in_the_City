@@ -3,8 +3,12 @@ package backend
 import akka.actor._
 import play.api.Logger
 import common._
-import scala.concurrent.duration.Duration;
-import java.util.concurrent.TimeUnit;
+import scala.concurrent.duration.Duration
+import java.util.concurrent.TimeUnit
+import scala.concurrent.duration._
+import akka.util.Timeout
+import akka.pattern.ask
+import scala.util.{Failure, Success}
 
 class GameManagerBackend () extends Actor {
   
@@ -14,6 +18,9 @@ class GameManagerBackend () extends Actor {
   var game_id = java.util.UUID.randomUUID.toString
   var game_n_players = 0
   var game_status = StatusGame.WAITING
+  
+  implicit val timeout = Timeout(5 seconds)
+  implicit val ec = context.dispatcher
   
   //ENUM GAME STATUS
   // 0 = waiting
@@ -49,6 +56,7 @@ class GameManagerBackend () extends Actor {
           //Se è l'ultimo giocatore allora mandiamo il messaggio di star a tutti i giocatori
           game_status = StatusGame.STARTED
           gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players))
+          //context.system.scheduler.scheduleOnce(1000 millis, self, "tick")
         }
       } else {
         //***Failure message
@@ -57,12 +65,26 @@ class GameManagerBackend () extends Actor {
     case LeaveGame(user: UserInfo) =>
       Logger.info("GMBackend: LeaveGame Request") 
       players = players.filterNot(elm => elm.uid == user.uid)
+      sender ! Success
+     
       // Se non abbiamo più giocatori dobbiamo dire al GameManager Client  di uccidersi
       if (players.size == 0) {
-        
+        val future = gameManagerClient ? KillYourself
+          future.onSuccess { 
+            case KillMyself => 
+              Logger.info ("GameManagerBackend: GMClient will die")
+              self ! PoisonPill
+          }
+          future onFailure {
+            case e: Exception => Logger.info("******GAME MANAGER BACKEND KILL ERROR ******")
+          }
       } else {
+        // Ci sono ancora giocatori nella lista quindi aggiorna lo stato
         gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players))
       }
+    case "tick" =>
+      //qui
+      //context.system.scheduler.scheduleOnce(1000 millis, self, "tick")
       
   }
   
