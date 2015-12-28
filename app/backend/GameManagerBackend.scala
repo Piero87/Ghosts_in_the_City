@@ -9,7 +9,7 @@ import scala.concurrent.duration._
 import akka.util.Timeout
 import akka.pattern.ask
 import scala.util.{Failure, Success}
-import scala.util.Random
+import util.Random.nextInt
 
 class GameManagerBackend () extends Actor {
   
@@ -31,7 +31,8 @@ class GameManagerBackend () extends Actor {
       game_status = StatusGame.WAITING
       Logger.info("GMBackend NewGame From: "+ref.toString())
       gameManagerClient = ref
-      var p = user
+      var rnd_team = selectTeam()
+      val p = new UserInfo(user.uid,user.name,rnd_team,user.x,user.y)
       players = players :+ p
       var g = new Game(game_id,name,n_players,game_status,players)
       sender ! GameHandler(g,self)
@@ -41,7 +42,10 @@ class GameManagerBackend () extends Actor {
       Logger.info("GMBackend richiesta join ricevuta")
       if (players.size < game_n_players) {
         Logger.info("GMBackend richiesta join accettata")
-        var p = user
+        //Scegliamo un Team Random Blu o Rosso
+        var rnd_team = selectTeam()
+        
+        val p = new UserInfo(user.uid,user.name,rnd_team,user.x,user.y)
         players = players :+ p
         sender ! Game(game_id,game_name,game_n_players,game_status,players)
         //Ora mandiamo il messaggio di update game status a tutti i giocatori (***Dobbiamo evitare di mandarlo a quello che si è
@@ -78,6 +82,12 @@ class GameManagerBackend () extends Actor {
         // Ci sono ancora giocatori nella lista quindi aggiorna lo stato
         gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players))
       }
+    case UpdatePosition(userInfo) =>
+      for( a <- 1 to players.size) {
+        if (players(a).uid == userInfo.uid) {
+          players(a).x = userInfo.x
+        }
+      }
     case "tick" =>
       Logger.info("Tick")
 //      //qui
@@ -94,5 +104,18 @@ class GameManagerBackend () extends Actor {
   
   def newGame () = {
       //...inizializza attori partita
+  }
+  
+  def selectTeam() = {
+    var rnd_team = nextInt(2)
+    //Restituisce il numero di giocatori che appartengono già a quel tipo appena selezionato
+    var count_rnd_team = players.count(_.team == rnd_team)
+                  
+    if (!(count_rnd_team < game_n_players/2)) {
+      //Opposto
+      rnd_team = 1-rnd_team
+    }
+    
+    rnd_team
   }
 }

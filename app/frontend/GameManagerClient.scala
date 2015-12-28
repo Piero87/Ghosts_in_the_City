@@ -90,9 +90,10 @@ class GameManagerClient (backend: ActorRef) extends Actor {
          var g = new Game(game_id,game_name,game_n_players,game_status,List())
          self ! GameStatusBroadcast(g)
        }
-       
        sender ! KillMyself
        self ! PoisonPill
+    case UpdatePosition(userInfo) =>
+      gameManagerBackend ! UpdatePosition(userInfo)
         
   }
 }
