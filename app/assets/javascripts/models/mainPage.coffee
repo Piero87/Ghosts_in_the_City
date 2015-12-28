@@ -128,6 +128,9 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 							console.log('Game Over!')
 							localStorage.removeItem("gameid")
 							
+				else if json.event == "update_position"
+					@game_map.busterMove(json.uid, json.x, json.y)
+							
 		# The user clicked connect
 		submitUsername: ->
 			@user.uid = @generateUID()
