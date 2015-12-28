@@ -48,7 +48,6 @@ define () ->
 			return
 		
 		addBuster: (uid, name, x, y) ->
-			console.log("Buster added!");
 			buster = {}
 			buster.uid = uid
 			buster.name = name
@@ -68,11 +67,11 @@ define () ->
 			return
 		
 		busterMove: (uid, x, y) ->
-			for buster, i in @busters when buster.uid = uid
-				@busters[i].old_x buster.x
-				@busters[i].old_y buster.y
-				@busters[i].x x
-				@busters[i].y y
+			for buster, i in @busters when buster.uid == uid
+				@busters[i].old_x = buster.x
+				@busters[i].old_y = buster.y
+				@busters[i].x = x
+				@busters[i].y = y
 			
 		addGhost: (uid, x, y) ->
 			ghost = {}
@@ -93,29 +92,28 @@ define () ->
 			return
 		
 		ghostMove: (uid, x, y) ->
-			for ghost, i in @ghosts when ghost.uid = uid
-				@ghosts[i].old_x ghost.x
-				@ghosts[i].old_y ghost.y
-				@ghosts[i].x x
-				@ghosts[i].y y
+			for ghost, i in @ghosts when ghost.uid == uid
+				@ghosts[i].old_x = ghost.x
+				@ghosts[i].old_y = ghost.y
+				@ghosts[i].x = x
+				@ghosts[i].y = y
 		
 		doGameLoop: ->
 			
 			for buster, i in @busters
 				@ctx.putImageData(@emptyBack, @busters[i].old_x, @busters[i].old_y);
-				@ctx.drawImage(@busters_images[i], @busters[i].x, @busters[i].y);
+				@ctx.drawImage(@busters_images[i], @busters[i].x, @busters[i].y, @icon_dim, @icon_dim);
 			
 			for ghost, i in @ghosts
 				@ctx.putImageData(@emptyBack, @ghosts[i].old_x, @ghosts[i].old_y);
-				@ctx.drawImage(@ghosts_images[i], @ghosts[i].x, @ghosts[i].y);
+				@ctx.drawImage(@ghosts_images[i], @ghosts[i].x, @ghosts[i].y, @icon_dim, @icon_dim);
 		
 			return
 		
 		# Get key press.
 		
 		whatKey: (evt) ->
-			for buster, i in @busters when buster.uid = @user_id
-				console.log buster
+			for buster, i in @busters when buster.uid == @user_id
 				
 				# Arrows keys
 				arrows = [
@@ -127,43 +125,50 @@ define () ->
 				# Flag to put variables back if we hit an edge of the board.
 				flag = 0
 				# Get where the buster was before key process.
-				@busters[i].old_x @busters[i].x
-				@busters[i].old_y @busters[i].y
+				@busters[i].old_x = @busters[i].x
+				@busters[i].old_y = @busters[i].y
 				if arrows.indexOf(evt.keyCode) == -1
 					return false
 				switch evt.keyCode
 					# Left arrow.
 					when 37
-						@busters[i].x @busters[i].x - @move
+						@busters[i].x = @busters[i].x - @move
 						if @busters[i].x < 0
 							# If at edge, reset buster position and set flag.
-							@busters[i].x 0
+							@busters[i].x = 0
 							flag = 1
 					# Right arrow.
 					when 39
-						@busters[i].x @busters[i].x + @move
+						@busters[i].x = @busters[i].x + @move
 						if @busters[i].x > @space_width - @icon_dim
 							# If at edge, reset buster position and set flag.
-							@busters[i].x @space_width - @move
+							@busters[i].x = @space_width - @move
 							flag = 1
 					# Down arrow
 					when 40
-						@busters[i].y @busters[i].y + @move
+						@busters[i].y = @busters[i].y + @move
 						if @busters[i].y > @space_height - @icon_dim
 							# If at edge, reset buster position and set flag.
-							@busters[i].y @space_height - @move
+							@busters[i].y = @space_height - @move
 							flag = 1
 					# Up arrow 
 					when 38
-						@busters[i].y @busters[i].y - @move
+						@busters[i].y = @busters[i].y - @move
 						if @busters[i].y < 0
 							# If at edge, reset buster position and set flag.
-							@busters[i].y 0
+							@busters[i].y = 0
 							flag = 1
+				
+				@ws.send(JSON.stringify
+					event: "update_position"
+					x: @busters[i].x
+					y: @busters[i].y
+				)
+				
 				# If flag is set, the buster did not move.
 				# Put everything backBuster the way it was.
 				if flag
-					@busters[i].x @busters[i].old_x
-					@busters[i].y @busters[i].old_y
-	        
+					@busters[i].x = @busters[i].old_x
+					@busters[i].y = @busters[i].old_y
+	        	
 	return GameMap
