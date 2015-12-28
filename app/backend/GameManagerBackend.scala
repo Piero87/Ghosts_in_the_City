@@ -63,7 +63,8 @@ class GameManagerBackend () extends Actor {
       sender ! Success
      
       // Se non abbiamo più giocatori dobbiamo dire al GameManager Client  di uccidersi
-      if (players.size == 0) {
+      if (players.size == 0 || game_status == StatusGame.STARTED) {
+        game_status = StatusGame.FINISHED
         val future = gameManagerClient ? KillYourself
           future.onSuccess { 
             case KillMyself => 

@@ -85,6 +85,9 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       }
     case KillYourself => 
        Logger.info ("GameManagerBackend: GMClient will die")
+       game_status = StatusGame.FINISHED
+       var g = new Game(game_id,game_name,game_n_players,game_status,List())
+       self ! GameStatusBroadcast(g)
        sender ! KillMyself
        self ! PoisonPill
         
