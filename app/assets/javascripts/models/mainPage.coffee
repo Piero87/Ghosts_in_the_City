@@ -133,7 +133,7 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 							localStorage.removeItem("gameid")
 							
 				else if json.event == "update_position"
-					@game_map.busterMove(json.uid, json.x, json.y)
+					@game_map.busterMove(json.user.uid, json.user.x, json.user.y)
 							
 		# The user clicked connect
 		submitUsername: ->
