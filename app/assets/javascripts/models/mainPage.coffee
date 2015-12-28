@@ -10,6 +10,7 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 		
 			# User data
 			@username = ko.observable()
+			@useruid = ko.observable()
 			pos_x = Math.round(Math.random()*500)
 			pos_y = Math.round(Math.random()*500)
 			@user = {uid: "", name: "", team: "", x: pos_x, y: pos_y}
@@ -44,8 +45,11 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 			# Load previously user name if set
 			if localStorage.username
 				@username(localStorage.username)
+				@useruid(localStorage.uid)
+				
 				@user.name = localStorage.username
 				@user.uid = localStorage.uid
+				
 				@connect()
 		
 		# Connect
@@ -134,6 +138,7 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 		# The user clicked connect
 		submitUsername: ->
 			@user.uid = @generateUID()
+			@useruid(@user.uid)
 			@user.name = @username()
 			localStorage.setItem("uid", @user.uid)
 			localStorage.setItem("username", @user.name)
@@ -146,7 +151,6 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 			console.log("New Game")
 			@ws.send(JSON.stringify
 				event: "new_game"
-				user: @user
 				name: gamename
 				n_players: parseInt( gamemaxplayers, 10 )
 			)
@@ -156,8 +160,6 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 			#console.log("Games List")
 			@ws.send(JSON.stringify
 				event: "games_list"
-				user: @user
-				list: []
 			)
 		
 		# Join Game 
@@ -165,7 +167,6 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 			console.log("Join Game")
 			@ws.send(JSON.stringify
 				event: "join_game"
-				user: @user
 				game: game
 			)
 		

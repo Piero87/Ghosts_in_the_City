@@ -161,7 +161,6 @@ define () ->
 				
 				@ws.send(JSON.stringify
 					event: "update_position"
-					user: @user_id
 					x: @busters[i].x
 					y: @busters[i].y
 				)
