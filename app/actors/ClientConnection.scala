@@ -41,9 +41,9 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
                   Logger.info ("ClientConnection: Frontend Game Manager path: "+sender.path)
                   if (ref != null) gameManagerClient = ref
                   game_id = game.id
-                  for( a <- 0 to game.players.size) {
-                     if (game.players(a).uid == uid) {
-                       team = game.players(a).team
+                  for( user <- game.players) {
+                     if (user.uid == uid) {
+                       team = user.team
                      } 
                   }
                   var g_json = new GameJSON("game_ready",game)
@@ -73,9 +73,9 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
                   Logger.info ("ClientConnection: Frontend Game Manager path: "+sender.path)
                   if (ref != null) gameManagerClient = ref
                   game_id = game.id
-                  for( a <- 0 to game.players.size) {
-                     if (game.players(a).uid == uid) {
-                       team = game.players(a).team
+                  for( user <- game.players) {
+                     if (user.uid == uid) {
+                       team = user.team
                      } 
                   }
                   var g_json = new GameJSON("game_ready",game)

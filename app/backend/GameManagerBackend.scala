@@ -83,11 +83,13 @@ class GameManagerBackend () extends Actor {
         gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players))
       }
     case UpdatePosition(user) =>
-      for( a <- 0 to players.size) {
-        if (players(a).uid == user.uid) {
+      var i = 0
+      for(user <- players) {
+        if (user.uid == user.uid) {
           val p = new UserInfo(user.uid,user.name,user.team,user.x,user.y)
-          players.updated(a,p)
+          players.updated(i,p)
         }
+        i = i + 1
       }
       sender ! BroadcastUpdatePosition(user)
       
