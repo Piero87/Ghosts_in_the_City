@@ -34,13 +34,14 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
           val newGameResult: JsResult[NewGameJSON] = msg.validate[NewGameJSON](CommonMessages.newGameReads)
           newGameResult match {
             case s: JsSuccess[NewGameJSON] => 
-              val future = frontendManager ? NewGame(s.get.name.replaceAll(" ", "_")+"_"+System.currentTimeMillis(),s.get.n_players,s.get.user,self)
+              var user_info = new UserInfo(uid,username,team,0,0)
+              val future = frontendManager ? NewGame(s.get.name.replaceAll(" ", "_")+"_"+System.currentTimeMillis(),s.get.n_players,user_info,self)
               future.onSuccess {
                 case GameHandler(game,ref) => 
                   Logger.info ("ClientConnection: Frontend Game Manager path: "+sender.path)
                   if (ref != null) gameManagerClient = ref
                   game_id = game.id
-                  for( a <- 1 to game.players.size) {
+                  for( a <- 0 to game.players.size) {
                      if (game.players(a).uid == uid) {
                        team = game.players(a).team
                      } 
@@ -65,7 +66,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
           val joinGameResult: JsResult[JoinGameJSON] = msg.validate[JoinGameJSON](CommonMessages.joinGameReads)
           joinGameResult match {
             case s: JsSuccess[JoinGameJSON] =>
-              var user_info = new UserInfo(uid,username,Team.UNKNOWN,0,0)
+              var user_info = new UserInfo(uid,username,team,0,0)
               val future = frontendManager ? JoinGame(s.get.game,user_info,self)
               future.onSuccess {
                 case GameHandler(game,ref) =>  
@@ -87,7 +88,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
          case "leave_game" =>
            Logger.info("CC: LeaveGame request")
            game_id = ""
-           var userInfo = new UserInfo(uid,username,Team.UNKNOWN, 0,0)
+           var userInfo = new UserInfo(uid,username,team, 0,0)
            gameManagerClient ! LeaveGame(userInfo)
          case "update_position" =>
            val updatePositionResult: JsResult[UpdatePositionJSON] = msg.validate[UpdatePositionJSON](CommonMessages.updatePositionReads)
@@ -112,7 +113,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
   
   override def postStop() = {
     if (game_id != "") {
-      var userInfo = new UserInfo(uid,username,Team.UNKNOWN, 0,0)
+      var userInfo = new UserInfo(uid,username,team, 0,0)
       gameManagerClient ! LeaveGame(userInfo)
     }
   }
