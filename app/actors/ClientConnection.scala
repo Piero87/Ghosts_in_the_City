@@ -104,6 +104,10 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
       var g_json = new GameJSON("game_status",game)
       val json = Json.toJson(g_json)(CommonMessages.gameJSONWrites)
       upstream ! json
+    case BroadcastUpdatePosition(user: UserInfo) =>
+      var broadcast_update_pos = new BroadcastUpdatePositionJSON("update_position",user)
+      val json = Json.toJson(broadcast_update_pos)(CommonMessages.broadcastUpdatePositionWrites)
+      upstream ! json
   }
   
   override def postStop() = {

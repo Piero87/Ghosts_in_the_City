@@ -92,8 +92,12 @@ class GameManagerClient (backend: ActorRef) extends Actor {
        }
        sender ! KillMyself
        self ! PoisonPill
-    case UpdatePosition(userInfo) =>
-      gameManagerBackend ! UpdatePosition(userInfo)
+    case UpdatePosition(user) =>
+      gameManagerBackend ! UpdatePosition(user)
+    case BroadcastUpdatePosition(user) =>
+      clientsConnections.map {cc =>
+        if (cc._1.uid != user.uid) cc._2 forward BroadcastUpdatePosition(user)
+      }
         
   }
 }

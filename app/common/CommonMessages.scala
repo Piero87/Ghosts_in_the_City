@@ -26,7 +26,7 @@ case object GameStatus
 case object KillYourself
 case object KillMyself
 case class UpdatePosition(user: UserInfo)
-
+case class BroadcastUpdatePosition(user: UserInfo)
 
 case class GameStatusBroadcast(game: Game)
 case class JoinGame(game: Game, user: UserInfo, ref: ActorRef = null)
@@ -39,6 +39,7 @@ case class GamesListRequestJSON(event: String)
 case class JoinGameJSON(event: String, game: Game)
 case class LeaveGameJSON(event: String)
 case class UpdatePositionJSON(event: String, x: Int, y: Int)
+case class BroadcastUpdatePositionJSON(event: String, user: UserInfo)
 
 import play.api.libs.json._
 
@@ -70,4 +71,7 @@ object CommonMessages {
   
   implicit val updatePositionReads = Json.reads[UpdatePositionJSON]
   implicit val updatePositionWrites = Json.writes[UpdatePositionJSON]
+  
+  implicit val broadcastUpdatePositionReads = Json.reads[BroadcastUpdatePositionJSON]
+  implicit val broadcastUpdatePositionWrites = Json.writes[BroadcastUpdatePositionJSON]
 }
