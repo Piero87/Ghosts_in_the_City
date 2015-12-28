@@ -88,7 +88,7 @@
 				    	<span class="col-xs-6" align="right">
 				    		<img width="32px" height="32px" alt="Buster Icon" data-bind="attr:{src: '/assets/images/G' + ($index() + 1) + '.png'}"/>
 				    	</span>
-				    	<span data-bind="if: uid === useruid">
+				    	<span data-bind="if: uid === useruid()">
 				    		<span style="color: red !important;">
 				    			<span class="col-xs-6 ghostbuster-font" align="left" data-bind="text: name"></span>
 				    		</span>
@@ -109,11 +109,10 @@
 					    	<span class="col-xs-6" align="right">
 					    		<img width="32px" height="32px" alt="Buster Icon" data-bind="attr:{src: '/assets/images/G' + ($index() + 1) + '.png'}"/>
 					    	</span>
-					    	<!--  <span data-bind="if: uid() === useruid()"> 
+					    	<span data-bind="if: uid === useruid()"> 
 					    		<span style="color: red !important;"> -->
 					    			<span class="col-xs-6 ghostbuster-font" align="left" data-bind="text: name"></span>
-					    	<!--  	</span>
-					    	</span>  -->
+					    		</span>
 					    </div>
 					</div>
 				</div>
