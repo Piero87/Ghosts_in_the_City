@@ -78,7 +78,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
          case "leave_game" =>
            Logger.info("CC: LeaveGame request")
            game_id = ""
-           var userInfo = new UserInfo("0","server","", 0,0)
+           var userInfo = new UserInfo(uid,username,"", 0,0)
            gameManagerClient ! LeaveGame(userInfo)
       }
     case GameStatusBroadcast(game: Game) =>
@@ -90,7 +90,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
   
   override def postStop() = {
     if (game_id != "") {
-      var userInfo = new UserInfo("0","server","", 0,0)
+      var userInfo = new UserInfo(uid,username,"", 0,0)
       gameManagerClient ! LeaveGame(userInfo)
     }
   }
