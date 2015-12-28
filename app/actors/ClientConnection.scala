@@ -73,7 +73,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
                   Logger.info ("ClientConnection: Frontend Game Manager path: "+sender.path)
                   if (ref != null) gameManagerClient = ref
                   game_id = game.id
-                  for( a <- 1 to game.players.size) {
+                  for( a <- 0 to game.players.size) {
                      if (game.players(a).uid == uid) {
                        team = game.players(a).team
                      } 
