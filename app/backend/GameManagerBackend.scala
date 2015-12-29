@@ -15,6 +15,7 @@ class GameManagerBackend () extends Actor {
   
   var gameManagerClient: ActorRef = _
   var players: List[UserInfo] = List()
+  var ghosts: List[Tuple2[GhostInfo, ActorRef]] = List()
   var game_name = ""
   var game_id = java.util.UUID.randomUUID.toString
   var game_n_players = 0
