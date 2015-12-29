@@ -98,6 +98,10 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       clientsConnections.map {cc =>
         if (cc._1.uid != user.uid) cc._2 forward BroadcastUpdatePosition(user)
       }
+    case BroadcastGhostsPositions(ghosts) =>
+      clientsConnections.map {cc =>
+        cc._2 forward BroadcastGhostsPositions(ghosts)
+      }
         
   }
 }
