@@ -1,7 +1,6 @@
 package backend.actors
 
 import akka.actor._
-import play.extras.geojson._
 import scala.math._
 import play.api.Logger
 import scala.concurrent.duration.Duration
@@ -10,7 +9,6 @@ import java.util.concurrent.TimeUnit
 import akka.util.Timeout
 import akka.pattern.ask
 import common._
-import common.Util
 
 object Ghost{
   
@@ -24,20 +22,21 @@ object Ghost{
    */
   case object UpdateGhostPosition
   
-  def props(area: Util.Polygon, position: Util.Point, level: Int, treasure: ActorRef) = Props(new Ghost(area,position, level, treasure))
+  def props(area: Polygon, position: Point, level: Int, treasure: ActorRef) = Props(new Ghost(area,position, level, treasure))
 }
 
-class Ghost(area : Util.Polygon, position: Util.Point, level: Int, treasure: ActorRef) extends Actor {
+class Ghost(area : Polygon, position: Point, level: Int, treasure: ActorRef) extends Actor {
   
   import context._
   import Ghost._
   
   implicit val timeout = Timeout(5 seconds)
   
-  var ghostpos: Util.Point = position
+  var ghostpos: Point = position
   var mood = GhostMood.CALM
   var GMbackend: ActorRef = _
   val range = level * 75
+  val area_Edge = area.foundEdge
   
   def receive = {
     case Start => 
@@ -51,10 +50,10 @@ class Ghost(area : Util.Polygon, position: Util.Point, level: Int, treasure: Act
       future.onSuccess { 
         case Players(players) => 
           Logger.info ("Player positions received")
-          var playerpos = new Util.Point(0,0)
+          var playerpos = new Point(0,0)
           var playerdist : Double = 500
           for(player <- players){
-            var currentplayerpos = new Util.Point(player.x, player.y)
+            var currentplayerpos = new Point(player.x, player.y)
             var distance = Math.sqrt(Math.pow((currentplayerpos.x - ghostpos.y),2) + Math.pow((currentplayerpos.x - ghostpos.y),2))
             if(distance < range){
               // Salvo solamente la posizone la cui distanza è minore
@@ -62,6 +61,7 @@ class Ghost(area : Util.Polygon, position: Util.Point, level: Int, treasure: Act
                 playerdist = distance
                 playerpos = currentplayerpos 
               }
+              // Sono incazzato!
               mood = GhostMood.ANGRY
             }else{
               // Nessuno all'interno del range
@@ -74,13 +74,14 @@ class Ghost(area : Util.Polygon, position: Util.Point, level: Int, treasure: Act
             attackPlayer(playerpos)
           }
           system.scheduler.scheduleOnce(500 millis, self, UpdateGhostPosition)
-          }
+        }
       future onFailure {
-        case e: Exception => Logger.info("******GHOST PLAYER POSITION ERROR ******")
+        case e: Exception => Logger.info("******GHOST REQUET PLAYER POSITION ERROR ******")
       }
   }
   
-  def random_move(position: Util.Point) = {
+  def random_move(position: Point) = {
+    
      val delta_time = 3
      val speed = 10.0
      
@@ -92,15 +93,19 @@ class Ghost(area : Util.Polygon, position: Util.Point, level: Int, treasure: Act
      var lat = (vx * delta_time) + position.x
      var lng = (vy * delta_time) + position.y
      
-     var new_position = new Util.Point(lat, lng)
+     var new_position = new Point(lat, lng)
      
-     ghostpos = new_position
+     if(area.contains(new_position, area_Edge)){
+       ghostpos = new_position
+     }else{
+       ghostpos = position
+     }
      
      context.parent ! ghostpos
      
   }
   
-  def attackPlayer(player_pos: Util.Point) = {
+  def attackPlayer(player_pos: Point) = {
     
   }
   

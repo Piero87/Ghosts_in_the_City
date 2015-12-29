@@ -106,8 +106,12 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
       val json = Json.toJson(g_json)(CommonMessages.gameJSONWrites)
       upstream ! json
     case BroadcastUpdatePosition(user: UserInfo) =>
-      var broadcast_update_pos = new BroadcastUpdatePositionJSON("update_position",user)
+      var broadcast_update_pos = new BroadcastUpdatePositionJSON("update_player_position",user)
       val json = Json.toJson(broadcast_update_pos)(CommonMessages.broadcastUpdatePositionWrites)
+      upstream ! json
+    case BroadcastGhostsPositions(ghosts) =>
+      var g_json = new BroadcastGhostsPositionsJSON("update_ghosts_positions",ghosts)
+      val json = Json.toJson(g_json)(CommonMessages.broadcastGhostsPositionWrites)
       upstream ! json
   }
   

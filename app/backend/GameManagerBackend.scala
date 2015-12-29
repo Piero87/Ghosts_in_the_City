@@ -11,12 +11,14 @@ import akka.pattern.ask
 import scala.util.{Failure, Success}
 import util.Random.nextInt
 import backend.actors._
+import backend.actors.models._
 
 class GameManagerBackend () extends Actor {
   
   var gameManagerClient: ActorRef = _
   var players: List[UserInfo] = List()
   var ghosts: List[Tuple2[GhostInfo, ActorRef]] = List()
+  var treasures: List[Tuple2[TreasureInfo, ActorRef]] = List()
   var game_name = ""
   var game_id = java.util.UUID.randomUUID.toString
   var game_n_players = 0
@@ -37,11 +39,13 @@ class GameManagerBackend () extends Actor {
       val p = new UserInfo(user.uid,user.name,rnd_team,user.x,user.y)
       players = players :+ p
       val tmp_g = ghosts.map(x => x._1).toList
-      var g = new Game(game_id,name,n_players,game_status,players,tmp_g)
+      val tmp_t = treasures.map(x => x._1).toList
+      var g = new Game(game_id,name,n_players,game_status,players,tmp_g,tmp_t)
       sender ! GameHandler(g,self)
     case GameStatus =>
       val tmp_g = ghosts.map(x => x._1).toList
-      sender ! Game(game_id,game_name,game_n_players,game_status,players,tmp_g)
+      val tmp_t = treasures.map(x => x._1).toList
+      sender ! Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t)
     case JoinGame(game,user,ref) =>
       Logger.info("GMBackend richiesta join ricevuta")
       if (players.size < game_n_players) {
@@ -52,22 +56,37 @@ class GameManagerBackend () extends Actor {
         val p = new UserInfo(user.uid,user.name,rnd_team,user.x,user.y)
         players = players :+ p
         val tmp_g = ghosts.map(x => x._1).toList
-        sender ! Game(game_id,game_name,game_n_players,game_status,players,tmp_g)
+        val tmp_t = treasures.map(x => x._1).toList
+        sender ! Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t)
         //Ora mandiamo il messaggio di update game status a tutti i giocatori (***Dobbiamo evitare di mandarlo a quello che si è
         //appena Joinato?
-        gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g))
+        gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
         if (players.size == game_n_players) {
           
           //Qui dovrà generare i fantasmi e i tesori
           for (i <- 0 to game_n_players) {
-            var p_zero = new Util.Point (0,0)
-            val ghost = context.actorOf(Props(new Ghost(Polygon(p_zero,p_zero,p_zero,p_zero),new_position),0,null), name = "bas")
+            var polygon = new Polygon(List(Point(0,0),Point(0,500),Point(500,0),Point(500,500)))
+            
+            var treasure_id = randomString(8)
+            //il boolean qui sotto si può fare random
+            var key = new Key(true,randomString(8))
+            //qui entrmabi i valori sono random
+            var gold = new Gold(true, 100)
+            var treasure_info = new TreasureInfo(treasure_id,0,0,0) 
+            val treasure = context.actorOf(Props(new Treasure(Point (0,0),key,gold,key)), name = treasure_id)
+            treasures = treasures :+ Tuple2(treasure_info,treasure)
+            
+            var ghost_id = randomString(8)
+            val ghost = context.actorOf(Props(new Ghost(polygon,Point (0,0),0,null)), name = ghost_id)
+            var ghost_info = new GhostInfo(ghost_id,0,GhostMood.CALM,0,0)
+            ghosts = ghosts :+ Tuple2(ghost_info,ghost)
           }
           
           game_status = StatusGame.STARTED
           val tmp_g = ghosts.map(x => x._1).toList
-          gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g))
-          // context.system.scheduler.scheduleOnce(1000 millis, self, "tick")
+          val tmp_t = treasures.map(x => x._1).toList
+          gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
+          context.system.scheduler.scheduleOnce(500 millis, self, UpdateGhostsPositions)
         }
       } else {
         //***Failure message
@@ -92,8 +111,9 @@ class GameManagerBackend () extends Actor {
           }
       } else {
         val tmp_g = ghosts.map(x => x._1).toList
+        val tmp_t = treasures.map(x => x._1).toList
         // Ci sono ancora giocatori nella lista quindi aggiorna lo stato
-        gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g))
+        gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
       }
     case UpdatePosition(user) =>
       var i = 0
@@ -106,17 +126,11 @@ class GameManagerBackend () extends Actor {
       }
       sender ! BroadcastUpdatePosition(user)
       
-    case "tick" =>
-      Logger.info("Tick")
-//      //qui
-//      players = players.map{ player => 
-//        val rnd = new scala.util.Random
-//        val range = 100 to 500
-//        player.x = 0
-//        player.y = range(rnd.nextInt(range length))
-//        
-//      }
-//      context.system.scheduler.scheduleOnce(1000 millis, self, "tick")
+    case UpdateGhostsPositions =>
+      Logger.info("UpdateGhostsPositions")
+      val tmp_g = ghosts.map(x => x._1).toList
+      gameManagerClient ! BroadcastGhostsPositions(tmp_g)
+      context.system.scheduler.scheduleOnce(500 millis, self, UpdateGhostsPositions)
       
   }
   
@@ -136,4 +150,6 @@ class GameManagerBackend () extends Actor {
     
     rnd_team
   }
+  
+  def randomString(length: Int) = scala.util.Random.alphanumeric.take(length).mkString
 }
