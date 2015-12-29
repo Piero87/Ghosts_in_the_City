@@ -73,11 +73,11 @@ class GameManagerBackend () extends Actor {
             //qui entrmabi i valori sono random
             var gold = new Gold(true, 100)
             var treasure_info = new TreasureInfo(treasure_id,0,0,0) 
-            val treasure = context.actorOf(Props(new Treasure(Point (0,0),key,gold,key)), name = treasure_id)
+            val treasure = context.actorOf(Props(new Treasure(treasure_id,Point (0,0),key,gold,key)), name = treasure_id)
             treasures = treasures :+ Tuple2(treasure_info,treasure)
             
             var ghost_id = randomString(8)
-            val ghost = context.actorOf(Props(new Ghost(polygon,Point (0,0),0,null)), name = ghost_id)
+            val ghost = context.actorOf(Props(new Ghost(ghost_id,polygon,Point (0,0),0,null)), name = ghost_id)
             var ghost_info = new GhostInfo(ghost_id,0,GhostMood.CALM,0,0)
             ghosts = ghosts :+ Tuple2(ghost_info,ghost)
           }
