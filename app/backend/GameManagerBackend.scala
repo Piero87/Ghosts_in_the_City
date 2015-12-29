@@ -50,14 +50,21 @@ class GameManagerBackend () extends Actor {
         
         val p = new UserInfo(user.uid,user.name,rnd_team,user.x,user.y)
         players = players :+ p
-        sender ! Game(game_id,game_name,game_n_players,game_status,players)
+        val tmp_g = ghosts.map(x => x._1).toList
+        sender ! Game(game_id,game_name,game_n_players,game_status,players,tmp_g)
         //Ora mandiamo il messaggio di update game status a tutti i giocatori (***Dobbiamo evitare di mandarlo a quello che si è
         //appena Joinato?
-        gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players))
+        gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g))
         if (players.size == game_n_players) {
           //Se è l'ultimo giocatore allora mandiamo il messaggio di star a tutti i giocatori
           game_status = StatusGame.STARTED
-          gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players))
+          //Qui dovrà generare i fantasmi e i tesori
+          
+          
+          
+          
+          val tmp_g = ghosts.map(x => x._1).toList
+          gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g))
           // context.system.scheduler.scheduleOnce(1000 millis, self, "tick")
         }
       } else {
@@ -82,8 +89,9 @@ class GameManagerBackend () extends Actor {
             case e: Exception => Logger.info("******GAME MANAGER BACKEND KILL ERROR ******")
           }
       } else {
+        val tmp_g = ghosts.map(x => x._1).toList
         // Ci sono ancora giocatori nella lista quindi aggiorna lo stato
-        gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players))
+        gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g))
       }
     case UpdatePosition(user) =>
       var i = 0
