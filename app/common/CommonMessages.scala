@@ -20,7 +20,8 @@ object Team extends Enumeration {
 
 object GhostStatus extends Enumeration {
   type GhostStatus = Int
-   val NORMAL = 0
+   val CALM = 0
+   val ANGRY = 1
 }
 
 case class GhostInfo(uid: String, level: Int, status: Int, x: Int, y: Int)
