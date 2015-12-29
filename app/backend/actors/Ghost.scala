@@ -47,7 +47,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
       Logger.info("Ghost: Updated position received")
       // Ciclo di vita del fantasma: chiedo al GMBackend le posizioni dei player, calcolo la distanza da ciascuno di essi 
       // se rientra nel range di azione attacco altrimenti mi muovo random
-      val future = GMbackend ? GiveMePlayerPosition
+      val future = GMbackend ? PlayersPositions
       future.onSuccess { 
         case Players(players) => 
           Logger.info ("Player positions received")
@@ -118,7 +118,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
       ghostpos = position
     }
     
-    context.parent ! ghostpos
+    GMbackend ! GhostPositionUpdate(uuid, ghostpos)
      
   }
   
@@ -160,7 +160,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
       ghostpos = position
     }
     
-    context.parent ! ghostpos
+    GMbackend ! GhostPositionUpdate(uuid, ghostpos)
    
   }
   
