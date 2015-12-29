@@ -73,9 +73,11 @@ define () ->
 				@busters[i].x = x
 				@busters[i].y = y
 			
-		addGhost: (uid, x, y) ->
+		addGhost: (uid, level, x, y) ->
 			ghost = {}
 			ghost.uid = uid
+			ghost.level = level
+			ghost.mood = 'calm'
 			ghost.x = x
 			# current ghost position X
 			ghost.y = y
@@ -87,12 +89,22 @@ define () ->
 			@ghosts.push ghost
 			ghost_img = new Image
 			# ghost
-			ghost_img.src = '/assets/images/ghost_right.png'
+			ghost_img.src = '/assets/images/Ghost_L' + level + '_right.png'
 			@ghosts_images.push ghost_img
 			return
 		
-		ghostMove: (uid, x, y) ->
+		ghostMove: (uid, mood, x, y) ->
 			for ghost, i in @ghosts when ghost.uid == uid
+				if mood == 'angry'
+					if ghost.x > x
+						@ghosts_images[i].src = '/assets/images/Ghost_L' + ghosts[i].level + '_Angry_left.png'
+					else
+						@ghosts_images[i].src = '/assets/images/Ghost_L' + ghosts[i].level + '_Angry_right.png'
+				else
+					if ghost.x > x
+						@ghosts_images[i].src = '/assets/images/Ghost_L' + ghosts[i].level + '_left.png'
+					else
+						@ghosts_images[i].src = '/assets/images/Ghost_L' + ghosts[i].level + '_right.png'
 				@ghosts[i].old_x = ghost.x
 				@ghosts[i].old_y = ghost.y
 				@ghosts[i].x = x
