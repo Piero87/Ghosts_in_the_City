@@ -33,8 +33,10 @@ case object GamesList
 case object GameStatus
 case object KillYourself
 case object KillMyself
+case object GiveMePlayerPosition
 case class UpdatePosition(user: UserInfo)
 case class BroadcastUpdatePosition(user: UserInfo)
+case class Players(players: List[UserInfo])
 
 case class GameStatusBroadcast(game: Game)
 case class JoinGame(game: Game, user: UserInfo, ref: ActorRef = null)
