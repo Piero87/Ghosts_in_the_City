@@ -58,10 +58,10 @@ class GameManagerClient (backend: ActorRef) extends Actor {
         val origin = sender
         val future = gameManagerBackend ? JoinGame(game,user)
         future.onSuccess { 
-          case Game(id,name,n_players, status,players) => 
+          case Game(id,name,n_players, status,players,ghosts) => 
             Logger.info ("GameManagerClient: Backend Game Manager path: "+sender.path)
             clientsConnections = clientsConnections :+ Tuple2(p,ccref)
-            var g = new Game(id,name,n_players,status,players)
+            var g = new Game(id,name,n_players,status,players,ghosts)
             origin ! GameHandler(g,self)
         }
         future onFailure {
@@ -87,7 +87,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
        Logger.info ("GameManagerBackend: GMClient will die")
        game_status = StatusGame.FINISHED
        if (clientsConnections.size > 0) {
-         var g = new Game(game_id,game_name,game_n_players,game_status,List())
+         var g = new Game(game_id,game_name,game_n_players,game_status,List(),List())
          self ! GameStatusBroadcast(g)
        }
        sender ! KillMyself

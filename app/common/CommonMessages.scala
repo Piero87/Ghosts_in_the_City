@@ -27,7 +27,7 @@ object GhostStatus extends Enumeration {
 case class GhostInfo(uid: String, level: Int, status: Int, x: Int, y: Int)
 case class UserInfo(uid: String, name: String, team: Int, x: Int, y: Int)
 case class NewGame(name: String, n_players: Int, user: UserInfo, ref: ActorRef = null)
-case class Game(id: String, name: String, n_players: Int, status: Int, players: List[UserInfo])
+case class Game(id: String, name: String, n_players: Int, status: Int, players: List[UserInfo], ghosts: List[GhostInfo])
 case class GamesList(list: List[Game])
 case object GamesList
 case object GameStatus
@@ -58,6 +58,9 @@ object CommonMessages {
   
   implicit val leaveGameReads = Json.reads[LeaveGameJSON]
   implicit val leaveGameWrites = Json.writes[LeaveGameJSON]
+  
+  implicit val ghostInfoReads = Json.reads[GhostInfo]
+  implicit val ghostInfoWrites = Json.writes[GhostInfo]
   
   implicit val gameReads = Json.reads[Game]
   implicit val gameWrites = Json.writes[Game]

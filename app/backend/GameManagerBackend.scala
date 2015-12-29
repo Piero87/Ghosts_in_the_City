@@ -35,10 +35,12 @@ class GameManagerBackend () extends Actor {
       var rnd_team = selectTeam()
       val p = new UserInfo(user.uid,user.name,rnd_team,user.x,user.y)
       players = players :+ p
-      var g = new Game(game_id,name,n_players,game_status,players)
+      val tmp_g = ghosts.map(x => x._1).toList
+      var g = new Game(game_id,name,n_players,game_status,players,tmp_g)
       sender ! GameHandler(g,self)
     case GameStatus =>
-      sender ! Game(game_id,game_name,game_n_players,game_status,players)
+      val tmp_g = ghosts.map(x => x._1).toList
+      sender ! Game(game_id,game_name,game_n_players,game_status,players,tmp_g)
     case JoinGame(game,user,ref) =>
       Logger.info("GMBackend richiesta join ricevuta")
       if (players.size < game_n_players) {
