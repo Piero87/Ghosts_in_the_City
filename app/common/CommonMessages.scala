@@ -18,13 +18,13 @@ object Team extends Enumeration {
    
 }
 
-object GhostStatus extends Enumeration {
-  type GhostStatus = Int
+object GhostMood extends Enumeration {
+  type GhostMood = Int
    val CALM = 0
    val ANGRY = 1
 }
 
-case class GhostInfo(uid: String, level: Int, status: Int, x: Int, y: Int)
+case class GhostInfo(uid: String, level: Int, mood: Int, x: Int, y: Int)
 case class UserInfo(uid: String, name: String, team: Int, x: Int, y: Int)
 case class NewGame(name: String, n_players: Int, user: UserInfo, ref: ActorRef = null)
 case class Game(id: String, name: String, n_players: Int, status: Int, players: List[UserInfo], ghosts: List[GhostInfo])

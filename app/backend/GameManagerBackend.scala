@@ -10,6 +10,7 @@ import akka.util.Timeout
 import akka.pattern.ask
 import scala.util.{Failure, Success}
 import util.Random.nextInt
+import backend.actors._
 
 class GameManagerBackend () extends Actor {
   
@@ -56,13 +57,14 @@ class GameManagerBackend () extends Actor {
         //appena Joinato?
         gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g))
         if (players.size == game_n_players) {
-          //Se è l'ultimo giocatore allora mandiamo il messaggio di star a tutti i giocatori
-          game_status = StatusGame.STARTED
+          
           //Qui dovrà generare i fantasmi e i tesori
+          for (i <- 0 to game_n_players) {
+            var p_zero = new Util.Point (0,0)
+            val ghost = context.actorOf(Props(new Ghost(Polygon(p_zero,p_zero,p_zero,p_zero),new_position),0,null), name = "bas")
+          }
           
-          
-          
-          
+          game_status = StatusGame.STARTED
           val tmp_g = ghosts.map(x => x._1).toList
           gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g))
           // context.system.scheduler.scheduleOnce(1000 millis, self, "tick")
