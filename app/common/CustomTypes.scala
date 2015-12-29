@@ -1,8 +1,29 @@
 package common
 
+import scala.collection.mutable
+
 sealed case class Point(x: Double, y: Double)
+
 sealed case class Polygon(points: List[Point]){
+  
+  val polygonPoints = points
+  
   def contains(p: Point, edges: Seq[Edge]) = edges.count(_.raySegI(p)) % 2 != 0
+  
+  // Create Seq[Edge] from polygon list point
+  def foundEdge : Seq[Edge] = {
+    val edges = mutable.ArrayBuffer[Edge]() 
+    for(i <- 0 to polygonPoints.length-1){
+      if(i == polygonPoints.length-1){
+         var edge = new Edge(polygonPoints(i), polygonPoints(0))
+        edges.append(edge)
+      }else{
+        var edge = new Edge(polygonPoints(i), polygonPoints(i+1))
+        edges.append(edge)
+      }
+    }
+    edges
+  }
 }
 
 case class Edge(_1: Point, _2: Point) {

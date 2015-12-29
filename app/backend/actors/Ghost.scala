@@ -36,6 +36,7 @@ class Ghost(area : Polygon, position: Point, level: Int, treasure: ActorRef) ext
   var mood = GhostMood.CALM
   var GMbackend: ActorRef = _
   val range = level * 75
+  val area_Edge = area.foundEdge
   
   def receive = {
     case Start => 
@@ -80,6 +81,7 @@ class Ghost(area : Polygon, position: Point, level: Int, treasure: ActorRef) ext
   }
   
   def random_move(position: Point) = {
+    
      val delta_time = 3
      val speed = 10.0
      
@@ -93,7 +95,11 @@ class Ghost(area : Polygon, position: Point, level: Int, treasure: ActorRef) ext
      
      var new_position = new Point(lat, lng)
      
-     ghostpos = new_position
+     if(area.contains(new_position, area_Edge)){
+       ghostpos = new_position
+     }else{
+       ghostpos = position
+     }
      
      context.parent ! ghostpos
      
