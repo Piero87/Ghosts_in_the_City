@@ -86,7 +86,7 @@ class GameManagerBackend () extends Actor {
           val tmp_g = ghosts.map(x => x._1).toList
           val tmp_t = treasures.map(x => x._1).toList
           gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
-          // context.system.scheduler.scheduleOnce(1000 millis, self, "tick")
+          context.system.scheduler.scheduleOnce(500 millis, self, UpdateGhostsPositions)
         }
       } else {
         //***Failure message
@@ -126,17 +126,11 @@ class GameManagerBackend () extends Actor {
       }
       sender ! BroadcastUpdatePosition(user)
       
-    case "tick" =>
-      Logger.info("Tick")
-//      //qui
-//      players = players.map{ player => 
-//        val rnd = new scala.util.Random
-//        val range = 100 to 500
-//        player.x = 0
-//        player.y = range(rnd.nextInt(range length))
-//        
-//      }
-//      context.system.scheduler.scheduleOnce(1000 millis, self, "tick")
+    case UpdateGhostsPositions =>
+      Logger.info("UpdateGhostsPositions")
+      val tmp_g = ghosts.map(x => x._1).toList
+      gameManagerClient ! BroadcastGhostsPositions(tmp_g)
+      context.system.scheduler.scheduleOnce(500 millis, self, UpdateGhostsPositions)
       
   }
   
