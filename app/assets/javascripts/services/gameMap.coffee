@@ -1,6 +1,6 @@
 define () ->
 	class GameMap
-		constructor: (id_user, players, id_canvas, canvas_width, canvas_height, websocket) -> #(id_user, players, ghosts, id_canvas, canvas_width, canvas_height, websocket)
+		constructor: (id_user, players, ghosts, treasures, id_canvas, canvas_width, canvas_height, websocket) ->
 			
 			@ws = websocket
 			@user_id = id_user
@@ -14,16 +14,27 @@ define () ->
 			@busters = []
 			@busters_images = []
 			
-			@addBuster(buster.uid, buster.name, buster.x, buster.y) for buster in players
+			@addBuster(
+				buster.uid, buster.name, buster.x, buster.y
+			) for buster in players
 			
 			@ghosts = []
 			@ghosts_images = []
 			
-			#@addGhost(ghost.id, ghost.x, ghost.y) for ghost in ghosts
+			@addGhost(
+				ghost.uid, ghost.level, ghost.mood, ghost.x, ghost.y
+			) for ghost in ghosts
+			
+			@treasures = []
+			@treasures_images = []
+			
+			@addTreasures(
+				treasure.uid, treasure.status, treasure.x, treasure.y
+			) for treasure in treasures
 			
 			@space_width = canvas_width
 			@space_height = canvas_height
-			@icon_dim = 32
+			@icon_dim = 48
 			@move = 5
 			
 		startGame: ->
@@ -38,7 +49,7 @@ define () ->
 				@ctx.rect 0, 0, @space_width, @space_height
 				@ctx.fill()
 				# Save the initial background.
-				@emptyBack = @ctx.getImageData(0, 0, @icon_dim, @icon_dim)
+				@emptyBack = @ctx.getImageData(0, 0, @space_width, @space_height)
 			# Play the game until the until the game is over.
 			callback_interval = @doGameLoop.bind(this)
 			gameLoop = setInterval(callback_interval, 16)
@@ -73,11 +84,11 @@ define () ->
 				@busters[i].x = x
 				@busters[i].y = y
 			
-		addGhost: (uid, level, x, y) ->
+		addGhost: (uid, level, mood, x, y) ->
 			ghost = {}
 			ghost.uid = uid
 			ghost.level = level
-			ghost.mood = 'calm'
+			ghost.mood = mood
 			ghost.x = x
 			# current ghost position X
 			ghost.y = y
@@ -95,7 +106,8 @@ define () ->
 		
 		ghostMove: (uid, mood, x, y) ->
 			for ghost, i in @ghosts when ghost.uid == uid
-				if mood == 'angry'
+				@ghosts[i].mood = mood
+				if @ghosts[i].mood == 'angry'
 					if ghost.x > x
 						@ghosts_images[i].src = '/assets/images/Ghost_L' + ghosts[i].level + '_Angry_left.png'
 					else
@@ -110,15 +122,47 @@ define () ->
 				@ghosts[i].x = x
 				@ghosts[i].y = y
 		
+		addTreasure: (uid, status, x, y) ->
+			treasure = {}
+			treasure.uid = uid
+			treasure.name = name
+			treasure.x = x
+			# current buster position X
+			treasure.y = y
+			# current buster position Y
+			@treasures.push treasure
+			treasure_img = new Image
+			# buster
+			if status == 0 #close
+				treasure_img.src = '/assets/images/Treasure_close.png'
+			else if status == 1 #open
+				treasure_img.src = '/assets/images/Treasure_open.png'
+			@treasures_images.push treasure_img
+			return
+		
+		updateTreasure: (uid, status) ->
+			for treasure, i in @treasures when treasure.uid == uid
+				@treasures[i].status = status
+				if status == 0 #close
+					@treasures_images[i].src = '/assets/images/Treasure_close.png'
+				else if status == 1 #open
+					@treasures_images[i].src = '/assets/images/Treasure_open.png'
+		
 		doGameLoop: ->
 			
-			for buster, i in @busters
-				@ctx.putImageData(@emptyBack, @busters[i].old_x, @busters[i].old_y);
-				@ctx.drawImage(@busters_images[i], @busters[i].x, @busters[i].y, @icon_dim, @icon_dim);
+			@ctx.putImageData(@emptyBack, 0, 0);
 			
-			for ghost, i in @ghosts
-				@ctx.putImageData(@emptyBack, @ghosts[i].old_x, @ghosts[i].old_y);
-				@ctx.drawImage(@ghosts_images[i], @ghosts[i].x, @ghosts[i].y, @icon_dim, @icon_dim);
+			@ctx.drawImage(
+				@busters_images[i], @busters[i].x, @busters[i].y, @icon_dim, @icon_dim
+			) for buster, i in @busters
+			
+			@ctx.drawImage(
+				@ghosts_images[i], @ghosts[i].x, @ghosts[i].y, @icon_dim, @icon_dim
+			) for ghost, i in @ghosts
+			
+			@ctx.drawImage(
+				@treasures_images[i], @treasures[i].x, @treasures[i].y, @icon_dim, @icon_dim
+			) for treasure, i in @treasures
 		
 			return
 		

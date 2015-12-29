@@ -50,6 +50,9 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 				@user.name = localStorage.username
 				@user.uid = localStorage.uid
 				
+				if localStorage.gameid
+					@gameid(localStorage.gameid)
+				
 				@connect()
 		
 		# Connect
@@ -58,8 +61,10 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 			@disconnected(null)
 			
 			# Open Web Socket
-
-			@ws = new WebSocket(jsRoutes.controllers.Application.stream(@user.name, @user.uid).webSocketURL())
+			if @gameid()
+				@ws = new WebSocket(jsRoutes.controllers.Application.stream(@user.name, @user.uid).webSocketURL())
+			else
+				@ws = new WebSocket(jsRoutes.controllers.Application.stream(@user.name, @user.uid).webSocketURL())
 			
 			# When the websocket opens
 			@ws.onopen = (event) =>
@@ -124,16 +129,19 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 						when 1 # game started
 							console.log(JSON.stringify(json))
 							@refreshPlayerList(json)
-							@game_map = new GameMap(@user.uid, json.game.players, "gameArena", 500, 500, @ws)
+							@game_map = new GameMap(@user.uid, json.game.players, json.game.ghosts, json.game.treasures, "gameArena", 500, 500, @ws)
 							@game_map.startGame()
 						when 2 # game paused
 							console.log('Hold on!')
 						when 3 # game ended
 							console.log('Game Over!')
-							localStorage.removeItem("gameid")
-							
+							localStorage.removeItem("gameid")			
 				else if json.event == "update_position"
 					@game_map.busterMove(json.user.uid, json.user.x, json.user.y)
+				else if json.event == "update_ghosts_position"
+					@game_map.ghostMove(ghost.uid, ghost.mood, ghost.x, ghost.y) for ghost in json.ghosts
+				else if json.event == "update_treasures"
+					@game_map.updateTreasure(treasure.uid, treasure.status) for treasure in json.treasures
 							
 		# The user clicked connect
 		submitUsername: ->

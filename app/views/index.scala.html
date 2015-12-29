@@ -86,13 +86,16 @@
 	        	<div data-bind="foreach: gameplayers">
 				    <div class="row" style="margin-bottom: 10px;">
 				    	<span class="col-xs-6" align="right">
-				    		<img width="32px" height="32px" alt="Buster Icon" data-bind="attr:{src: '/assets/images/G' + ($index() + 1) + '.png'}"/>
+				    		<img width="48px" height="48px" alt="Buster Icon" data-bind="attr:{src: '/assets/images/G' + ($index() + 1) + '.png'}"/>
 				    	</span>
-				    	<!--  <span data-bind="if: uid === useruid()"> 
-					    		<span style="color: red !important;"> -->
-				    			<span class="col-xs-6 ghostbuster-font" align="left" data-bind="text: name"></span>
-				    	<!--  	</span>
-				    	</span>  -->
+				    	<span class="col-xs-6 ghostbuster-font font-big" align="left" data-bind="if: uid == $parent.useruid()"> 
+				    	  	<span style="color: red !important;">
+				    			<span data-bind="text: name"></span>
+				    	  	</span>
+				    	</span>
+				    	<span class="col-xs-6 ghostbuster-font font-big" align="left" data-bind="if: uid != $parent.useruid()"> 
+				    	  	<span data-bind="text: name"></span>
+				    	</span>
 				    </div>
 				</div>
 				<hr>
@@ -104,21 +107,27 @@
 	        		<div class="col-md-6">
 		        		<canvas id="gameArena" width="500" height="500"></canvas>	
 		        	</div>
-	        		<div class="col-md-6" data-bind="foreach: gameplayers">
-					    <div class="row" style="margin-bottom: 10px;">
-					    	<span class="col-xs-6" align="right">
-					    		<img width="32px" height="32px" alt="Buster Icon" data-bind="attr:{src: '/assets/images/G' + ($index() + 1) + '.png'}"/>
-					    	</span>
-					    	<!--  <span data-bind="if: uid === useruid()"> 
-					    		<span style="color: red !important;"> -->
-					    			<span class="col-xs-6 ghostbuster-font" align="left" data-bind="text: name"></span>
-					    	<!--  	</span>
-					    	</span>  -->
-					    </div>
+	        		<div class="col-md-6">
+		        		<div data-bind="foreach: gameplayers">
+						    <div class="row" style="margin-bottom: 10px;">
+						    	<span class="col-xs-6" align="right">
+						    		<img width="48px" height="48px" alt="Buster Icon" data-bind="attr:{src: '/assets/images/G' + ($index() + 1) + '.png'}"/>
+						    	</span>
+					    		<span class="col-xs-6 ghostbuster-font font-big" align="left" data-bind="if: uid == $parent.useruid()"> 
+						    	  	<span style="color: red !important;">
+						    			<span data-bind="text: name"></span>
+						    	  	</span>
+						    	</span>
+						    	<span class="col-xs-6 ghostbuster-font font-big" align="left" data-bind="if: uid != $parent.useruid()"> 
+						    	  	<span data-bind="text: name"></span>
+						    	</span>
+						    </div>
+						</div>
+						<hr>
+						<button class="btn ghostbuster-font" data-bind="click: leaveGame">Leave Game</button>
 					</div>
 				</div>
-				<hr>
-				<button class="btn ghostbuster-font" data-bind="click: leaveGame">Leave Game</button>
+				
 	        </div>
 	        <div data-bind="if: gameended" align="center">
 	        	<h1 class="ghostbuster-font font-huge">GAME OVER</h1>
