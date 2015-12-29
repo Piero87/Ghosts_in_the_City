@@ -37,7 +37,7 @@ class Ghost(area : Util.Polygon, position: Util.Point, level: Int, treasure: Act
   var ghostpos: Util.Point = position
   var mood = GhostMood.CALM
   var GMbackend: ActorRef = _
-  val range = mood * 75
+  val range = level * 75
   
   def receive = {
     case Start => 
@@ -51,11 +51,11 @@ class Ghost(area : Util.Polygon, position: Util.Point, level: Int, treasure: Act
       future.onSuccess { 
         case Players(players) => 
           Logger.info ("Player positions received")
-          var playerpos : Point[LatLng] = null
+          var playerpos = new Util.Point(0,0)
           var playerdist : Double = 500
           for(player <- players){
-            var currentplayerpos = Point(LatLng(player.x,player.y))
-            var distance = Math.sqrt(Math.pow((currentplayerpos.coordinates.lat - ghostpos.coordinates.lat),2) + Math.pow((currentplayerpos.coordinates.lng - ghostpos.coordinates.lng),2))
+            var currentplayerpos = new Util.Point(player.x, player.y)
+            var distance = Math.sqrt(Math.pow((currentplayerpos.x - ghostpos.y),2) + Math.pow((currentplayerpos.x - ghostpos.y),2))
             if(distance < range){
               // Salvo solamente la posizone la cui distanza è minore
               if(distance < playerdist){
@@ -65,10 +65,10 @@ class Ghost(area : Util.Polygon, position: Util.Point, level: Int, treasure: Act
               mood = GhostMood.ANGRY
             }else{
               // Nessuno all'interno del range
-              mood = GhostStatus.CALM
+              mood = GhostMood.CALM
             }
           }
-          if(mood == GhostStatus.CALM){
+          if(mood == GhostMood.CALM){
             random_move(ghostpos)
           }else{
             attackPlayer(playerpos)
@@ -80,7 +80,7 @@ class Ghost(area : Util.Polygon, position: Util.Point, level: Int, treasure: Act
       }
   }
   
-  def random_move(position: Point[LatLng]) = {
+  def random_move(position: Util.Point) = {
      val delta_time = 3
      val speed = 10.0
      
@@ -89,10 +89,10 @@ class Ghost(area : Util.Polygon, position: Util.Point, level: Int, treasure: Act
      var vx = (speed * Math.cos(direction)).toInt
      var vy = (speed * Math.sin(direction)).toInt
      
-     var lat = (vx * delta_time) + position.coordinates.lat
-     var lng = (vy * delta_time) + position.coordinates.lng
+     var lat = (vx * delta_time) + position.x
+     var lng = (vy * delta_time) + position.y
      
-     var new_position = Point(LatLng(lat,lng))
+     var new_position = new Util.Point(lat, lng)
      
      ghostpos = new_position
      
@@ -100,7 +100,7 @@ class Ghost(area : Util.Polygon, position: Util.Point, level: Int, treasure: Act
      
   }
   
-  def attackPlayer(player_pos: Point[LatLng]) = {
+  def attackPlayer(player_pos: Util.Point) = {
     
   }
   
