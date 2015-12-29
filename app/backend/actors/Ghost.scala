@@ -152,7 +152,16 @@ class Ghost(area : Polygon, position: Point, level: Int, treasure: ActorRef) ext
       case 2 => new_position = new Point(position.x, position.y - 5)
       // A sinistra
       case 3 => new_position = new Point(position.x - 5, position.y)
+   }
+   
+   if(area.contains(new_position, area_Edge)){
+      ghostpos = new_position
+    }else{
+      ghostpos = position
     }
+    
+    context.parent ! ghostpos
+   
   }
   
   //schedulo tramite il tick per richiamare il metodo
