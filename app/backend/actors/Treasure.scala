@@ -3,10 +3,7 @@ package backend.actors
 import akka.actor.{ ActorRef, Actor }
 import akka.actor.Props
 import play.api.Logger
-import play.api.libs.json._
-import play.extras.geojson.Point
-import play.extras.geojson.Polygon
-import play.extras.geojson.LatLng
+import common._
 
 import backend.actors.models._
 
@@ -30,10 +27,10 @@ object Treasure {
   /**
    * Actor Props 
    */
-  def props(area: Polygon[LatLng], position: Point[LatLng], key: Key, gold: Gold, keyIn: Key) = Props(new Treasure(area,position, key, gold, keyIn))
+  def props(position: Point, key: Key, gold: Gold, keyIn: Key) = Props(new Treasure(position, key, gold, keyIn))
 }
 
-class Treasure(area: Polygon[LatLng], position: Point[LatLng], key: Key, gold: Gold, keyIn: Key) extends Actor{
+class Treasure(position: Point, key: Key, gold: Gold, keyIn: Key) extends Actor{
   
   import Treasure._
   
@@ -59,7 +56,7 @@ class Treasure(area: Polygon[LatLng], position: Point[LatLng], key: Key, gold: G
             // Key
             var key_recovered = new Key(treasure_keyIn.requested, treasure_keyIn.key_id)
             treasure_keyIn.requested = false
-            treasure_keyIn.key_id = 0
+            //treasure_keyIn.key_id = 0
           }
           sender ! "Opened" // Aggiungerò anche quello che ho raccolto
         } else {
@@ -76,7 +73,7 @@ class Treasure(area: Polygon[LatLng], position: Point[LatLng], key: Key, gold: G
             // Key
             var key_recovered = new Key(treasure_keyIn.requested, treasure_keyIn.key_id)
             treasure_keyIn.requested = false
-            treasure_keyIn.key_id = 0
+            //treasure_keyIn.key_id = 0
           }
       }
       sender ! "Opened"// Aggiungerò anche quello che ho raccolto
