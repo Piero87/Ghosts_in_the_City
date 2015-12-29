@@ -1,4 +1,28 @@
 package common
 
-sealed case class Point(x: Int, y: Int)
-sealed case class Polygon(points: List[Point])
+sealed case class Point(x: Double, y: Double)
+sealed case class Polygon(points: List[Point]){
+  def contains(p: Point, edges: Seq[Edge]) = edges.count(_.raySegI(p)) % 2 != 0
+}
+
+case class Edge(_1: Point, _2: Point) {
+  
+  import Math._
+  import Double._
+ 
+  // Ray-casting algorithm
+  // It checks if a point is contained in the Polygon
+  def raySegI(p: Point): Boolean = {
+    if (_1.y > _2.y) return Edge(_2, _1).raySegI(p)
+    if (p.y == _1.y || p.y == _2.y) return raySegI(new Point(p.x, p.y + epsilon))
+    if (p.y > _2.y || p.y < _1.y || p.x > max(_1.x, _2.x))
+      return false
+    if (p.x < min(_1.x, _2.x)) return true
+    val blue = if (abs(_1.x - p.x) > MinValue) (p.y - _1.y) / (p.x - _1.x) else MaxValue
+    val red = if (abs(_1.x - _2.x) > MinValue) (_2.y - _1.y) / (_2.x - _1.x) else MaxValue
+    blue >= red
+  }
+ 
+  final val epsilon = 0.00001
+}
+ 
