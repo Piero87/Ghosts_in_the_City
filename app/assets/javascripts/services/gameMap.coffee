@@ -32,10 +32,15 @@ define () ->
 				treasure.uid, treasure.status, treasure.x, treasure.y
 			) for treasure in treasures
 			
+			@sensible_area = new Image
+			@sensible_area.src = '/assets/images/Area.png'
+			
 			@space_width = canvas_width
 			@space_height = canvas_height
 			@icon_dim = 48
 			@move = 5
+			@ghost_radius = 75
+			@treasure_radius = 100
 			
 		startGame: ->
 			console.log("Start Game!")
@@ -152,17 +157,48 @@ define () ->
 			
 			@ctx.putImageData(@emptyBack, 0, 0);
 			
-			@ctx.drawImage(
-				@busters_images[i], @busters[i].x, @busters[i].y, @icon_dim, @icon_dim
-			) for buster, i in @busters
+			for buster, i in @busters
+				# Draw the player
+				@ctx.drawImage(
+					@busters_images[i]
+					@busters[i].x - (@icon_dim / 2) # in this way "x" is in the middle of the image
+					@busters[i].y - (@icon_dim / 2) # in this way "y" is in the middle of the image
+					@icon_dim
+					@icon_dim
+				)
 			
-			@ctx.drawImage(
-				@ghosts_images[i], @ghosts[i].x, @ghosts[i].y, @icon_dim, @icon_dim
-			) for ghost, i in @ghosts
+			for ghost, i in @ghosts
+				@ctx.drawImage(
+					@sensible_area
+					# in this way the area is centered in the image
+					(@ghosts[i].x - (@icon_dim / 2)) - (75 * @ghosts[i].level) 
+					(@ghosts[i].y - (@icon_dim / 2)) - (75 * @ghosts[i].level) 
+					(150 * @ghosts[i].level)
+					(150 * @ghosts[i].level)
+				)
+				@ctx.drawImage(
+					@ghosts_images[i]
+					@ghosts[i].x - (@icon_dim / 2) # in this way "x" is in the middle of the image
+					@ghosts[i].y - (@icon_dim / 2) # in this way "y" is in the middle of the image
+					@icon_dim, @icon_dim
+				)
 			
-			@ctx.drawImage(
-				@treasures_images[i], @treasures[i].x, @treasures[i].y, @icon_dim, @icon_dim
-			) for treasure, i in @treasures
+			for treasure, i in @treasures
+				@ctx.drawImage(
+					@sensible_area
+					# in this way the area is centered in the image
+					@treasures[i].x - (@icon_dim / 2) - (100 * @treasures[i].level) 
+					@treasures[i].y - (@icon_dim / 2) - (100 * @treasures[i].level) 
+					(200 * @treasures[i].level)
+					(200 * @treasures[i].level)
+				)
+				@ctx.drawImage(
+					@treasures_images[i]
+					@treasures[i].x - (@icon_dim / 2) # in this way "x" is in the middle of the image
+					@treasures[i].y - (@icon_dim / 2) # in this way "y" is in the middle of the image
+					@icon_dim
+					@icon_dim
+				) 
 		
 			return
 		

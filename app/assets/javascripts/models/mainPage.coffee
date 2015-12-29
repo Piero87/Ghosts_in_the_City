@@ -11,9 +11,7 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 			# User data
 			@username = ko.observable()
 			@useruid = ko.observable()
-			pos_x = Math.round(Math.random()*500)
-			pos_y = Math.round(Math.random()*500)
-			@user = {uid: "", name: "", team: "", x: pos_x, y: pos_y}
+			@user = {uid: "", name: "", team: "", x: 0, y: 0}
 			
 			# Game data
 			@gameready = ko.observable(false)
@@ -136,9 +134,9 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 						when 3 # game ended
 							console.log('Game Over!')
 							localStorage.removeItem("gameid")			
-				else if json.event == "update_position"
+				else if json.event == "update_player_position"
 					@game_map.busterMove(json.user.uid, json.user.x, json.user.y)
-				else if json.event == "update_ghosts_position"
+				else if json.event == "update_ghosts_positions"
 					@game_map.ghostMove(ghost.uid, ghost.mood, ghost.x, ghost.y) for ghost in json.ghosts
 				else if json.event == "update_treasures"
 					@game_map.updateTreasure(treasure.uid, treasure.status) for treasure in json.treasures
