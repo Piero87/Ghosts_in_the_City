@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit
 import akka.util.Timeout
 import akka.pattern.ask
 import common._
+import common.Util
 
 object Ghost{
   
@@ -23,18 +24,18 @@ object Ghost{
    */
   case object UpdateGhostPosition
   
-  def props(area: Polygon[LatLng], position: Point[LatLng], level: Int, treasure: ActorRef) = Props(new Ghost(area,position, level, treasure))
+  def props(area: Util.Polygon, position: Util.Point, level: Int, treasure: ActorRef) = Props(new Ghost(area,position, level, treasure))
 }
 
-class Ghost(area :Polygon[LatLng], position: Point[LatLng], level: Int, treasure: ActorRef) extends Actor {
+class Ghost(area : Util.Polygon, position: Util.Point, level: Int, treasure: ActorRef) extends Actor {
   
   import context._
   import Ghost._
   
   implicit val timeout = Timeout(5 seconds)
   
-  var ghostpos: Point[LatLng] = position
-  var mood = GhostStatus.CALM
+  var ghostpos: Util.Point = position
+  var mood = GhostMood.CALM
   var GMbackend: ActorRef = _
   val range = mood * 75
   
@@ -61,7 +62,7 @@ class Ghost(area :Polygon[LatLng], position: Point[LatLng], level: Int, treasure
                 playerdist = distance
                 playerpos = currentplayerpos 
               }
-              mood = GhostStatus.ANGRY
+              mood = GhostMood.ANGRY
             }else{
               // Nessuno all'interno del range
               mood = GhostStatus.CALM
