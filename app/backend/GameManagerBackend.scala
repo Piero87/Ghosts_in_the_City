@@ -12,6 +12,7 @@ import scala.util.{Failure, Success}
 import util.Random.nextInt
 import backend.actors._
 import backend.actors.models._
+import util.control.Breaks._
 
 class GameManagerBackend () extends Actor {
   
@@ -72,13 +73,13 @@ class GameManagerBackend () extends Actor {
             var key = new Key(true,randomString(8))
             //qui entrmabi i valori sono random
             var gold = new Gold(true, 100)
-            var treasure_info = new TreasureInfo(treasure_id,0,0,0) 
+            var treasure_info = new TreasureInfo(treasure_id,0,Point(0,0)) 
             val treasure = context.actorOf(Props(new Treasure(treasure_id,Point (0,0),key,gold,key)), name = treasure_id)
             treasures = treasures :+ Tuple2(treasure_info,treasure)
             
             var ghost_id = randomString(8)
             val ghost = context.actorOf(Props(new Ghost(ghost_id,polygon,Point (0,0),0,null)), name = ghost_id)
-            var ghost_info = new GhostInfo(ghost_id,0,GhostMood.CALM,0,0)
+            var ghost_info = new GhostInfo(ghost_id,0,GhostMood.CALM,Point(0,0))
             ghosts = ghosts :+ Tuple2(ghost_info,ghost)
           }
           
@@ -121,6 +122,7 @@ class GameManagerBackend () extends Actor {
         if (user.uid == user.uid) {
           val p = new UserInfo(user.uid,user.name,user.team,user.x,user.y)
           players.updated(i,p)
+          break
         }
         i = i + 1
       }
@@ -131,6 +133,18 @@ class GameManagerBackend () extends Actor {
       val tmp_g = ghosts.map(x => x._1).toList
       gameManagerClient ! BroadcastGhostsPositions(tmp_g)
       context.system.scheduler.scheduleOnce(500 millis, self, UpdateGhostsPositions)
+    case GhostPositionUpdate(uid, point) =>
+      var i = 0
+      for(ghost <- ghosts) {
+        if (ghost._1.uid == uid) {
+          val g = new GhostInfo(ghost._1.uid,ghost._1.level,ghost._1.mood,point)
+          ghosts.updated(i,g)
+          break
+        }
+        i = i + 1
+      }
+    case PlayersPositions =>
+      sender ! Players(players)
       
   }
   
