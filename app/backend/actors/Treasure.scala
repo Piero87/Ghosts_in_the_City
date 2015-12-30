@@ -27,10 +27,10 @@ object Treasure {
   /**
    * Actor Props 
    */
-  def props(position: Point, key: Key, gold: Gold, keyIn: Key) = Props(new Treasure(position, key, gold, keyIn))
+  def props(uid: String, position: Point, key: Key, gold: Gold, keyIn: Key) = Props(new Treasure(uid,position, key, gold, keyIn))
 }
 
-class Treasure(position: Point, key: Key, gold: Gold, keyIn: Key) extends Actor{
+class Treasure(uid: String, position: Point, key: Key, gold: Gold, keyIn: Key) extends Actor{
   
   import Treasure._
   

@@ -2,8 +2,6 @@ package actors
 
 import akka.actor._
 import play.api.Logger
-import play.extras.geojson.LatLng
-import play.extras.geojson.Point
 import scala.concurrent.duration._
 import akka.util.Timeout
 import akka.pattern.ask
@@ -34,7 +32,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
           val newGameResult: JsResult[NewGameJSON] = msg.validate[NewGameJSON](CommonMessages.newGameReads)
           newGameResult match {
             case s: JsSuccess[NewGameJSON] => 
-              var user_info = new UserInfo(uid,username,team,0,0)
+              var user_info = new UserInfo(uid,username,team,Point(0,0))
               val future = frontendManager ? NewGame(s.get.name.replaceAll(" ", "_")+"_"+System.currentTimeMillis(),s.get.n_players,user_info,self)
               future.onSuccess {
                 case GameHandler(game,ref) => 
@@ -66,7 +64,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
           val joinGameResult: JsResult[JoinGameJSON] = msg.validate[JoinGameJSON](CommonMessages.joinGameReads)
           joinGameResult match {
             case s: JsSuccess[JoinGameJSON] =>
-              var user_info = new UserInfo(uid,username,team,0,0)
+              var user_info = new UserInfo(uid,username,team,Point(0,0))
               val future = frontendManager ? JoinGame(s.get.game,user_info,self)
               future.onSuccess {
                 case GameHandler(game,ref) =>  
@@ -88,13 +86,13 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
          case "leave_game" =>
            Logger.info("CC: LeaveGame request")
            game_id = ""
-           var userInfo = new UserInfo(uid,username,team, 0,0)
+           var userInfo = new UserInfo(uid,username,team, Point(0,0))
            gameManagerClient ! LeaveGame(userInfo)
          case "update_position" =>
            val updatePositionResult: JsResult[UpdatePositionJSON] = msg.validate[UpdatePositionJSON](CommonMessages.updatePositionReads)
            updatePositionResult match {
             case s: JsSuccess[UpdatePositionJSON] =>
-              var userInfo = new UserInfo(uid,username,team, s.get.x,s.get.y)
+              var userInfo = new UserInfo(uid,username,team, s.get.pos)
               gameManagerClient ! UpdatePosition(userInfo)
             case e: JsError => 
               Logger.info("Ops JoinGame: "+e.toString())
@@ -117,7 +115,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
   
   override def postStop() = {
     if (game_id != "") {
-      var userInfo = new UserInfo(uid,username,team, 0,0)
+      var userInfo = new UserInfo(uid,username,team, Point(0,0))
       gameManagerClient ! LeaveGame(userInfo)
     }
   }

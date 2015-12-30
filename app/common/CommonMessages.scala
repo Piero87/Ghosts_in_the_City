@@ -23,9 +23,10 @@ object GhostMood extends Enumeration {
    val ANGRY = 1
 }
 
-case class TreasureInfo(uid: String, status: Int, x: Int, y: Int)
-case class GhostInfo(uid: String, level: Int, mood: Int, x: Int, y: Int)
-case class UserInfo(uid: String, name: String, team: Int, x: Int, y: Int)
+case class GhostPositionUpdate(uid: String, pos: Point)
+case class TreasureInfo(uid: String, status: Int, pos: Point)
+case class GhostInfo(uid: String, level: Int, mood: Int, pos: Point)
+case class UserInfo(uid: String, name: String, team: Int, pos: Point)
 case class NewGame(name: String, n_players: Int, user: UserInfo, ref: ActorRef = null)
 case class Game(id: String, name: String, n_players: Int, status: Int, players: List[UserInfo], ghosts: List[GhostInfo], treasures: List[TreasureInfo])
 case class GamesList(list: List[Game])
@@ -33,7 +34,7 @@ case object GamesList
 case object GameStatus
 case object KillYourself
 case object KillMyself
-case object GiveMePlayerPosition
+case object PlayersPositions
 case object UpdateGhostsPositions
 case class UpdatePosition(user: UserInfo)
 case class BroadcastUpdatePosition(user: UserInfo)
@@ -50,14 +51,17 @@ case class GamesListResponseJSON(event: String, list: List[Game])
 case class GamesListRequestJSON(event: String)
 case class JoinGameJSON(event: String, game: Game)
 case class LeaveGameJSON(event: String)
-case class UpdatePositionJSON(event: String, x: Int, y: Int)
+case class UpdatePositionJSON(event: String, pos: Point)
 case class BroadcastUpdatePositionJSON(event: String, user: UserInfo)
 case class BroadcastGhostsPositionsJSON(event: String, ghosts: List[GhostInfo])
 
 import play.api.libs.json._
 
 object CommonMessages {
-  
+
+  implicit val pointReads = Json.reads[Point]
+  implicit val pointWrites = Json.writes[Point]
+    
   implicit val playerInfoReads = Json.reads[UserInfo]
   implicit val playerInfoWrites = Json.writes[UserInfo]
   
