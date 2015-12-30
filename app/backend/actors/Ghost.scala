@@ -55,7 +55,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
           var playerdist : Double = 500
           if(players.size == 0){
             for(player <- players){
-              var currentplayerpos = new Point(player.x, player.y)
+              var currentplayerpos = player.pos
               var distance = Math.sqrt(Math.pow((currentplayerpos.x - ghostpos.y),2) + Math.pow((currentplayerpos.x - ghostpos.y),2))
               if(distance < range){
                 // Salvo solamente la posizone la cui distanza è minore
