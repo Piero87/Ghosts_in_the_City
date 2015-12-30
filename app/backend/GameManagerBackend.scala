@@ -77,6 +77,8 @@ class GameManagerBackend () extends Actor {
           var position_ghosts = new Array[(Double,Double)](n_treasure)
           
           var position_players = new Array[(Double,Double)](game_n_players)
+          position_players = UtilFunctions.randomPositionPlayers(spaces(spaces.length - 1), n_treasure-1)
+          
           var i = 0
           for(user <- players) {
             val p = new UserInfo(user.uid,user.name,user.team,Point(position_players(i)._1,position_players(i)._2))
@@ -88,8 +90,6 @@ class GameManagerBackend () extends Actor {
             position_treasure(i) = UtilFunctions.randomPositionTreasure(spaces(i))
             System.out.println("position tesoro "+i+" ("+position_treasure(i)._1 +", "+position_treasure(i)._2 +")")
           }
-          
-          position_players = UtilFunctions.randomPositionPlayers(spaces(spaces.length - 1), n_treasure-1)
           
           for(j <- 0 to n_treasure-1){ //l'ultimo space è dei giocatori e non ha fantasmi
             position_ghosts(j) = UtilFunctions.randomPositionGhosts(position_treasure(j))
