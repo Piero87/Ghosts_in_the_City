@@ -156,7 +156,6 @@ class GameManagerBackend () extends Actor {
         if (user.uid == user.uid) {
           val p = new UserInfo(user.uid,user.name,user.team,user.pos)
           players.updated(i,p)
-          break
         }
         i = i + 1
       }
@@ -173,7 +172,6 @@ class GameManagerBackend () extends Actor {
         if (ghost._1.uid == uid) {
           val g = new GhostInfo(ghost._1.uid,ghost._1.level,ghost._1.mood,point)
           ghosts.updated(i,g)
-          break
         }
         i = i + 1
       }
