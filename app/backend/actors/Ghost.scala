@@ -76,8 +76,9 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
               attackPlayer(playerpos)
             }
             system.scheduler.scheduleOnce(500 millis, self, UpdateGhostPosition)
+          }else{
+            random_move(ghostpos)
           }
-          random_move(ghostpos)
         }
       future onFailure {
         case e: Exception => Logger.info("******GHOST REQUET PLAYER POSITION ERROR ******")
