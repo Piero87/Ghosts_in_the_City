@@ -28,7 +28,7 @@ define () ->
 			@treasures = []
 			@treasures_images = []
 			
-			@addTreasures(
+			@addTreasure(
 				treasure.uid, treasure.status, treasure.pos.x, treasure.pos.y
 			) for treasure in treasures
 			
@@ -88,6 +88,7 @@ define () ->
 				@busters[i].old_y = buster.y
 				@busters[i].x = x
 				@busters[i].y = y
+			return
 			
 		addGhost: (uid, level, mood, x, y) ->
 			ghost = {}
@@ -114,18 +115,19 @@ define () ->
 				@ghosts[i].mood = mood
 				if @ghosts[i].mood == 'angry'
 					if ghost.x > x
-						@ghosts_images[i].src = '/assets/images/Ghost_L' + ghosts[i].level + '_Angry_left.png'
+						@ghosts_images[i].src = '/assets/images/Ghost_L' + @ghosts[i].level + '_Angry_left.png'
 					else
-						@ghosts_images[i].src = '/assets/images/Ghost_L' + ghosts[i].level + '_Angry_right.png'
+						@ghosts_images[i].src = '/assets/images/Ghost_L' + @ghosts[i].level + '_Angry_right.png'
 				else
 					if ghost.x > x
-						@ghosts_images[i].src = '/assets/images/Ghost_L' + ghosts[i].level + '_left.png'
+						@ghosts_images[i].src = '/assets/images/Ghost_L' + @ghosts[i].level + '_left.png'
 					else
-						@ghosts_images[i].src = '/assets/images/Ghost_L' + ghosts[i].level + '_right.png'
+						@ghosts_images[i].src = '/assets/images/Ghost_L' + @ghosts[i].level + '_right.png'
 				@ghosts[i].old_x = ghost.x
 				@ghosts[i].old_y = ghost.y
 				@ghosts[i].x = x
 				@ghosts[i].y = y
+			return
 		
 		addTreasure: (uid, status, x, y) ->
 			treasure = {}
@@ -152,7 +154,8 @@ define () ->
 					@treasures_images[i].src = '/assets/images/Treasure_close.png'
 				else if status == 1 #open
 					@treasures_images[i].src = '/assets/images/Treasure_open.png'
-		
+			return
+			
 		doGameLoop: ->
 			
 			@ctx.putImageData(@emptyBack, 0, 0);
@@ -263,5 +266,6 @@ define () ->
 				if flag
 					@busters[i].x = @busters[i].old_x
 					@busters[i].y = @busters[i].old_y
+			return
 	        	
 	return GameMap
