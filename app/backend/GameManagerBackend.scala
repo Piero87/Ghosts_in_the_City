@@ -111,8 +111,9 @@ class GameManagerBackend () extends Actor {
             
             var ghost_id = randomString(8)
             var p_g = new Point (position_ghosts(i)._1,position_ghosts(i)._2)
-            val ghost = context.actorOf(Props(new Ghost(ghost_id,polygon,p_g,0,null)), name = ghost_id)
-            var ghost_info = new GhostInfo(ghost_id,0,GhostMood.CALM,p_g)
+            val g_level = nextInt(2)+1
+            val ghost = context.actorOf(Props(new Ghost(ghost_id,polygon,p_g,g_level,null)), name = ghost_id)
+            var ghost_info = new GhostInfo(ghost_id,g_level,GhostMood.CALM,p_g)
             ghosts = ghosts :+ Tuple2(ghost_info,ghost)
           }
           
