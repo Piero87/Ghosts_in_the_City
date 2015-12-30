@@ -79,12 +79,15 @@ class GameManagerBackend () extends Actor {
           var position_players = new Array[(Double,Double)](game_n_players)
           position_players = UtilFunctions.randomPositionPlayers(spaces(spaces.length - 1), n_treasure-1)
           
-          var i = 0
-          for(user <- players) {
+          Logger.info("players list BEFORE: " + players)
+          
+          for(i <- 0 to game_n_players-1){
+            val user = players(i)
             val p = new UserInfo(user.uid,user.name,user.team,Point(position_players(i)._1,position_players(i)._2))
             players.updated(i,p)
-            i = i+1
           }
+          
+          Logger.info("players list AFTER: " + players)
           
           for(i <- 0 to n_treasure-1){
             position_treasure(i) = UtilFunctions.randomPositionTreasure(spaces(i))

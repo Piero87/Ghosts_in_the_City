@@ -111,6 +111,7 @@ define () ->
 			return
 		
 		ghostMove: (uid, mood, x, y) ->
+			console.log "GHOST MOVE: {uid: " + uid + ", x: " + x + ", y: " + y + "}"
 			for ghost, i in @ghosts when ghost.uid == uid
 				@ghosts[i].mood = mood
 				if @ghosts[i].mood == 'angry'
@@ -190,10 +191,10 @@ define () ->
 				@ctx.drawImage(
 					@sensible_area
 					# in this way the area is centered in the image
-					@treasures[i].x - (@icon_dim / 2) - (100 * @treasures[i].level) 
-					@treasures[i].y - (@icon_dim / 2) - (100 * @treasures[i].level) 
-					(200 * @treasures[i].level)
-					(200 * @treasures[i].level)
+					@treasures[i].x - (@icon_dim / 2) - 100 
+					@treasures[i].y - (@icon_dim / 2) - 100 
+					200
+					200
 				)
 				@ctx.drawImage(
 					@treasures_images[i]
