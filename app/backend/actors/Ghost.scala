@@ -112,11 +112,11 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
       case 3 => new_position = new Point(position.x - 5, position.y)
     }
     
-    if(area.contains(new_position, area_Edge)){
+    //if(area.contains(new_position, area_Edge)){
       ghostpos = new_position
-    }else{
-      ghostpos = position
-    }
+    //}else{
+      //ghostpos = position
+    //}
     
     GMbackend ! GhostPositionUpdate(uuid, ghostpos)
      
@@ -145,20 +145,20 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
 			}
    ghost_move match {
       // In alto
-      case 0 => new_position = new Point(position.x + 5, position.y)
+      case 0 => new_position = new Point(ghostpos.x + 5, ghostpos.y)
       // A destra
-      case 1 => new_position = new Point(position.x, position.y+ 5)
+      case 1 => new_position = new Point(ghostpos.x, ghostpos.y+ 5)
       // In basso
-      case 2 => new_position = new Point(position.x, position.y - 5)
+      case 2 => new_position = new Point(ghostpos.x, ghostpos.y - 5)
       // A sinistra
-      case 3 => new_position = new Point(position.x - 5, position.y)
+      case 3 => new_position = new Point(ghostpos.x - 5, ghostpos.y)
    }
    
-   if(area.contains(new_position, area_Edge)){
+   //if(area.contains(new_position, area_Edge)){
       ghostpos = new_position
-    }else{
-      ghostpos = position
-    }
+    //}else{
+      //ghostpos = position
+    //}
     
     GMbackend ! GhostPositionUpdate(uuid, ghostpos)
    
