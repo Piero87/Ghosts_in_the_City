@@ -88,6 +88,7 @@ define () ->
 				@busters[i].old_y = buster.y
 				@busters[i].x = x
 				@busters[i].y = y
+			return
 			
 		addGhost: (uid, level, mood, x, y) ->
 			ghost = {}
@@ -126,6 +127,7 @@ define () ->
 				@ghosts[i].old_y = ghost.y
 				@ghosts[i].x = x
 				@ghosts[i].y = y
+			return
 		
 		addTreasure: (uid, status, x, y) ->
 			treasure = {}
@@ -152,7 +154,8 @@ define () ->
 					@treasures_images[i].src = '/assets/images/Treasure_close.png'
 				else if status == 1 #open
 					@treasures_images[i].src = '/assets/images/Treasure_open.png'
-		
+			return
+			
 		doGameLoop: ->
 			
 			@ctx.putImageData(@emptyBack, 0, 0);
@@ -263,5 +266,6 @@ define () ->
 				if flag
 					@busters[i].x = @busters[i].old_x
 					@busters[i].y = @busters[i].old_y
+			return
 	        	
 	return GameMap
