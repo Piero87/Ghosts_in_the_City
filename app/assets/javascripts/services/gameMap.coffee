@@ -15,21 +15,21 @@ define () ->
 			@busters_images = []
 			
 			@addBuster(
-				buster.uid, buster.name, buster.x, buster.y
+				buster.uid, buster.name, buster.pos.x, buster.pos.y
 			) for buster in players
 			
 			@ghosts = []
 			@ghosts_images = []
 			
 			@addGhost(
-				ghost.uid, ghost.level, ghost.mood, ghost.x, ghost.y
+				ghost.uid, ghost.level, ghost.mood, ghost.pos.x, ghost.pos.y
 			) for ghost in ghosts
 			
 			@treasures = []
 			@treasures_images = []
 			
 			@addTreasures(
-				treasure.uid, treasure.status, treasure.x, treasure.y
+				treasure.uid, treasure.status, treasure.pos.x, treasure.pos.y
 			) for treasure in treasures
 			
 			@sensible_area = new Image
@@ -253,8 +253,9 @@ define () ->
 				
 				@ws.send(JSON.stringify
 					event: "update_position"
-					x: @busters[i].x
-					y: @busters[i].y
+					pos:
+						x: @busters[i].x
+						y: @busters[i].y
 				)
 				
 				# If flag is set, the buster did not move.
