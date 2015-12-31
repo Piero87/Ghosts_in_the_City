@@ -15,6 +15,7 @@ import backend.actors.models._
 import util.control.Breaks._
 import common.UtilFunctions
 import scala.collection.mutable.MutableList
+import com.typesafe.config.ConfigFactory
 
 class GameManagerBackend () extends Actor {
   
@@ -66,29 +67,25 @@ class GameManagerBackend () extends Actor {
         gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
         if (players.size == game_n_players) {
           
-          var width = 1000
-          var height = 500
-          
+          var width = ConfigFactory.load().getDouble("width_canvas")
+          var height = ConfigFactory.load().getDouble("height_canvas")
+
           var polygon = new Polygon(List(Point(0,0),Point(0,height),Point(width,0),Point(width,height)))
           
           val n_treasure = game_n_players+1
           
-          var spaces = UtilFunctions.createSpaces(n_treasure, width, height)
+          var spaces = UtilFunctions.createSpaces(n_treasure)
           var position_treasure = new Array[(Double,Double)](n_treasure)
           var position_ghosts = new Array[(Double,Double)](n_treasure)
           
           var position_players = new Array[(Double,Double)](game_n_players)
           position_players = UtilFunctions.randomPositionPlayers(spaces(spaces.length - 1), n_treasure-1)
           
-          Logger.info("players list BEFORE: " + players)
-          
           for(i <- 0 to game_n_players-1){
             val user = players(i)
             val p = new UserInfo(user.uid,user.name,user.team,Point(position_players(i)._1,position_players(i)._2))
             players(i) = p
           }
-          
-          Logger.info("players list AFTER: " + players)
           
           for(i <- 0 to n_treasure-1){
             position_treasure(i) = UtilFunctions.randomPositionTreasure(spaces(i))
@@ -175,17 +172,12 @@ class GameManagerBackend () extends Actor {
       gameManagerClient ! BroadcastGhostsPositions(tmp_g)
       context.system.scheduler.scheduleOnce(500 millis, self, UpdateGhostsPositions)
     case GhostPositionUpdate(uid, point) =>
-      Logger.info("UpdateGhostsPositions: "+uid+" Point: "+point)
-      val tmp_g = ghosts.map(x => x._1)
-      Logger.info("Ghosts LIST BEFORE UPDATE: "+tmp_g)
       for (i <- 0 to ghosts.size-1) {
         if (ghosts(i)._1.uid == uid) {
           var g = new GhostInfo(ghosts(i)._1.uid,ghosts(i)._1.level,ghosts(i)._1.mood,point)
           ghosts(i) = ghosts(i).copy(_1 = g)
         }
       }
-      val tmp_g2 = ghosts.map(x => x._1)
-      Logger.info("Ghosts LIST AFTER UPDATE: "+tmp_g2)
     case PlayersPositions =>
       sender ! Players(players)
       
