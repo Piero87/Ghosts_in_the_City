@@ -32,8 +32,8 @@ object UtilFunctions {
     var space_width = ConfigFactory.load().getDouble("space_width")
     
     val rnd = new Random()
-    var lat_rnd = (treasure_radius / 2) + rnd.nextInt(treasure_radius.toInt / 2)
-    var lng_rnd = (treasure_radius / 2) + rnd.nextInt(treasure_radius.toInt / 2)
+    var lat_rnd = (treasure_radius / 3) + rnd.nextInt(treasure_radius.toInt / 2)
+    var lng_rnd = (treasure_radius / 3) + rnd.nextInt(treasure_radius.toInt / 2)
     var lat = pos_treasure._1 + lat_rnd
     var lng = pos_treasure._2 + lng_rnd
     
