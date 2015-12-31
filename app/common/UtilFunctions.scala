@@ -39,7 +39,7 @@ object UtilFunctions {
     var lat = pos_treasure._1 + lat_rnd
     var lng = pos_treasure._2 + lng_rnd
     if(lat < icon_size) lat = icon_size
-    if(lat > space_height - icon_size) lat = space_height - icon_size
+    if(lat > space_width - icon_size) lat = space_width - icon_size
     if(lng < icon_size) lng = icon_size
     if(lng > space_height - icon_size) lng = space_height - icon_size
     (lat,lng)
