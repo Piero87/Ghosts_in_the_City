@@ -135,19 +135,19 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
     }
     
 //    if (area.contains(new_position, area_Edge)) {
-//      if ((new_position.x < width-icon_size) || 
-//          (new_position.y < height-icon_size)) {
-//        if (distanceFrom(position_treasure) < treasure_radius) {
+      if ((new_position.x < width-icon_size) || 
+          (new_position.y < height-icon_size)) {
+        if (distanceFrom(position_treasure) < treasure_radius) {
             ghostpos = new_position
             Logger.info("GHOST: SEND NEW POSITION")
             GMbackend ! GhostPositionUpdate(uuid, ghostpos)
             scheduler()
-//        } else {
-//           random_move(ghostpos)
-//        }
-//    } else {
-//      random_move(ghostpos)
-//    } 
+        } else {
+           random_move(ghostpos)
+        }
+    } else {
+      random_move(ghostpos)
+    } 
   }
   
   def attackPlayer(player_pos: Point) = {
