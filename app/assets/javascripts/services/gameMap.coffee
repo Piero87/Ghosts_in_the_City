@@ -47,7 +47,7 @@ define () ->
 			@space_height = canvas_height
 			@icon_size = 48
 			@move = 5
-			@ghost_radius = 75
+			@ghost_radius = 35
 			@treasure_radius = 100
 			
 		startGame: ->
