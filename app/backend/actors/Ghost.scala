@@ -33,6 +33,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
   var GMbackend: ActorRef = _
   val range = level * 75
   val area_Edge = area.foundEdge
+  var past_move : Int = -1
   
   def receive = {
     case GhostStart => 
@@ -70,12 +71,10 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
 //            }else{
 //              attackPlayer(playerpos)
 //            }
-//            system.scheduler.scheduleOnce(500 millis, self, UpdateGhostPosition)
 //          }else{
 //            random_move(ghostpos)
 //          }
           random_move(ghostpos)
-          system.scheduler.scheduleOnce(500 millis, self, UpdateGhostPosition)
         }
       future onFailure {
         case e: Exception => Logger.info("******GHOST REQUET PLAYER POSITION ERROR ******")
@@ -101,13 +100,33 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
     var new_position : Point = null
     rnd_pos match {
       // In alto
-      case 0 => new_position = new Point(position.x + 5, position.y)
+      case 0 => {
+        if(past_move != rnd_pos){
+          past_move = rnd_pos
+          new_position = new Point(position.x + 5, position.y)
+        }
+      }
       // A destra
-      case 1 => new_position = new Point(position.x, position.y+ 5)
+      case 1 => {
+        if(past_move != rnd_pos){
+          past_move = rnd_pos
+          new_position = new Point(position.x, position.y+ 5)
+        }
+      }
       // In basso
-      case 2 => new_position = new Point(position.x, position.y - 5)
+      case 2 => {
+        if(past_move != rnd_pos){
+          past_move = rnd_pos
+          new_position = new Point(position.x, position.y - 5)
+        }
+      }
       // A sinistra
-      case 3 => new_position = new Point(position.x - 5, position.y)
+      case 3 => {
+        if(past_move != rnd_pos){
+          past_move = rnd_pos
+          new_position = new Point(position.x - 5, position.y)
+        }
+      }
     }
     
     //if(area.contains(new_position, area_Edge)){
@@ -115,9 +134,10 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
     //}else{
       //ghostpos = position
     //}
+      
     Logger.info("GHOST: SEND NEW POSITION")
     GMbackend ! GhostPositionUpdate(uuid, ghostpos)
-     
+    scheduler() 
   }
   
   def attackPlayer(player_pos: Point) = {
@@ -128,28 +148,49 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
     var distance_y = player_pos.y - ghostpos.y
     if(Math.abs(distance_x) < range && Math.abs(distance_y) < range){
       if (Math.abs(distance_x) > Math.abs(distance_y) && Math.abs(distance_x) > 10) {
-					if (distance_x > 0){
-						ghost_move = 1;
-					} else {
-						ghost_move = 3;
-					}
-				} else if (Math.abs(distance_x) < Math.abs(distance_y) && Math.abs(distance_y) > 10) {
-					if (distance_y > 0){
-						ghost_move = 2;
-					} else {
-						ghost_move = 0;
-					}
+				if (distance_x > 0){
+					ghost_move = 1
+				} else {
+					ghost_move = 3
+				}
+			} else if (Math.abs(distance_x) < Math.abs(distance_y) && Math.abs(distance_y) > 10) {
+		    if (distance_y > 0){
+						ghost_move = 2
+				} else {
+						ghost_move = 0
 				}
 			}
+		}
+    
    ghost_move match {
       // In alto
-      case 0 => new_position = new Point(ghostpos.x + 5, ghostpos.y)
+      case 0 => {
+        if(past_move != ghost_move){
+          past_move = ghost_move
+          new_position = new Point(ghostpos.x + 5, ghostpos.y)
+        }
+      }
       // A destra
-      case 1 => new_position = new Point(ghostpos.x, ghostpos.y+ 5)
+      case 1 => {
+        if(past_move != ghost_move){
+          past_move = ghost_move
+          new_position = new Point(ghostpos.x, ghostpos.y+ 5)
+        }
+      }
       // In basso
-      case 2 => new_position = new Point(ghostpos.x, ghostpos.y - 5)
+      case 2 => {
+        if(past_move != ghost_move){
+          past_move = ghost_move
+          new_position = new Point(ghostpos.x, ghostpos.y - 5)
+        }
+      }
       // A sinistra
-      case 3 => new_position = new Point(ghostpos.x - 5, ghostpos.y)
+      case 3 => {
+        if(past_move != ghost_move){
+          past_move = ghost_move
+          new_position = new Point(ghostpos.x - 5, ghostpos.y)
+        }
+      }
    }
    
    //if(area.contains(new_position, area_Edge)){
@@ -159,7 +200,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
     //}
     
     GMbackend ! GhostPositionUpdate(uuid, ghostpos)
-   
+    scheduler()
   }
   
   //schedulo tramite il tick per richiamare il metodo
