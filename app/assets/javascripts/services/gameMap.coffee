@@ -17,7 +17,7 @@ define () ->
 			@busters_images = []
 			
 			@addBuster(
-				buster.uid, buster.name, buster.pos.x, buster.pos.y
+				buster.uid, buster.name, buster.team, buster.pos.x, buster.pos.y
 			) for buster in players
 			
 			@ghosts = []
@@ -65,10 +65,11 @@ define () ->
 			window.addEventListener 'keydown', @whatKey.bind(this), true
 			return
 		
-		addBuster: (uid, name, x, y) ->
+		addBuster: (uid, name, team, x, y) ->
 			buster = {}
 			buster.uid = uid
 			buster.name = name
+			buster.team = team
 			buster.x = x
 			# current buster position X
 			buster.y = y
