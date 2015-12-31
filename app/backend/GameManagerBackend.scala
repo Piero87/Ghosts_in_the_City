@@ -67,8 +67,8 @@ class GameManagerBackend () extends Actor {
         gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
         if (players.size == game_n_players) {
           
-          var width = ConfigFactory.load().getDouble("width_canvas")
-          var height = ConfigFactory.load().getDouble("height_canvas")
+          var width = ConfigFactory.load().getDouble("space_width")
+          var height = ConfigFactory.load().getDouble("space_height")
 
           var polygon = new Polygon(List(Point(0,0),Point(0,height),Point(width,0),Point(width,height)))
           
