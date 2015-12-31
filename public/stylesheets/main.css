@@ -3,6 +3,14 @@
 	line-height: 60px;
 }
 
+.line-with-icon {
+	line-height: 50px;
+}
+
+.font-small {
+	font-size: 10px;
+}
+
 .font-medium {
 	font-size: 15px;
 }

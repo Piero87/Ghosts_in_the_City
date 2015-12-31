@@ -39,7 +39,7 @@ define () ->
 			
 			@space_width = canvas_width
 			@space_height = canvas_height
-			@icon_dim = 48
+			@icon_size = 48
 			@move = 5
 			@ghost_radius = 75
 			@treasure_radius = 100
@@ -165,8 +165,8 @@ define () ->
 			
 			for treasure, i in @treasures
 				# To center the images in their position point
-				treasure_x = @treasures[i].x - (@icon_dim / 2)
-				treasure_y = @treasures[i].y - (@icon_dim / 2)
+				treasure_x = @treasures[i].x - (@icon_size / 2)
+				treasure_y = @treasures[i].y - (@icon_size / 2)
 				area_x =  @treasures[i].x -  @treasure_radius
 				area_y =  @treasures[i].y -  @treasure_radius
 				# Drawings
@@ -181,27 +181,39 @@ define () ->
 					@treasures_images[i]
 					treasure_x
 					treasure_y
-					@icon_dim
-					@icon_dim
+					@icon_size
+					@icon_size
 				) 
 				
 			for buster, i in @busters
 				# To center the image in its position point
-				buster_x = @busters[i].x - (@icon_dim / 2)
-				buster_y = @busters[i].y - (@icon_dim / 2)
+				buster_x = @busters[i].x - (@icon_size / 2)
+				buster_y = @busters[i].y - (@icon_size / 2)
 				# Drawings
 				@ctx.drawImage(
 					@busters_images[i]
 					buster_x
 					buster_y
-					@icon_dim
-					@icon_dim
+					@icon_size
+					@icon_size
 				)
+				# Draw team square color in the corner bottom-right
+				if buster.team = 0
+					@ctx.fillStyle = 'red'
+				else if buster.team = 0
+					@ctx.fillStyle = 'blue'
+				@ctx.rect(
+					(buster_x + (@icon_size - 8))
+					(buster_y + (@icon_size - 8))
+					8
+					8
+				)
+				@ctx.fill()
 			
 			for ghost, i in @ghosts
 				# To center the images in their position point
-				ghost_x = @ghosts[i].x - (@icon_dim / 2)
-				ghost_y = @ghosts[i].y - (@icon_dim / 2)
+				ghost_x = @ghosts[i].x - (@icon_size / 2)
+				ghost_y = @ghosts[i].y - (@icon_size / 2)
 				area_x =  @ghosts[i].x - (@ghost_radius * @ghosts[i].level)
 				area_y =  @ghosts[i].y - (@ghost_radius * @ghosts[i].level)
 				# Drawings
@@ -216,8 +228,8 @@ define () ->
 					@ghosts_images[i]
 					ghost_x
 					ghost_y
-					@icon_dim
-					@icon_dim
+					@icon_size
+					@icon_size
 				)
 				
 			return
@@ -246,30 +258,30 @@ define () ->
 					# Left arrow.
 					when 37
 						@busters[i].x = @busters[i].x - @move
-						if @busters[i].x < (@icon_dim / 2)
+						if @busters[i].x < (@icon_size / 2)
 							# If at edge, reset buster position and set flag.
-							@busters[i].x = (@icon_dim / 2)
+							@busters[i].x = (@icon_size / 2)
 							flag = 1
 					# Right arrow.
 					when 39
 						@busters[i].x = @busters[i].x + @move
-						if @busters[i].x > @space_width - (@icon_dim / 2)
+						if @busters[i].x > @space_width - (@icon_size / 2)
 							# If at edge, reset buster position and set flag.
 							@busters[i].x = @space_width - @move
 							flag = 1
 					# Down arrow
 					when 40
 						@busters[i].y = @busters[i].y + @move
-						if @busters[i].y > @space_height - (@icon_dim / 2)
+						if @busters[i].y > @space_height - (@icon_size / 2)
 							# If at edge, reset buster position and set flag.
 							@busters[i].y = @space_height - @move
 							flag = 1
 					# Up arrow 
 					when 38
 						@busters[i].y = @busters[i].y - @move
-						if @busters[i].y < (@icon_dim / 2)
+						if @busters[i].y < (@icon_size / 2)
 							# If at edge, reset buster position and set flag.
-							@busters[i].y = (@icon_dim / 2)
+							@busters[i].y = (@icon_size / 2)
 							flag = 1
 				
 				# If flag is set, the buster did not move.

@@ -113,14 +113,18 @@
 						    	<span class="col-xs-6" align="right">
 						    		<img width="48px" height="48px" alt="Buster Icon" data-bind="attr:{src: '/assets/images/G' + ($index() + 1) + '.png'}"/>
 						    	</span>
-					    		<span class="col-xs-6 ghostbuster-font font-big" align="left" data-bind="if: uid == $parent.useruid()"> 
+					    		<span class="col-xs-6 ghostbuster-font font-big line-with-icon" align="left"> 
+						    	  	<!-- ko if: team == 0 -->
 						    	  	<span style="color: red !important;">
+						    	  	<!-- /ko -->
+						    	  	<!-- ko if: team == 1 -->
+						    	  	<span style="color: blue !important;">
+						    	  	<!-- /ko -->
 						    			<span data-bind="text: name"></span>
-						    	  	</span>
+						    			<span class="ghostbuster-font font-small" align="left" data-bind="if: uid == $parent.useruid()"> (you)</span>
+						    	  	</span>					    	  	
 						    	</span>
-						    	<span class="col-xs-6 ghostbuster-font font-big" align="left" data-bind="if: uid != $parent.useruid()"> 
-						    	  	<span data-bind="text: name"></span>
-						    	</span>
+							    	
 						    </div>
 						</div>
 						<hr>
