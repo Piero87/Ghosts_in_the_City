@@ -31,9 +31,11 @@ object UtilFunctions {
     var space_height = ConfigFactory.load().getDouble("space_height")
     var space_width = ConfigFactory.load().getDouble("space_width")
     
+    var tmp_dist = treasure_radius - 20
+    
     val rnd = new Random()
-    var lat_rnd = rnd.nextInt(treasure_radius) - rnd.nextInt(treasure_radius)
-    var lng_rnd = rnd.nextInt(treasure_radius) - rnd.nextInt(treasure_radius)
+    var lat_rnd = rnd.nextInt(tmp_dist) - rnd.nextInt(tmp_dist)
+    var lng_rnd = rnd.nextInt(tmp_dist) - rnd.nextInt(tmp_dist)
     var lat = pos_treasure._1 + lat_rnd
     var lng = pos_treasure._2 + lng_rnd
     
