@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit
 import akka.util.Timeout
 import akka.pattern.ask
 import common._
-import util.Random.nextInt
+import scala.util.Random
 import com.typesafe.config.ConfigFactory
 
 object Ghost{
@@ -100,8 +100,9 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
 //     var lng = (vy * delta_time) + position.y
 //     
 //     var new_position = new Point(lat, lng)
-//     
-    var rnd_pos = nextInt(4)
+//    
+    val rnd = new Random()
+    var rnd_pos = rnd.nextInt(4)
     var new_position : Point = position
     rnd_pos match {
       // In alto
