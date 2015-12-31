@@ -298,7 +298,7 @@ define () ->
 					@busters[i].y = @busters[i].old_y
 				
 				@ws.send(JSON.stringify
-					event: "update_position"
+					event: "update_player_position"
 					pos:
 						x: @busters[i].x
 						y: @busters[i].y
