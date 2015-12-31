@@ -24,7 +24,6 @@ object UtilFunctions {
     var pos = new Array[(Double,Double)](n_player)
     var i = 0
     for(i <- 0 to (n_player-1)){
-      //System.out.println(i)
       var lat = space._1 + rnd.nextInt( space._2.toInt - space._1.toInt + 1)
       var lng = space._3 + rnd.nextInt( space._4.toInt - space._3.toInt + 1)
       pos(i) = (lat,lng)
@@ -33,7 +32,7 @@ object UtilFunctions {
     return pos 
   }
   
-  def randomPositionGhosts(space: (Double,Double,Double,Double,Boolean), pos_treasure : (Double,Double)) : (Double,Double) = {
+  def randomPositionGhost(pos_treasure : (Double,Double)) : (Double,Double) = {
     val rnd = new Random()
     var lat_rnd = (treasure_radius / 2) + rnd.nextInt(treasure_radius.toInt / 2)
     var lng_rnd = (treasure_radius / 2) + rnd.nextInt(treasure_radius.toInt / 2)
