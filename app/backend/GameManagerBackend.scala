@@ -85,7 +85,7 @@ class GameManagerBackend () extends Actor {
           for(i <- 0 to game_n_players-1){
             val user = players(i)
             val p = new UserInfo(user.uid,user.name,user.team,Point(position_players(i)._1,position_players(i)._2))
-            players.updated(i,p)
+            players(i) = p
           }
           
           Logger.info("players list AFTER: " + players)
@@ -159,7 +159,7 @@ class GameManagerBackend () extends Actor {
       for(user <- players) {
         if (user.uid == user.uid) {
           val p = new UserInfo(user.uid,user.name,user.team,user.pos)
-          players.updated(i,p)
+          players(i) = p
         }
         i = i + 1
       }
@@ -171,13 +171,11 @@ class GameManagerBackend () extends Actor {
       gameManagerClient ! BroadcastGhostsPositions(tmp_g)
       context.system.scheduler.scheduleOnce(500 millis, self, UpdateGhostsPositions)
     case GhostPositionUpdate(uid, point) =>
-      var i = 0
-      for(ghost <- ghosts) {
-        if (ghost._1.uid == uid) {
-          val g = new GhostInfo(ghost._1.uid,ghost._1.level,ghost._1.mood,point)
-          ghosts.updated(i,g)
+      for (i <- 0 to ghosts.size-1) {
+        if (ghosts(i)._1.uid == uid) {
+          var g = new GhostInfo(ghosts(i)._1.uid,ghosts(i)._1.level,ghosts(i)._1.mood,point)
+          ghosts(i) = ghosts(i).copy(_1 = g)
         }
-        i = i + 1
       }
     case PlayersPositions =>
       sender ! Players(players)
