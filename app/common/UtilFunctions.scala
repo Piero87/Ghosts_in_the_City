@@ -1,15 +1,16 @@
 package common
 
 import scala.util.Random
+import com.typesafe.config.ConfigFactory
 
 object UtilFunctions {
   
-  var icon_size = 0 //dimesione spazio livero nell'angolo
-  var column = 0 //numero colonne
-  var ghost_radius = 0
-  var treasure_radius = 0
-  var space_height = 0 
-  var space_width = 0
+  var icon_size = 0.0 //dimesione spazio livero nell'angolo
+  var column = 0.0 //numero colonne
+  var ghost_radius = 0.0
+  var treasure_radius = 0.0
+  var space_height = 0.0 
+  var space_width = 0.0
   
   def randomPositionTreasure(space: (Int,Int,Int,Int,Boolean)): (Double,Double) = {
     val rnd = new Random()
@@ -45,16 +46,18 @@ object UtilFunctions {
     (lat,lng)
   }
   
-  def createSpaces(n_treasure : Int, env_width:Int, env_height:Int, icon_d:Int, ghost_r:Int, treasure_r:Int ): Array[(Int,Int,Int,Int,Boolean)] = {
-    icon_size = icon_d
-    ghost_radius = ghost_r
-    treasure_radius = treasure_r
+  def createSpaces(n_treasure : Int ): Array[(Int,Int,Int,Int,Boolean)] = {
+    icon_size = ConfigFactory.load().getDouble("icon_size")
+    ghost_radius = ConfigFactory.load().getDouble("ghost_radius")
+    treasure_radius = ConfigFactory.load().getDouble("treasure_radius")
+    space_height = ConfigFactory.load().getDouble("space_height")
+    space_width = ConfigFactory.load().getDouble("space_width")
     
     //divido sempre lo spazio totale per un numero pari di spaces dove in ognuno andrà un tesoro e in uno i giocatori
     // che sono sempre pari
     var nro_spaces = 0
-    if(n_treasure%2 > 0){
-      nro_spaces = n_treasure+1
+    if(n_treasure % 2 > 0){
+      nro_spaces = n_treasure + 1
     }else{
       nro_spaces = n_treasure
     }
