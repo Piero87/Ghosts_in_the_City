@@ -37,6 +37,12 @@ define () ->
 			@sensible_area = new Image
 			@sensible_area.src = '/assets/images/Area.png'
 			
+			@team_red = new Image
+			@team_red.src = '/assets/images/Team_red.png'
+			
+			@team_blue = new Image
+			@team_blue.src = '/assets/images/Team_blue.png'
+			
 			@space_width = canvas_width
 			@space_height = canvas_height
 			@icon_size = 48
@@ -199,17 +205,17 @@ define () ->
 					@icon_size
 				)
 				# Draw team square color in the corner bottom-right
-				if buster.team = 0
-					@ctx.fillStyle = 'red'
-				else if buster.team = 0
-					@ctx.fillStyle = 'blue'
-				@ctx.rect(
-					(buster_x + (@icon_size - 8))
-					(buster_y + (@icon_size - 8))
-					8
-					8
-				)
-				@ctx.fill()
+				if buster.team == 0
+					team_img = @team_red
+				else if buster.team == 1
+					team_img = @team_blue
+				@ctx.drawImage(
+						team_img
+						(buster_x + (@icon_size - 8))
+						(buster_y + (@icon_size - 8))
+						8
+						8
+					)
 			
 			for ghost, i in @ghosts
 				# To center the images in their position point

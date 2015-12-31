@@ -38,10 +38,17 @@ object UtilFunctions {
     var lng_rnd = (treasure_radius / 2) + rnd.nextInt(treasure_radius.toInt / 2)
     var lat = pos_treasure._1 + lat_rnd
     var lng = pos_treasure._2 + lng_rnd
-    if(lat < icon_size) lat = icon_size
-    if(lat > space_width - icon_size) lat = space_width - icon_size
-    if(lng < icon_size) lng = icon_size
-    if(lng > space_height - icon_size) lng = space_height - icon_size
+    
+    val min_lat = icon_size
+    val max_lat = space_width - icon_size
+    if(lat < min_lat) lat = min_lat
+    if(lat > max_lat) lat = max_lat
+    
+    val min_lng = icon_size
+    val max_lng = space_height - icon_size
+    if(lng < min_lng) lng = min_lng
+    if(lng > max_lng) lng = max_lng
+    
     (lat,lng)
   }
   
