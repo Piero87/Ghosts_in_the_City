@@ -12,28 +12,28 @@ object UtilFunctions {
   var space_height = 0.0 
   var space_width = 0.0
   
-  def randomPositionTreasure(space: (Int,Int,Int,Int,Boolean)): (Double,Double) = {
+  def randomPositionTreasure(space: (Double,Double,Double,Double,Boolean)): (Double,Double) = {
     val rnd = new Random()
-    var lat = space._1 + rnd.nextInt( space._2 - space._1 +1)
-    var lng = space._3 + rnd.nextInt( space._4 - space._3 +1)
+    var lat = space._1 + rnd.nextInt(space._2.toInt - space._1.toInt + 1)
+    var lng = space._3 + rnd.nextInt(space._4.toInt - space._3.toInt + 1)
     return (lat,lng)
   }
   
-  def randomPositionPlayers(space: (Int,Int,Int,Int,Boolean), n_player: Int): Array[(Double,Double)] = {
+  def randomPositionPlayers(space: (Double,Double,Double,Double,Boolean), n_player: Int): Array[(Double,Double)] = {
     val rnd = new Random()
     var pos = new Array[(Double,Double)](n_player)
     var i = 0
     for(i <- 0 to (n_player-1)){
       //System.out.println(i)
-      var lat = space._1 + rnd.nextInt( space._2 - space._1 +1)
-      var lng = space._3 + rnd.nextInt( space._4 - space._3 +1)
+      var lat = space._1 + rnd.nextInt( space._2.toInt - space._1.toInt + 1)
+      var lng = space._3 + rnd.nextInt( space._4.toInt - space._3.toInt + 1)
       pos(i) = (lat,lng)
       System.out.println("position player "+i+": ("+pos(i)._1+", "+pos(i)._2+")")
     }
     return pos 
   }
   
-  def randomPositionGhosts(space: (Int,Int,Int,Int,Boolean), pos_treasure : (Double,Double)) : (Double,Double) = {
+  def randomPositionGhosts(space: (Double,Double,Double,Double,Boolean), pos_treasure : (Double,Double)) : (Double,Double) = {
     val rnd = new Random()
     var lat_rnd = (treasure_radius / 2) + rnd.nextInt(treasure_radius.toInt / 2)
     var lng_rnd = (treasure_radius / 2) + rnd.nextInt(treasure_radius.toInt / 2)
