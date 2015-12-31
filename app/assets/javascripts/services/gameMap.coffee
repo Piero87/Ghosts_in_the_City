@@ -269,6 +269,12 @@ define () ->
 							@busters[i].y = (@icon_dim / 2)
 							flag = 1
 				
+				# If flag is set, the buster did not move.
+				# Put everything backBuster the way it was.
+				if flag
+					@busters[i].x = @busters[i].old_x
+					@busters[i].y = @busters[i].old_y
+				
 				@ws.send(JSON.stringify
 					event: "update_position"
 					pos:
@@ -276,11 +282,6 @@ define () ->
 						y: @busters[i].y
 				)
 				
-				# If flag is set, the buster did not move.
-				# Put everything backBuster the way it was.
-				if flag
-					@busters[i].x = @busters[i].old_x
-					@busters[i].y = @busters[i].old_y
 			return
 	        	
 	return GameMap
