@@ -163,57 +163,57 @@ define () ->
 			
 			for treasure, i in @treasures
 				# To center the images in their position point
-				treasure_center_x = @treasures[i].x - (@icon_dim / 2)
-				treasure_center_y = @treasures[i].y - (@icon_dim / 2)
-				area_center_x =  treasure_center_x -  @treasure_radius
-				area_center_y =  treasure_center_y -  @treasure_radius
+				treasure_x = @treasures[i].x - (@icon_dim / 2)
+				treasure_y = @treasures[i].y - (@icon_dim / 2)
+				area_x =  treasure_x -  @treasure_radius
+				area_y =  treasure_y -  @treasure_radius
 				# Drawings
 				@ctx.drawImage(
 					@sensible_area
-					area_center_x 
-					area_center_y 
+					area_x 
+					area_y 
 					(@treasure_radius * 2)
 					(@treasure_radius * 2)
 				)
 				@ctx.drawImage(
 					@treasures_images[i]
-					treasure_center_x
-					treasure_center_y
+					treasure_x
+					treasure_y
 					@icon_dim
 					@icon_dim
 				) 
 				
 			for buster, i in @busters
 				# To center the images in their position point
-				buster_center_x = @busters[i].x - (@icon_dim / 2)
-				buster_center_y = @busters[i].y - (@icon_dim / 2)
+				buster_x = @busters[i].x - (@icon_dim / 2)
+				buster_y = @busters[i].y - (@icon_dim / 2)
 				# Drawings
 				@ctx.drawImage(
 					@busters_images[i]
-					buster_center_x
-					buster_center_y
+					buster_x
+					buster_y
 					@icon_dim
 					@icon_dim
 				)
 			
 			for ghost, i in @ghosts
 				# To center the images in their position point
-				ghost_center_x = @ghosts[i].x - (@icon_dim / 2)
-				ghost_center_y = @ghosts[i].y - (@icon_dim / 2)
-				area_center_x =  ghost_center_x -  (@ghost_radius * @ghosts[i].level)
-				area_center_y =  ghost_center_y -  (@ghost_radius * @ghosts[i].level)
+				ghost_x = @ghosts[i].x - (@icon_dim / 2)
+				ghost_y = @ghosts[i].y - (@icon_dim / 2)
+				area_x =  ghost_x - (@ghost_radius * @ghosts[i].level)
+				area_y =  ghost_y - (@ghost_radius * @ghosts[i].level)
 				# Drawings
 				@ctx.drawImage(
 					@sensible_area
-					area_center_x
-					area_center_y
+					area_x
+					area_y
 					(@ghost_radius * 2 * @ghosts[i].level)
 					(@ghost_radius * 2 * @ghosts[i].level)
 				)
 				@ctx.drawImage(
 					@ghosts_images[i]
-					ghost_center_x
-					ghost_center_y
+					ghost_x
+					ghost_y
 					@icon_dim
 					@icon_dim
 				)
@@ -243,30 +243,30 @@ define () ->
 					# Left arrow.
 					when 37
 						@busters[i].x = @busters[i].x - @move
-						if @busters[i].x < 0
+						if @busters[i].x < (@icon_dim / 2)
 							# If at edge, reset buster position and set flag.
-							@busters[i].x = 0
+							@busters[i].x = (@icon_dim / 2)
 							flag = 1
 					# Right arrow.
 					when 39
 						@busters[i].x = @busters[i].x + @move
-						if @busters[i].x > @space_width - @icon_dim
+						if @busters[i].x > @space_width - (@icon_dim / 2)
 							# If at edge, reset buster position and set flag.
 							@busters[i].x = @space_width - @move
 							flag = 1
 					# Down arrow
 					when 40
 						@busters[i].y = @busters[i].y + @move
-						if @busters[i].y > @space_height - @icon_dim
+						if @busters[i].y > @space_height - (@icon_dim / 2)
 							# If at edge, reset buster position and set flag.
 							@busters[i].y = @space_height - @move
 							flag = 1
 					# Up arrow 
 					when 38
 						@busters[i].y = @busters[i].y - @move
-						if @busters[i].y < 0
+						if @busters[i].y < (@icon_dim / 2)
 							# If at edge, reset buster position and set flag.
-							@busters[i].y = 0
+							@busters[i].y = (@icon_dim / 2)
 							flag = 1
 				
 				@ws.send(JSON.stringify
