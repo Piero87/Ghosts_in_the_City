@@ -161,49 +161,63 @@ define () ->
 			
 			@ctx.putImageData(@emptyBack, 0, 0);
 			
+			for treasure, i in @treasures
+				# To center the images in their position point
+				treasure_center_x = @treasures[i].x - (@icon_dim / 2)
+				treasure_center_y = @treasures[i].y - (@icon_dim / 2)
+				area_center_x =  treasure_center_x -  @treasure_radius
+				area_center_y =  treasure_center_y -  @treasure_radius
+				# Drawings
+				@ctx.drawImage(
+					@sensible_area
+					area_center_x 
+					area_center_y 
+					(@treasure_radius * 2)
+					(@treasure_radius * 2)
+				)
+				@ctx.drawImage(
+					@treasures_images[i]
+					treasure_center_x
+					treasure_center_y
+					@icon_dim
+					@icon_dim
+				) 
+				
 			for buster, i in @busters
-				# Draw the player
+				# To center the images in their position point
+				buster_center_x = @busters[i].x - (@icon_dim / 2)
+				buster_center_y = @busters[i].y - (@icon_dim / 2)
+				# Drawings
 				@ctx.drawImage(
 					@busters_images[i]
-					@busters[i].x - (@icon_dim / 2) # in this way "x" is in the middle of the image
-					@busters[i].y - (@icon_dim / 2) # in this way "y" is in the middle of the image
+					buster_center_x
+					buster_center_y
 					@icon_dim
 					@icon_dim
 				)
 			
 			for ghost, i in @ghosts
+				# To center the images in their position point
+				ghost_center_x = @ghosts[i].x - (@icon_dim / 2)
+				ghost_center_y = @ghosts[i].y - (@icon_dim / 2)
+				area_center_x =  ghost_center_x -  (@ghost_radius * @ghosts[i].level)
+				area_center_y =  ghost_center_y -  (@ghost_radius * @ghosts[i].level)
+				# Drawings
 				@ctx.drawImage(
 					@sensible_area
-					# in this way the area is centered in the image
-					(@ghosts[i].x - (@icon_dim / 2)) - (75 * @ghosts[i].level) 
-					(@ghosts[i].y - (@icon_dim / 2)) - (75 * @ghosts[i].level) 
-					(150 * @ghosts[i].level)
-					(150 * @ghosts[i].level)
+					area_center_x
+					area_center_y
+					(@ghost_radius * 2 * @ghosts[i].level)
+					(@ghost_radius * 2 * @ghosts[i].level)
 				)
 				@ctx.drawImage(
 					@ghosts_images[i]
-					@ghosts[i].x - (@icon_dim / 2) # in this way "x" is in the middle of the image
-					@ghosts[i].y - (@icon_dim / 2) # in this way "y" is in the middle of the image
-					@icon_dim, @icon_dim
-				)
-			
-			for treasure, i in @treasures
-				@ctx.drawImage(
-					@sensible_area
-					# in this way the area is centered in the image
-					@treasures[i].x - (@icon_dim / 2) - 100 
-					@treasures[i].y - (@icon_dim / 2) - 100 
-					200
-					200
-				)
-				@ctx.drawImage(
-					@treasures_images[i]
-					@treasures[i].x - (@icon_dim / 2) # in this way "x" is in the middle of the image
-					@treasures[i].y - (@icon_dim / 2) # in this way "y" is in the middle of the image
+					ghost_center_x
+					ghost_center_y
 					@icon_dim
 					@icon_dim
-				) 
-		
+				)
+				
 			return
 		
 		# Get key press.
