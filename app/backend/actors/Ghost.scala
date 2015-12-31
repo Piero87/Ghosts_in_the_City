@@ -36,6 +36,9 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
   val treasure_radius = ConfigFactory.load().getDouble("treasure_radius")
   val area_Edge = area.foundEdge
   var past_move : Int = -1
+  val width = ConfigFactory.load().getDouble("space_width")
+  val height = ConfigFactory.load().getDouble("space_height")
+  val icon_size = ConfigFactory.load().getDouble("icon_size")
   
   def receive = {
     case GhostStart => 
@@ -99,39 +102,41 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
 //     var new_position = new Point(lat, lng)
 //     
     var rnd_pos = nextInt(4)
-    var new_position : Point = null
+    var new_position : Point = position
     rnd_pos match {
       // In alto
       case 0 => {
-        if(past_move != rnd_pos){
+        if(past_move != 2){
           past_move = rnd_pos
           new_position = new Point(position.x + 5, position.y)
         }
       }
       // A destra
       case 1 => {
-        if(past_move != rnd_pos){
+        if(past_move != 3){
           past_move = rnd_pos
           new_position = new Point(position.x, position.y+ 5)
         }
       }
       // In basso
       case 2 => {
-        if(past_move != rnd_pos){
+        if(past_move != 0){
           past_move = rnd_pos
           new_position = new Point(position.x, position.y - 5)
         }
       }
       // A sinistra
       case 3 => {
-        if(past_move != rnd_pos){
+        if(past_move != 1){
           past_move = rnd_pos
           new_position = new Point(position.x - 5, position.y)
         }
       }
     }
     
-    if (area.contains(new_position, area_Edge)) {
+//    if (area.contains(new_position, area_Edge)) {
+      if ((new_position.x < width-icon_size) || 
+          (new_position.y < height-icon_size)) {
         if (distanceFrom(position_treasure) < treasure_radius) {
             ghostpos = new_position
             Logger.info("GHOST: SEND NEW POSITION")
@@ -148,7 +153,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
   def attackPlayer(player_pos: Point) = {
     
     var ghost_move : Int = -1
-    var new_position : Point = null
+    var new_position : Point = ghostpos
     var distance_x = player_pos.x - ghostpos.x
     var distance_y = player_pos.y - ghostpos.y
     if(Math.abs(distance_x) < ghost_radius && Math.abs(distance_y) < ghost_radius){
@@ -170,28 +175,28 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
    ghost_move match {
       // In alto
       case 0 => {
-        if(past_move != ghost_move){
+        if(past_move != 2){
           past_move = ghost_move
           new_position = new Point(ghostpos.x + 5, ghostpos.y)
         }
       }
       // A destra
       case 1 => {
-        if(past_move != ghost_move){
+        if(past_move != 3){
           past_move = ghost_move
           new_position = new Point(ghostpos.x, ghostpos.y+ 5)
         }
       }
       // In basso
       case 2 => {
-        if(past_move != ghost_move){
+        if(past_move != 0){
           past_move = ghost_move
           new_position = new Point(ghostpos.x, ghostpos.y - 5)
         }
       }
       // A sinistra
       case 3 => {
-        if(past_move != ghost_move){
+        if(past_move != 1){
           past_move = ghost_move
           new_position = new Point(ghostpos.x - 5, ghostpos.y)
         }
