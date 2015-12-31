@@ -48,32 +48,34 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
           Logger.info ("Player positions received")
           var playerpos = new Point(0,0)
           var playerdist : Double = 500
-          if(players.size == 0){
-            for(player <- players){
-              var currentplayerpos = player.pos
-              var distance = Math.sqrt(Math.pow((currentplayerpos.x - ghostpos.y),2) + Math.pow((currentplayerpos.x - ghostpos.y),2))
-              if(distance < range){
-                // Salvo solamente la posizone la cui distanza è minore
-                if(distance < playerdist){
-                  playerdist = distance
-                  playerpos = currentplayerpos 
-                }
-                // Sono incazzato!
-                mood = GhostMood.ANGRY
-              }else{
-                // Nessuno all'interno del range
-                mood = GhostMood.CALM
-              }
-            }
-            if(mood == GhostMood.CALM){
-              random_move(ghostpos)
-            }else{
-              attackPlayer(playerpos)
-            }
-            system.scheduler.scheduleOnce(500 millis, self, UpdateGhostPosition)
-          }else{
-            random_move(ghostpos)
-          }
+//          if(players.size == 0){
+//            for(player <- players){
+//              var currentplayerpos = player.pos
+//              var distance = Math.sqrt(Math.pow((currentplayerpos.x - ghostpos.y),2) + Math.pow((currentplayerpos.x - ghostpos.y),2))
+//              if(distance < range){
+//                // Salvo solamente la posizone la cui distanza è minore
+//                if(distance < playerdist){
+//                  playerdist = distance
+//                  playerpos = currentplayerpos 
+//                }
+//                // Sono incazzato!
+//                mood = GhostMood.ANGRY
+//              }else{
+//                // Nessuno all'interno del range
+//                mood = GhostMood.CALM
+//              }
+//            }
+//            if(mood == GhostMood.CALM){
+//              random_move(ghostpos)
+//            }else{
+//              attackPlayer(playerpos)
+//            }
+//            system.scheduler.scheduleOnce(500 millis, self, UpdateGhostPosition)
+//          }else{
+//            random_move(ghostpos)
+//          }
+          random_move(ghostpos)
+          system.scheduler.scheduleOnce(500 millis, self, UpdateGhostPosition)
         }
       future onFailure {
         case e: Exception => Logger.info("******GHOST REQUET PLAYER POSITION ERROR ******")
@@ -113,7 +115,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
     //}else{
       //ghostpos = position
     //}
-    
+    Logger.info("GHOST: SEND NEW POSITION")
     GMbackend ! GhostPositionUpdate(uuid, ghostpos)
      
   }
