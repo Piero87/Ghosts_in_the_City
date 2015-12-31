@@ -10,6 +10,7 @@ import akka.util.Timeout
 import akka.pattern.ask
 import common._
 import util.Random.nextInt
+import com.typesafe.config.ConfigFactory
 
 object Ghost{
   
@@ -31,7 +32,8 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
   var ghostpos: Point = position
   var mood = GhostMood.CALM
   var GMbackend: ActorRef = _
-  val range = level * 75
+  val ghost_radius = level * ConfigFactory.load().getDouble("ghost_radius")
+  val treasure_radius = ConfigFactory.load().getDouble("treasure_radius")
   val area_Edge = area.foundEdge
   var past_move : Int = -1
   
@@ -52,7 +54,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
 //          if(players.size == 0){
 //            for(player <- players){
 //              var currentplayerpos = player.pos
-//              var distance = Math.sqrt(Math.pow((currentplayerpos.x - ghostpos.y),2) + Math.pow((currentplayerpos.x - ghostpos.y),2))
+//              var distance = distanceFrom(currentplayerpos)
 //              if(distance < range){
 //                // Salvo solamente la posizone la cui distanza è minore
 //                if(distance < playerdist){
@@ -130,14 +132,16 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
     }
     
     //if(area.contains(new_position, area_Edge)){
-      ghostpos = new_position
+        //if(distanceFrom(treasure.pos) < treasure_radius){
+            ghostpos = new_position
+            Logger.info("GHOST: SEND NEW POSITION")
+            GMbackend ! GhostPositionUpdate(uuid, ghostpos)
+            scheduler()
+        //}else{
+           //random_move(ghost_pos) 
     //}else{
-      //ghostpos = position
-    //}
-      
-    Logger.info("GHOST: SEND NEW POSITION")
-    GMbackend ! GhostPositionUpdate(uuid, ghostpos)
-    scheduler() 
+      //random_move(ghost_pos)
+    //} 
   }
   
   def attackPlayer(player_pos: Point) = {
@@ -146,7 +150,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
     var new_position : Point = null
     var distance_x = player_pos.x - ghostpos.x
     var distance_y = player_pos.y - ghostpos.y
-    if(Math.abs(distance_x) < range && Math.abs(distance_y) < range){
+    if(Math.abs(distance_x) < ghost_radius && Math.abs(distance_y) < ghost_radius){
       if (Math.abs(distance_x) > Math.abs(distance_y) && Math.abs(distance_x) > 10) {
 				if (distance_x > 0){
 					ghost_move = 1
@@ -194,13 +198,23 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
    }
    
    //if(area.contains(new_position, area_Edge)){
-      ghostpos = new_position
+     //if(distanceFrom(treasure.pos) < treasure_radius){
+        ghostpos = new_position
+        GMbackend ! GhostPositionUpdate(uuid, ghostpos)
+        scheduler()
     //}else{
+        //mood = GhostMood.CALM
+        //random_move(ghostpos)
+   //}else{
       //ghostpos = position
     //}
-    
-    GMbackend ! GhostPositionUpdate(uuid, ghostpos)
-    scheduler()
+       
+  }
+  
+  // Calculate distance
+  def distanceFrom(pos: Point) : Double = {
+    var dist = Math.sqrt(Math.pow((pos.x - pos.y),2) + Math.pow((pos.x - pos.y),2))
+    dist
   }
   
   //schedulo tramite il tick per richiamare il metodo
@@ -208,7 +222,5 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
      system.scheduler.scheduleOnce(500 millis, self, UpdateGhostPosition)
      
   }
-  
-  
   
 }
