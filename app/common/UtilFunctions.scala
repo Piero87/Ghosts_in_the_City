@@ -1,8 +1,16 @@
 package common
 
 import scala.util.Random
+import com.typesafe.config.ConfigFactory
 
 object UtilFunctions {
+  
+  var icon_size = 0.0 //dimesione spazio livero nell'angolo
+  var column = 0.0 //numero colonne
+  var ghost_radius = 0.0
+  var treasure_radius = 0.0
+  var space_height = 0.0 
+  var space_width = 0.0
   
   def randomPositionTreasure(space: (Int,Int,Int,Int,Boolean)): (Double,Double) = {
     val rnd = new Random()
@@ -25,85 +33,81 @@ object UtilFunctions {
     return pos 
   }
   
-  def randomPositionGhosts(pos_treasure : (Double,Double)) : (Double,Double) = {
+  def randomPositionGhosts(space: (Int,Int,Int,Int,Boolean), pos_treasure : (Double,Double)) : (Double,Double) = {
     val rnd = new Random()
-    var lat_rnd = 50+ rnd.nextInt(50)
-    var lng_rnd = 50 + rnd.nextInt(50)
+    var lat_rnd = (treasure_radius / 2) + rnd.nextInt(treasure_radius.toInt / 2)
+    var lng_rnd = (treasure_radius / 2) + rnd.nextInt(treasure_radius.toInt / 2)
     var lat = pos_treasure._1 + lat_rnd
     var lng = pos_treasure._2 + lng_rnd
-    if(lat < 48) lat = 48
-    if(lat > 450) lat = 450
-    if(lng < 48) lng = 48
-    if(lng > 450) lng = 450
+    if(lat < icon_size) lat = icon_size
+    if(lat > space_height - icon_size) lat = space_height - icon_size
+    if(lng < icon_size) lng = icon_size
+    if(lng > space_height - icon_size) lng = space_height - icon_size
     (lat,lng)
   }
   
-  def createSpaces(n_treasure : Int, env_width:Int, env_height:Int ): Array[(Int,Int,Int,Int,Boolean)] = {
+  def createSpaces(n_treasure : Int ): Array[(Double,Double,Double,Double,Boolean)] = {
+    icon_size = ConfigFactory.load().getDouble("icon_size")
+    ghost_radius = ConfigFactory.load().getDouble("ghost_radius")
+    treasure_radius = ConfigFactory.load().getDouble("treasure_radius")
+    space_height = ConfigFactory.load().getDouble("space_height")
+    space_width = ConfigFactory.load().getDouble("space_width")
+    
     //divido sempre lo spazio totale per un numero pari di spaces dove in ognuno andrà un tesoro e in uno i giocatori
     // che sono sempre pari
     var nro_spaces = 0
-    if(n_treasure%2 > 0){
-      nro_spaces = n_treasure+1
+    if(n_treasure % 2 > 0){
+      nro_spaces = n_treasure + 1
     }else{
       nro_spaces = n_treasure
     }
     
-    var icon_dim = 48 //dimesione spazio livero nell'angolo 
-    var column = 0  //nro colonne
-    var height_space = 0 
-    var width_space = 0
-    
     //se il numero degli spazi è divisibile per 3 faccio 3 colonne, se no 2; definisco la grandezza di ogni spazio
     if((nro_spaces%3) == 0){
       column = 3
-      width_space = (env_width-(icon_dim *2)) / (3)
-      height_space = (env_height-(icon_dim)) / (nro_spaces/3)
+      space_width = (space_width-(icon_size *2)) / (3)
+      space_height = (space_height-(icon_size)) / (nro_spaces/3)
     }else{
       column = 2
-      width_space = (env_width-(icon_dim *2)) / (2)
-      height_space = (env_height-(icon_dim)) / (nro_spaces/2)
+      space_width = (space_width-(icon_size *2)) / (2)
+      space_height = (space_height-(icon_size)) / (nro_spaces/2)
     }
     
-    System.out.println("width space = "+width_space)
-    System.out.println("height space = "+height_space)
-    System.out.println("column = "+column)
-    
-    var spaces = new Array[(Int, Int, Int, Int, Boolean)](nro_spaces)
+    var spaces = new Array[(Double, Double, Double, Double, Boolean)](nro_spaces)
     
     var i = 0
     var j = 0
     var count = 0
     //inizializzo le dimensioni per lo space iniziale
-    var width_start = icon_dim
-    var height_start = icon_dim
-    var height_finish = height_space
+    var width_start = icon_size
+    var height_start = icon_size
+    var height_finish = space_height
     
-    var width_finish = 0 //mi serve solo inizializzarla
+    var width_finish = 0.0 //mi serve solo inizializzarla
     
-    for(i <- 0 to (nro_spaces/column)-1){
-      for(j <- 0 to column-1){
+    for(i <- 0 to (nro_spaces / column.toInt) - 1){
+      for(j <- 0 to column.toInt - 1){
 //        if (i == 0 && j == 0){
-//          width_start = icon_dim
-//          height_start = icon_dim
-//          width_finish = width_space
-//          height_finish = height_space
+//          width_start = icon_size
+//          height_start = icon_size
+//          width_finish = space_width
+//          height_finish = space_height
 //        }else{
 //          width_start = width_finish
-//          width_finish = width_finish + width_space
+//          width_finish = width_finish + space_width
 //        }
         if (i == 0 && j == 0){
-          width_finish = icon_dim
+          width_finish = icon_size
         }
         width_start = width_finish
-        width_finish = width_finish + width_space
+        width_finish = width_finish + space_width
         
-        spaces(count)= (width_start,width_finish, height_start, height_finish,false)
-        System.out.println("space "+count+" = W_start "+spaces(count)._1+", W_end "+spaces(count)._2+", H_start "+spaces(count)._3+", H_end "+spaces(count)._4)
-        count = count+1
+        spaces(count) = (width_start, width_finish, height_start, height_finish, false)
+        count = count + 1
       }
       height_start = height_finish
-      height_finish = height_finish + height_space
-      width_finish = icon_dim
+      height_finish = height_finish + space_height
+      width_finish = icon_size
     }
     
     return spaces
