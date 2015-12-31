@@ -125,6 +125,10 @@ class GameManagerBackend () extends Actor {
           val tmp_g = ghosts.map(x => x._1)
           val tmp_t = treasures.map(x => x._1)
           gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
+          for (i <- 0 to ghosts.size-1) {
+            ghosts(i)._2 ! GhostStart
+          }
+            
           context.system.scheduler.scheduleOnce(500 millis, self, UpdateGhostsPositions)
         }
       } else {
