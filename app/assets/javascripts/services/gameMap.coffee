@@ -241,6 +241,7 @@ define () ->
 				@busters[i].old_y = @busters[i].y
 				if arrows.indexOf(evt.keyCode) == -1
 					return false
+				evt.preventDefault();
 				switch evt.keyCode
 					# Left arrow.
 					when 37
