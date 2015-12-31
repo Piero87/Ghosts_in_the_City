@@ -186,7 +186,7 @@ define () ->
 				) 
 				
 			for buster, i in @busters
-				# To center the images in their position point
+				# To center the image in its position point
 				buster_x = @busters[i].x - (@icon_dim / 2)
 				buster_y = @busters[i].y - (@icon_dim / 2)
 				# Drawings
