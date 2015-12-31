@@ -49,6 +49,7 @@ object UtilFunctions {
     if(lng < min_lng) lng = min_lng
     if(lng > max_lng) lng = max_lng
     
+    System.out.println("initial position ghost: (" + lat + ", " + lng + ")")
     (lat,lng)
   }
   
