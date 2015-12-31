@@ -170,17 +170,22 @@ class GameManagerBackend () extends Actor {
       sender ! BroadcastUpdatePosition(user)
       
     case UpdateGhostsPositions =>
-      Logger.info("UpdateGhostsPositions")
+      Logger.info("UpdateGhostsPositionsBroadcast")
       val tmp_g = ghosts.map(x => x._1)
       gameManagerClient ! BroadcastGhostsPositions(tmp_g)
       context.system.scheduler.scheduleOnce(500 millis, self, UpdateGhostsPositions)
     case GhostPositionUpdate(uid, point) =>
+      Logger.info("UpdateGhostsPositions: "+uid+" Point: "+point)
+      val tmp_g = ghosts.map(x => x._1)
+      Logger.info("Ghosts LIST BEFORE UPDATE: "+tmp_g)
       for (i <- 0 to ghosts.size-1) {
         if (ghosts(i)._1.uid == uid) {
           var g = new GhostInfo(ghosts(i)._1.uid,ghosts(i)._1.level,ghosts(i)._1.mood,point)
           ghosts(i) = ghosts(i).copy(_1 = g)
         }
       }
+      val tmp_g2 = ghosts.map(x => x._1)
+      Logger.info("Ghosts LIST AFTER UPDATE: "+tmp_g2)
     case PlayersPositions =>
       sender ! Players(players)
       
