@@ -145,9 +145,11 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
             Logger.info("UUID: " + uuid + " - POS: " + ghostpos)
             scheduler()
         } else {
-           scheduler()
+          past_move = -1
+          scheduler()
         }
     } else {
+      past_move = -1
       scheduler()
     } 
   }
