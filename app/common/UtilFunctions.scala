@@ -5,12 +5,11 @@ import com.typesafe.config.ConfigFactory
 
 object UtilFunctions {
   
-  var icon_size = 0.0 //dimesione spazio livero nell'angolo
-  var column = 0.0 //numero colonne
-  var ghost_radius = 0.0
-  var treasure_radius = 0.0
-  var space_height = 0.0 
-  var space_width = 0.0
+  var icon_size = ConfigFactory.load().getDouble("icon_size")
+  var ghost_radius = ConfigFactory.load().getDouble("ghost_radius")
+  var treasure_radius = ConfigFactory.load().getDouble("treasure_radius")
+  var space_height = ConfigFactory.load().getDouble("space_height")
+  var space_width = ConfigFactory.load().getDouble("space_width")
   
   def randomPositionTreasure(space: (Double,Double,Double,Double,Boolean)): (Double,Double) = {
     val rnd = new Random()
@@ -54,11 +53,6 @@ object UtilFunctions {
   }
   
   def createSpaces(n_treasure : Int ): Array[(Double,Double,Double,Double,Boolean)] = {
-    icon_size = ConfigFactory.load().getDouble("icon_size")
-    ghost_radius = ConfigFactory.load().getDouble("ghost_radius")
-    treasure_radius = ConfigFactory.load().getDouble("treasure_radius")
-    space_height = ConfigFactory.load().getDouble("space_height")
-    space_width = ConfigFactory.load().getDouble("space_width")
     
     //divido sempre lo spazio totale per un numero pari di spaces dove in ognuno andrà un tesoro e in uno i giocatori
     // che sono sempre pari
@@ -69,6 +63,7 @@ object UtilFunctions {
       nro_spaces = n_treasure
     }
     
+    var column = 0
     //se il numero degli spazi è divisibile per 3 faccio 3 colonne, se no 2; definisco la grandezza di ogni spazio
     if((nro_spaces%3) == 0){
       column = 3
