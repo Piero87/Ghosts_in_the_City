@@ -167,8 +167,8 @@ define () ->
 				# To center the images in their position point
 				treasure_x = @treasures[i].x - (@icon_dim / 2)
 				treasure_y = @treasures[i].y - (@icon_dim / 2)
-				area_x =  treasure_x -  @treasure_radius
-				area_y =  treasure_y -  @treasure_radius
+				area_x =  @treasures[i].x -  @treasure_radius
+				area_y =  @treasures[i].y -  @treasure_radius
 				# Drawings
 				@ctx.drawImage(
 					@sensible_area
@@ -202,8 +202,8 @@ define () ->
 				# To center the images in their position point
 				ghost_x = @ghosts[i].x - (@icon_dim / 2)
 				ghost_y = @ghosts[i].y - (@icon_dim / 2)
-				area_x =  ghost_x - (@ghost_radius * @ghosts[i].level)
-				area_y =  ghost_y - (@ghost_radius * @ghosts[i].level)
+				area_x =  @ghosts[i].x - (@ghost_radius * @ghosts[i].level)
+				area_y =  @ghosts[i].y - (@ghost_radius * @ghosts[i].level)
 				# Drawings
 				@ctx.drawImage(
 					@sensible_area
