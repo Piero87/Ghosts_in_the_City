@@ -221,7 +221,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
   
   // Calculate distance
   def distanceFrom(pos: Point) : Double = {
-    var dist = Math.sqrt(Math.pow((pos.x - pos.y),2) + Math.pow((pos.x - pos.y),2))
+    var dist = Math.sqrt(Math.pow((ghostpos.x - pos.x),2) + Math.pow((ghostpos.y - pos.y),2))
     dist
   }
   
