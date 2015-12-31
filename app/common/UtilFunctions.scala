@@ -35,8 +35,8 @@ object UtilFunctions {
   
   def randomPositionGhosts(space: (Int,Int,Int,Int,Boolean), pos_treasure : (Double,Double)) : (Double,Double) = {
     val rnd = new Random()
-    var lat_rnd = (treasure_radius / 2) + rnd.nextInt(treasure_radius / 2)
-    var lng_rnd = (treasure_radius / 2) + rnd.nextInt(treasure_radius / 2)
+    var lat_rnd = (treasure_radius / 2) + rnd.nextInt(treasure_radius.toInt / 2)
+    var lng_rnd = (treasure_radius / 2) + rnd.nextInt(treasure_radius.toInt / 2)
     var lat = pos_treasure._1 + lat_rnd
     var lng = pos_treasure._2 + lng_rnd
     if(lat < icon_size) lat = icon_size
@@ -46,7 +46,7 @@ object UtilFunctions {
     (lat,lng)
   }
   
-  def createSpaces(n_treasure : Int ): Array[(Int,Int,Int,Int,Boolean)] = {
+  def createSpaces(n_treasure : Int ): Array[(Double,Double,Double,Double,Boolean)] = {
     icon_size = ConfigFactory.load().getDouble("icon_size")
     ghost_radius = ConfigFactory.load().getDouble("ghost_radius")
     treasure_radius = ConfigFactory.load().getDouble("treasure_radius")
@@ -65,15 +65,15 @@ object UtilFunctions {
     //se il numero degli spazi è divisibile per 3 faccio 3 colonne, se no 2; definisco la grandezza di ogni spazio
     if((nro_spaces%3) == 0){
       column = 3
-      space_width = (env_width-(icon_size *2)) / (3)
-      space_height = (env_height-(icon_size)) / (nro_spaces/3)
+      space_width = (space_width-(icon_size *2)) / (3)
+      space_height = (space_height-(icon_size)) / (nro_spaces/3)
     }else{
       column = 2
-      space_width = (env_width-(icon_size *2)) / (2)
-      space_height = (env_height-(icon_size)) / (nro_spaces/2)
+      space_width = (space_width-(icon_size *2)) / (2)
+      space_height = (space_height-(icon_size)) / (nro_spaces/2)
     }
     
-    var spaces = new Array[(Int, Int, Int, Int, Boolean)](nro_spaces)
+    var spaces = new Array[(Double, Double, Double, Double, Boolean)](nro_spaces)
     
     var i = 0
     var j = 0
@@ -83,10 +83,10 @@ object UtilFunctions {
     var height_start = icon_size
     var height_finish = space_height
     
-    var width_finish = 0 //mi serve solo inizializzarla
+    var width_finish = 0.0 //mi serve solo inizializzarla
     
-    for(i <- 0 to (nro_spaces/column)-1){
-      for(j <- 0 to column-1){
+    for(i <- 0 to (nro_spaces / column.toInt) - 1){
+      for(j <- 0 to column.toInt - 1){
 //        if (i == 0 && j == 0){
 //          width_start = icon_size
 //          height_start = icon_size
@@ -102,9 +102,8 @@ object UtilFunctions {
         width_start = width_finish
         width_finish = width_finish + space_width
         
-        spaces(count)= (width_start,width_finish, height_start, height_finish,false)
-        System.out.println("space "+count+" = W_start "+spaces(count)._1+", W_end "+spaces(count)._2+", H_start "+spaces(count)._3+", H_end "+spaces(count)._4)
-        count = count+1
+        spaces(count) = (width_start, width_finish, height_start, height_finish, false)
+        count = count + 1
       }
       height_start = height_finish
       height_finish = height_finish + space_height
