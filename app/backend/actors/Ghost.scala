@@ -142,6 +142,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
 //            ghostpos = new_position
             Logger.info("GHOST: SEND NEW POSITION")
             GMbackend ! GhostPositionUpdate(uuid, ghostpos)
+            Logger.info("POS: " + ghostpos)
             scheduler()
 //        } else {
 //           random_move(ghostpos)
