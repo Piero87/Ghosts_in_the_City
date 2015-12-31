@@ -88,7 +88,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
            game_id = ""
            var userInfo = new UserInfo(uid,username,team, Point(0,0))
            gameManagerClient ! LeaveGame(userInfo)
-         case "update_position" =>
+         case "update_player_position" =>
            val updatePositionResult: JsResult[UpdatePositionJSON] = msg.validate[UpdatePositionJSON](CommonMessages.updatePositionReads)
            updatePositionResult match {
             case s: JsSuccess[UpdatePositionJSON] =>
