@@ -93,7 +93,7 @@ class GameManagerBackend () extends Actor {
           }
           
           for(j <- 0 to n_treasure-1){ //l'ultimo space è dei giocatori e non ha fantasmi
-            position_ghosts(j) = UtilFunctions.randomPositionGhosts(position_treasure(j))
+            position_ghosts(j) = UtilFunctions.randomPositionGhost(position_treasure(j))
             System.out.println("position ghost "+j+" ("+position_ghosts(j)._1 +", "+position_ghosts(j)._2 +")")
           }
           
