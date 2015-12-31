@@ -26,14 +26,14 @@ object UtilFunctions {
   }
   
   def randomPositionGhost(pos_treasure : (Double,Double)) : (Double,Double) = {
-    var icon_size = ConfigFactory.load().getDouble("icon_size")
-    var treasure_radius = ConfigFactory.load().getDouble("treasure_radius")
+    var icon_size = ConfigFactory.load().getInt("icon_size")
+    var treasure_radius = ConfigFactory.load().getInt("treasure_radius")
     var space_height = ConfigFactory.load().getDouble("space_height")
     var space_width = ConfigFactory.load().getDouble("space_width")
     
     val rnd = new Random()
-    var lat_rnd = (treasure_radius / 3) + rnd.nextInt(treasure_radius.toInt / 2)
-    var lng_rnd = (treasure_radius / 3) + rnd.nextInt(treasure_radius.toInt / 2)
+    var lat_rnd = rnd.nextInt(treasure_radius) - rnd.nextInt(treasure_radius)
+    var lng_rnd = rnd.nextInt(treasure_radius) - rnd.nextInt(treasure_radius)
     var lat = pos_treasure._1 + lat_rnd
     var lng = pos_treasure._2 + lng_rnd
     
