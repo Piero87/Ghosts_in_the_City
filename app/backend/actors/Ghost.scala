@@ -14,11 +14,6 @@ import util.Random.nextInt
 object Ghost{
   
   /**
-   * Event sent from the GM when they start moved
-   */
-  case object Start
-  
-  /**
    * Event sent from the Ghost when move itself
    */
   case object UpdateGhostPosition
@@ -40,7 +35,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
   val area_Edge = area.foundEdge
   
   def receive = {
-    case Start => 
+    case GhostStart => 
       GMbackend = sender
       scheduler()
     case UpdateGhostPosition => 

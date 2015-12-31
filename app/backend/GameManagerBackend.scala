@@ -14,13 +14,14 @@ import backend.actors._
 import backend.actors.models._
 import util.control.Breaks._
 import common.UtilFunctions
+import scala.collection.mutable.MutableList
 
 class GameManagerBackend () extends Actor {
   
   var gameManagerClient: ActorRef = _
-  var players: List[UserInfo] = List()
-  var ghosts: List[Tuple2[GhostInfo, ActorRef]] = List()
-  var treasures: List[Tuple2[TreasureInfo, ActorRef]] = List()
+  var players: MutableList[UserInfo] = MutableList()
+  var ghosts: MutableList[Tuple2[GhostInfo, ActorRef]] = MutableList()
+  var treasures: MutableList[Tuple2[TreasureInfo, ActorRef]] = MutableList()
   var game_name = ""
   var game_id = java.util.UUID.randomUUID.toString
   var game_n_players = 0
@@ -40,13 +41,13 @@ class GameManagerBackend () extends Actor {
       var rnd_team = selectTeam()
       val p = new UserInfo(user.uid,user.name,rnd_team,user.pos)
       players = players :+ p
-      val tmp_g = ghosts.map(x => x._1).toList
-      val tmp_t = treasures.map(x => x._1).toList
+      val tmp_g = ghosts.map(x => x._1)
+      val tmp_t = treasures.map(x => x._1)
       var g = new Game(game_id,name,n_players,game_status,players,tmp_g,tmp_t)
       sender ! GameHandler(g,self)
     case GameStatus =>
-      val tmp_g = ghosts.map(x => x._1).toList
-      val tmp_t = treasures.map(x => x._1).toList
+      val tmp_g = ghosts.map(x => x._1)
+      val tmp_t = treasures.map(x => x._1)
       sender ! Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t)
     case JoinGame(game,user,ref) =>
       Logger.info("GMBackend richiesta join ricevuta")
@@ -57,8 +58,8 @@ class GameManagerBackend () extends Actor {
         
         val p = new UserInfo(user.uid,user.name,rnd_team,user.pos)
         players = players :+ p
-        val tmp_g = ghosts.map(x => x._1).toList
-        val tmp_t = treasures.map(x => x._1).toList
+        val tmp_g = ghosts.map(x => x._1)
+        val tmp_t = treasures.map(x => x._1)
         sender ! Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t)
         //Ora mandiamo il messaggio di update game status a tutti i giocatori (***Dobbiamo evitare di mandarlo a quello che si è
         //appena Joinato?
@@ -84,7 +85,7 @@ class GameManagerBackend () extends Actor {
           for(i <- 0 to game_n_players-1){
             val user = players(i)
             val p = new UserInfo(user.uid,user.name,user.team,Point(position_players(i)._1,position_players(i)._2))
-            players.updated(i,p)
+            players(i) = p
           }
           
           Logger.info("players list AFTER: " + players)
@@ -121,9 +122,13 @@ class GameManagerBackend () extends Actor {
           }
           
           game_status = StatusGame.STARTED
-          val tmp_g = ghosts.map(x => x._1).toList
-          val tmp_t = treasures.map(x => x._1).toList
+          val tmp_g = ghosts.map(x => x._1)
+          val tmp_t = treasures.map(x => x._1)
           gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
+          for (i <- 0 to ghosts.size-1) {
+            ghosts(i)._2 ! GhostStart
+          }
+            
           context.system.scheduler.scheduleOnce(500 millis, self, UpdateGhostsPositions)
         }
       } else {
@@ -148,8 +153,8 @@ class GameManagerBackend () extends Actor {
             case e: Exception => Logger.info("******GAME MANAGER BACKEND KILL ERROR ******")
           }
       } else {
-        val tmp_g = ghosts.map(x => x._1).toList
-        val tmp_t = treasures.map(x => x._1).toList
+        val tmp_g = ghosts.map(x => x._1)
+        val tmp_t = treasures.map(x => x._1)
         // Ci sono ancora giocatori nella lista quindi aggiorna lo stato
         gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
       }
@@ -158,7 +163,7 @@ class GameManagerBackend () extends Actor {
       for(user <- players) {
         if (user.uid == user.uid) {
           val p = new UserInfo(user.uid,user.name,user.team,user.pos)
-          players.updated(i,p)
+          players(i) = p
         }
         i = i + 1
       }
@@ -166,17 +171,15 @@ class GameManagerBackend () extends Actor {
       
     case UpdateGhostsPositions =>
       Logger.info("UpdateGhostsPositions")
-      val tmp_g = ghosts.map(x => x._1).toList
+      val tmp_g = ghosts.map(x => x._1)
       gameManagerClient ! BroadcastGhostsPositions(tmp_g)
       context.system.scheduler.scheduleOnce(500 millis, self, UpdateGhostsPositions)
     case GhostPositionUpdate(uid, point) =>
-      var i = 0
-      for(ghost <- ghosts) {
-        if (ghost._1.uid == uid) {
-          val g = new GhostInfo(ghost._1.uid,ghost._1.level,ghost._1.mood,point)
-          ghosts.updated(i,g)
+      for (i <- 0 to ghosts.size-1) {
+        if (ghosts(i)._1.uid == uid) {
+          var g = new GhostInfo(ghosts(i)._1.uid,ghosts(i)._1.level,ghosts(i)._1.mood,point)
+          ghosts(i) = ghosts(i).copy(_1 = g)
         }
-        i = i + 1
       }
     case PlayersPositions =>
       sender ! Players(players)

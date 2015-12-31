@@ -8,6 +8,7 @@ import scala.util.{Failure, Success}
 import play.api.Logger
 import common._
 import akka.actor.PoisonPill
+import scala.collection.mutable.MutableList
 
 object GameManagerClient {
   
@@ -87,7 +88,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
        Logger.info ("GameManagerBackend: GMClient will die")
        game_status = StatusGame.FINISHED
        if (clientsConnections.size > 0) {
-         var g = new Game(game_id,game_name,game_n_players,game_status,List(),List(),List())
+         var g = new Game(game_id,game_name,game_n_players,game_status,MutableList(),MutableList(),MutableList())
          self ! GameStatusBroadcast(g)
        }
        sender ! KillMyself

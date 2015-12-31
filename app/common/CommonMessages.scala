@@ -1,6 +1,7 @@
 package common
 
 import akka.actor._
+import scala.collection.mutable.MutableList
 
 object StatusGame extends Enumeration {
   type StatusGame = Int
@@ -28,7 +29,7 @@ case class TreasureInfo(uid: String, status: Int, pos: Point)
 case class GhostInfo(uid: String, level: Int, mood: Int, pos: Point)
 case class UserInfo(uid: String, name: String, team: Int, pos: Point)
 case class NewGame(name: String, n_players: Int, user: UserInfo, ref: ActorRef = null)
-case class Game(id: String, name: String, n_players: Int, status: Int, players: List[UserInfo], ghosts: List[GhostInfo], treasures: List[TreasureInfo])
+case class Game(id: String, name: String, n_players: Int, status: Int, players: MutableList[UserInfo], ghosts: MutableList[GhostInfo], treasures: MutableList[TreasureInfo])
 case class GamesList(list: List[Game])
 case object GamesList
 case object GameStatus
@@ -38,8 +39,9 @@ case object PlayersPositions
 case object UpdateGhostsPositions
 case class UpdatePosition(user: UserInfo)
 case class BroadcastUpdatePosition(user: UserInfo)
-case class BroadcastGhostsPositions(ghosts: List[GhostInfo])
-case class Players(players: List[UserInfo])
+case class BroadcastGhostsPositions(ghosts: MutableList[GhostInfo])
+case class Players(players: MutableList[UserInfo])
+case object GhostStart
 
 case class GameStatusBroadcast(game: Game)
 case class JoinGame(game: Game, user: UserInfo, ref: ActorRef = null)
@@ -53,7 +55,7 @@ case class JoinGameJSON(event: String, game: Game)
 case class LeaveGameJSON(event: String)
 case class UpdatePositionJSON(event: String, pos: Point)
 case class BroadcastUpdatePositionJSON(event: String, user: UserInfo)
-case class BroadcastGhostsPositionsJSON(event: String, ghosts: List[GhostInfo])
+case class BroadcastGhostsPositionsJSON(event: String, ghosts: MutableList[GhostInfo])
 
 import play.api.libs.json._
 
