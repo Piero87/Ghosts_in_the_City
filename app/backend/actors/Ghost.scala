@@ -132,7 +132,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
     }
     
     //if(area.contains(new_position, area_Edge)){
-        //if(distanceFrom(treasure.pos) < treasure_radius){
+        //if(distanceFrom(treasure.position) < treasure_radius){
             ghostpos = new_position
             Logger.info("GHOST: SEND NEW POSITION")
             GMbackend ! GhostPositionUpdate(uuid, ghostpos)
@@ -198,7 +198,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
    }
    
    //if(area.contains(new_position, area_Edge)){
-     //if(distanceFrom(treasure.pos) < treasure_radius){
+     //if(distanceFrom(treasure.position) < treasure_radius){
         ghostpos = new_position
         GMbackend ! GhostPositionUpdate(uuid, ghostpos)
         scheduler()
