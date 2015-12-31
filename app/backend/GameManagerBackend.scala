@@ -66,14 +66,14 @@ class GameManagerBackend () extends Actor {
         gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
         if (players.size == game_n_players) {
           
-          var width = 500
+          var width = 1000
           var height = 500
           
           var polygon = new Polygon(List(Point(0,0),Point(0,height),Point(width,0),Point(width,height)))
           
           val n_treasure = game_n_players+1
           
-          var spaces = UtilFunctions.createSpaces(n_treasure, width, width)
+          var spaces = UtilFunctions.createSpaces(n_treasure, width, height)
           var position_treasure = new Array[(Double,Double)](n_treasure)
           var position_ghosts = new Array[(Double,Double)](n_treasure)
           
