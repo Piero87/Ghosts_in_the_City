@@ -19,10 +19,10 @@ object Ghost{
    */
   case object UpdateGhostPosition
   
-  def props(uuid: String, area: Polygon, position: Point, level: Int, treasure: ActorRef) = Props(new Ghost(uuid, area,position, level, treasure))
+  def props(uuid: String, area: Polygon, position: Point, level: Int, treasure: ActorRef,position_treasure: Point) = Props(new Ghost(uuid, area,position, level, treasure,position_treasure))
 }
 
-class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure: ActorRef) extends Actor {
+class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure: ActorRef, position_treasure: Point) extends Actor {
   
   import context._
   import Ghost._
@@ -83,7 +83,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
       }
   }
   
-  def random_move(position: Point) = {
+  def random_move(position: Point) : Unit = {
     
 //     val delta_time = 3
 //     val speed = 10.0
@@ -131,17 +131,18 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
       }
     }
     
-    //if(area.contains(new_position, area_Edge)){
-        //if(distanceFrom(treasure.position) < treasure_radius){
+    if (area.contains(new_position, area_Edge)) {
+        if (distanceFrom(position_treasure) < treasure_radius) {
             ghostpos = new_position
             Logger.info("GHOST: SEND NEW POSITION")
             GMbackend ! GhostPositionUpdate(uuid, ghostpos)
             scheduler()
-        //}else{
-           //random_move(ghost_pos) 
-    //}else{
-      //random_move(ghost_pos)
-    //} 
+        } else {
+           random_move(ghostpos)
+        }
+    } else {
+      random_move(ghostpos)
+    } 
   }
   
   def attackPlayer(player_pos: Point) = {
