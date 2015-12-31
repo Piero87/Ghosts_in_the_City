@@ -6,6 +6,8 @@ define () ->
 			@user_id = id_user
 			# Y position of buster
 			@canvas = document.getElementById(id_canvas)
+			@canvas.width = canvas_width
+			@canvas.height = canvas_height
 			# canvas
 			@ctx = undefined
 			# context
