@@ -5,12 +5,6 @@ import com.typesafe.config.ConfigFactory
 
 object UtilFunctions {
   
-  var icon_size = ConfigFactory.load().getDouble("icon_size")
-  var ghost_radius = ConfigFactory.load().getDouble("ghost_radius")
-  var treasure_radius = ConfigFactory.load().getDouble("treasure_radius")
-  var space_height = ConfigFactory.load().getDouble("space_height")
-  var space_width = ConfigFactory.load().getDouble("space_width")
-  
   def randomPositionTreasure(space: (Double,Double,Double,Double,Boolean)): (Double,Double) = {
     val rnd = new Random()
     var lat = space._1 + rnd.nextInt(space._2.toInt - space._1.toInt + 1)
@@ -32,6 +26,11 @@ object UtilFunctions {
   }
   
   def randomPositionGhost(pos_treasure : (Double,Double)) : (Double,Double) = {
+    var icon_size = ConfigFactory.load().getDouble("icon_size")
+    var treasure_radius = ConfigFactory.load().getDouble("treasure_radius")
+    var space_height = ConfigFactory.load().getDouble("space_height")
+    var space_width = ConfigFactory.load().getDouble("space_width")
+    
     val rnd = new Random()
     var lat_rnd = (treasure_radius / 2) + rnd.nextInt(treasure_radius.toInt / 2)
     var lng_rnd = (treasure_radius / 2) + rnd.nextInt(treasure_radius.toInt / 2)
@@ -53,6 +52,12 @@ object UtilFunctions {
   }
   
   def createSpaces(n_treasure : Int ): Array[(Double,Double,Double,Double,Boolean)] = {
+    
+    var icon_size = ConfigFactory.load().getDouble("icon_size")
+    var ghost_radius = ConfigFactory.load().getDouble("ghost_radius")
+    var treasure_radius = ConfigFactory.load().getDouble("treasure_radius")
+    var space_height = ConfigFactory.load().getDouble("space_height")
+    var space_width = ConfigFactory.load().getDouble("space_width")
     
     //divido sempre lo spazio totale per un numero pari di spaces dove in ognuno andrà un tesoro e in uno i giocatori
     // che sono sempre pari
