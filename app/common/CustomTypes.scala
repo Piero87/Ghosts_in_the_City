@@ -7,8 +7,7 @@ sealed case class Point(x: Double, y: Double)
 sealed case class Polygon(points: List[Point]){
   
   val polygonPoints = points
-  
-  def contains(p: Point, edges: Seq[Edge]) = edges.count(_.raySegI(p)) % 2 != 0
+  val edges = foundEdge
   
   // Create Seq[Edge] from polygon list point
   def foundEdge : Seq[Edge] = {
@@ -24,6 +23,8 @@ sealed case class Polygon(points: List[Point]){
     }
     edges
   }
+  
+  def contains(p: Point) = edges.count(_.raySegI(p)) % 2 != 0
 }
 
 case class Edge(_1: Point, _2: Point) {
