@@ -183,11 +183,11 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
    ghost_move match {
       // In alto
       case 0 => {
-          new_position = new Point(ghostpos.x + ghostmovement, ghostpos.y)
+          new_position = new Point(ghostpos.x, ghostpos.y + ghostmovement)
       }
       // A destra
       case 1 => {
-          new_position = new Point(ghostpos.x, ghostpos.y+ ghostmovement)
+          new_position = new Point(ghostpos.x + ghostmovement, ghostpos.y)
       }
       // In basso
       case 2 => {
