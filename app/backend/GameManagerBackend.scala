@@ -157,8 +157,8 @@ class GameManagerBackend () extends Actor {
       }
     case UpdatePosition(user) =>
       var i = 0
-      for(user <- players) {
-        if (user.uid == user.uid) {
+      for(user_tmp <- players) {
+        if (user_tmp.uid == user.uid) {
           val p = new UserInfo(user.uid,user.name,user.team,user.pos)
           players(i) = p
         }
@@ -167,7 +167,7 @@ class GameManagerBackend () extends Actor {
       sender ! BroadcastUpdatePosition(user)
       
     case UpdateGhostsPositions =>
-      Logger.info("UpdateGhostsPositionsBroadcast")
+      //Logger.info("UpdateGhostsPositionsBroadcast")
       val tmp_g = ghosts.map(x => x._1)
       gameManagerClient ! BroadcastGhostsPositions(tmp_g)
       context.system.scheduler.scheduleOnce(500 millis, self, UpdateGhostsPositions)

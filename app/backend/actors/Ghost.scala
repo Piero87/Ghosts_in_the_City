@@ -52,7 +52,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
       val future = GMbackend ? PlayersPositions
       future.onSuccess { 
         case Players(players) => 
-          Logger.info ("Player positions received")
+          //Logger.info ("Player positions received")
           var playerpos = new Point(0,0)
           var playerdist : Double = ghost_radius //Max range iniziale
           if(players.size != 0){
@@ -67,6 +67,8 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
                 }
                 // Sono incazzato!
                 mood = GhostMood.ANGRY
+              } else {
+                mood = GhostMood.CALM
               }
             }
             if(mood == GhostMood.CALM){
@@ -79,7 +81,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
           }
         }
       future onFailure {
-        case e: Exception => Logger.info("******GHOST REQUET PLAYER POSITION ERROR ******")
+        case e: Exception => Logger.info("******GHOST REQUEST PLAYER POSITION ERROR ******")
       }
   }
   
@@ -136,9 +138,9 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
       if ((new_position.x < width-icon_size) || (new_position.y < height-icon_size)) {
         if (distanceBetween(new_position, position_treasure) < treasure_radius) {
             ghostpos = new_position
-            Logger.info("GHOST: SEND NEW POSITION")
+            //Logger.info("GHOST: SEND NEW POSITION")
             GMbackend ! GhostPositionUpdate(uuid, ghostpos , mood)
-            Logger.info("UUID: " + uuid + " - POS: " + ghostpos)
+            //Logger.info("UUID: " + uuid + " - POS: " + ghostpos)
             scheduler()
         } else {
           if (rnd_pos<2) {
