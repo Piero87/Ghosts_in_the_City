@@ -55,6 +55,9 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
           //Logger.info ("Player positions received")
           var playerpos = new Point(0,0)
           var playerdist : Double = ghost_radius //Max range iniziale
+          
+          var found_someone = false
+          
           if(players.size != 0){
             for(player <- players){
               var currentplayerpos = player.pos
@@ -67,8 +70,12 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
                 }
                 // Sono incazzato!
                 mood = GhostMood.ANGRY
+                found_someone = true
               }
             }
+            
+            if (found_someone == false) mood = GhostMood.CALM
+            
             if(mood == GhostMood.CALM){
               random_move(ghostpos)
             }else{
