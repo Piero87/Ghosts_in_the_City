@@ -67,8 +67,6 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
                 }
                 // Sono incazzato!
                 mood = GhostMood.ANGRY
-              } else {
-                mood = GhostMood.CALM
               }
             }
             if(mood == GhostMood.CALM){
