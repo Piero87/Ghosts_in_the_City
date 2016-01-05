@@ -47,8 +47,8 @@ define () ->
 			@space_height = canvas_height
 			@icon_size = 48
 			@move = 5
-			@ghost_radius = 35
-			@treasure_radius = 100
+			@ghost_radius = 50
+			@treasure_radius = 150
 			
 		startGame: ->
 			console.log("Start Game!")
