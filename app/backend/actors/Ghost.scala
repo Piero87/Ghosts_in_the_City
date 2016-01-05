@@ -106,14 +106,14 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
       case 0 => {
         if(past_move != 2){
           past_move = rnd_pos
-          new_position = new Point(position.x + ghostmovement, position.y)
+          new_position = new Point(position.x, position.y + ghostmovement)
         }
       }
       // A destra
       case 1 => {
         if(past_move != 3){
           past_move = rnd_pos
-          new_position = new Point(position.x, position.y+ ghostmovement)
+          new_position = new Point(position.x + ghostmovement, position.y)
         }
       }
       // In basso
