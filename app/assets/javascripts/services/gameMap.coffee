@@ -1,13 +1,20 @@
 define () ->
 	class GameMap
-		constructor: (id_user, players, ghosts, treasures, id_canvas, canvas_width, canvas_height, websocket) ->
+		constructor: (id_user, players, ghosts, treasures, websocket) ->
+			
+			@space_width = $("#conf_space_width").val()
+			@space_height = $("#conf_space_height").val()
+			@icon_size = $("#conf_icon_size").val()
+			@move = 5
+			@ghost_radius = $("#conf_ghost_radius").val()
+			@treasure_radius = $("#conf_treasure_radius").val()
 			
 			@ws = websocket
 			@user_id = id_user
 			# Y position of buster
-			@canvas = document.getElementById(id_canvas)
-			@canvas.width = canvas_width
-			@canvas.height = canvas_height
+			@canvas = document.getElementById("gameArena")
+			@canvas.width = @space_width
+			@canvas.height = @space_height
 			# canvas
 			@ctx = undefined
 			# context
@@ -42,13 +49,6 @@ define () ->
 			
 			@team_blue = new Image
 			@team_blue.src = '/assets/images/Team_blue.png'
-			
-			@space_width = canvas_width
-			@space_height = canvas_height
-			@icon_size = 48
-			@move = 5
-			@ghost_radius = 50
-			@treasure_radius = 150
 			
 		startGame: ->
 			console.log("Start Game!")
@@ -124,6 +124,7 @@ define () ->
 			for ghost, i in @ghosts when ghost.uid == uid
 				@ghosts[i].mood = mood
 				if @ghosts[i].mood == 'angry'
+					alert "fantasma incazzato!"
 					if ghost.x > x
 						@ghosts_images[i].src = '/assets/images/Ghost_L' + @ghosts[i].level + '_Angry_left.png'
 					else
