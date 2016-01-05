@@ -216,10 +216,12 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
        GMbackend ! GhostPositionUpdate(uuid, ghostpos, mood)
        scheduler()
      }else{
+      GMbackend ! GhostPositionUpdate(uuid, ghostpos, mood)
       scheduler()
      }
    }else{
-      scheduler()
+     GMbackend ! GhostPositionUpdate(uuid, ghostpos, mood)
+     scheduler()
    }
        
   }
