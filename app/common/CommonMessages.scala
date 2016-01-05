@@ -24,7 +24,7 @@ object GhostMood extends Enumeration {
    val ANGRY = 1
 }
 
-case class GhostPositionUpdate(uid: String, pos: Point)
+case class GhostPositionUpdate(uid: String, pos: Point, mood: Int)
 case class TreasureInfo(uid: String, status: Int, pos: Point)
 case class GhostInfo(uid: String, level: Int, mood: Int, pos: Point)
 case class UserInfo(uid: String, name: String, team: Int, pos: Point)

@@ -171,10 +171,10 @@ class GameManagerBackend () extends Actor {
       val tmp_g = ghosts.map(x => x._1)
       gameManagerClient ! BroadcastGhostsPositions(tmp_g)
       context.system.scheduler.scheduleOnce(500 millis, self, UpdateGhostsPositions)
-    case GhostPositionUpdate(uid, point) =>
+    case GhostPositionUpdate(uid, point,mood) =>
       for (i <- 0 to ghosts.size-1) {
         if (ghosts(i)._1.uid == uid) {
-          var g = new GhostInfo(ghosts(i)._1.uid,ghosts(i)._1.level,ghosts(i)._1.mood,point)
+          var g = new GhostInfo(ghosts(i)._1.uid,ghosts(i)._1.level,mood,point)
           ghosts(i) = ghosts(i).copy(_1 = g)
         }
       }
