@@ -216,12 +216,9 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
        GMbackend ! GhostPositionUpdate(uuid, ghostpos, mood)
        scheduler()
      }else{
-       mood = GhostMood.CALM
-       random_move(ghostpos)
+      scheduler()
      }
    }else{
-      ghostpos = position
-      GMbackend ! GhostPositionUpdate(uuid, ghostpos, mood)
       scheduler()
    }
        
