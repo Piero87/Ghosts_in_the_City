@@ -106,7 +106,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
       case 0 => {
         if(past_move != 2){
           past_move = rnd_pos
-          new_position = new Point(position.x, position.y + ghostmovement)
+          new_position = new Point(position.x, position.y - ghostmovement)
         }
       }
       // A destra
@@ -120,7 +120,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
       case 2 => {
         if(past_move != 0){
           past_move = rnd_pos
-          new_position = new Point(position.x, position.y - ghostmovement)
+          new_position = new Point(position.x, position.y + ghostmovement)
         }
       }
       // A sinistra
@@ -159,7 +159,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
   }
   
   def attackPlayer(player_pos: Point) = {
-    
+    Logger.info("ATTACCO GIOCATORE POS: "+player_pos+" POS FANTASMA: "+ghostpos)
     var ghost_move : Int = -1
     var new_position : Point = ghostpos
     var distance_x = player_pos.x - ghostpos.x
@@ -183,7 +183,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
    ghost_move match {
       // In alto
       case 0 => {
-          new_position = new Point(ghostpos.x, ghostpos.y + ghostmovement)
+          new_position = new Point(ghostpos.x, ghostpos.y - ghostmovement)
       }
       // A destra
       case 1 => {
@@ -191,11 +191,14 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
       }
       // In basso
       case 2 => {
-          new_position = new Point(ghostpos.x, ghostpos.y - ghostmovement)
+          new_position = new Point(ghostpos.x, ghostpos.y + ghostmovement)
       }
       // A sinistra
       case 3 => {
           new_position = new Point(ghostpos.x - ghostmovement, ghostpos.y)
+      }
+      case -1 => {
+          Logger.info("CASE -1")
       }
    }
    
