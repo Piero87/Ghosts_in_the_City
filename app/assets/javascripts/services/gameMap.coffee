@@ -124,6 +124,7 @@ define () ->
 			for ghost, i in @ghosts when ghost.uid == uid
 				@ghosts[i].mood = mood
 				if @ghosts[i].mood == 'angry'
+					alert "fantasma incazzato!"
 					if ghost.x > x
 						@ghosts_images[i].src = '/assets/images/Ghost_L' + @ghosts[i].level + '_Angry_left.png'
 					else
