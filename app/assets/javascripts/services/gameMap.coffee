@@ -120,7 +120,7 @@ define () ->
 			return
 		
 		ghostMove: (uid, mood, x, y) ->
-			console.log "GHOST MOVE: {uid: " + uid + ", x: " + x + ", y: " + y + "}"
+			console.log "GHOST MOVE: {uid: " + uid + ", mood:" + mood + ", x: " + x + ", y: " + y + "}"
 			for ghost, i in @ghosts when ghost.uid == uid
 				@ghosts[i].mood = mood
 				if @ghosts[i].mood == 1 // Oh oh, someone is angry...
