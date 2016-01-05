@@ -127,7 +127,7 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 						when 1 # game started
 							console.log(JSON.stringify(json))
 							@refreshPlayerList(json)
-							@game_map = new GameMap(@user.uid, json.game.players, json.game.ghosts, json.game.treasures, "gameArena", 1000, 500, @ws)
+							@game_map = new GameMap(@user.uid, json.game.players, json.game.ghosts, json.game.treasures, @ws)
 							@game_map.startGame()
 						when 2 # game paused
 							console.log('Hold on!')
