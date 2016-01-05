@@ -54,33 +54,29 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
         case Players(players) => 
           Logger.info ("Player positions received")
           var playerpos = new Point(0,0)
-          var playerdist : Double = 500
-//          if(players.size == 0){
-//            for(player <- players){
-//              var currentplayerpos = player.pos
-//              var distance = distanceBetween(ghostpos, currentplayerpos)
-//              if(distance < range){
-//                // Salvo solamente la posizone la cui distanza è minore
-//                if(distance < playerdist){
-//                  playerdist = distance
-//                  playerpos = currentplayerpos 
-//                }
-//                // Sono incazzato!
-//                mood = GhostMood.ANGRY
-//              }else{
-//                // Nessuno all'interno del range
-//                mood = GhostMood.CALM
-//              }
-//            }
-//            if(mood == GhostMood.CALM){
-//              random_move(ghostpos)
-//            }else{
-//              attackPlayer(playerpos)
-//            }
-//          }else{
-//            random_move(ghostpos)
-//          }
-          random_move(ghostpos)
+          var playerdist : Double = ghost_radius //Max range iniziale
+          if(players.size != 0){
+            for(player <- players){
+              var currentplayerpos = player.pos
+              var distance = distanceBetween(ghostpos, currentplayerpos)
+              if(distance < ghost_radius){
+                // Salvo solamente la posizone la cui distanza è minore
+                if(distance < playerdist){
+                  playerdist = distance
+                  playerpos = currentplayerpos 
+                }
+                // Sono incazzato!
+                mood = GhostMood.ANGRY
+              }
+            }
+            if(mood == GhostMood.CALM){
+              random_move(ghostpos)
+            }else{
+              attackPlayer(playerpos)
+            }
+          }else{
+            random_move(ghostpos)
+          }
         }
       future onFailure {
         case e: Exception => Logger.info("******GHOST REQUET PLAYER POSITION ERROR ******")
@@ -137,12 +133,11 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
     }
     
 //    if (area.contains(new_position)) {
-      if ((new_position.x < width-icon_size) || 
-          (new_position.y < height-icon_size)) {
+      if ((new_position.x < width-icon_size) || (new_position.y < height-icon_size)) {
         if (distanceBetween(new_position, position_treasure) < treasure_radius) {
             ghostpos = new_position
             Logger.info("GHOST: SEND NEW POSITION")
-            GMbackend ! GhostPositionUpdate(uuid, ghostpos)
+            GMbackend ! GhostPositionUpdate(uuid, ghostpos , mood)
             Logger.info("UUID: " + uuid + " - POS: " + ghostpos)
             scheduler()
         } else {
@@ -188,49 +183,41 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
    ghost_move match {
       // In alto
       case 0 => {
-        if(past_move != 2){
-          past_move = ghost_move
           new_position = new Point(ghostpos.x + ghostmovement, ghostpos.y)
-        }
       }
       // A destra
       case 1 => {
-        if(past_move != 3){
-          past_move = ghost_move
           new_position = new Point(ghostpos.x, ghostpos.y+ ghostmovement)
-        }
       }
       // In basso
       case 2 => {
-        if(past_move != 0){
-          past_move = ghost_move
           new_position = new Point(ghostpos.x, ghostpos.y - ghostmovement)
-        }
       }
       // A sinistra
       case 3 => {
-        if(past_move != 1){
-          past_move = ghost_move
           new_position = new Point(ghostpos.x - ghostmovement, ghostpos.y)
-        }
       }
    }
    
 //   if(area.contains(new_position, area_Edge)){
-//   if ((new_position.x < width-icon_size) || 
-//          (new_position.y < height-icon_size)) {  
-//     if(distanceBetween(new_position, streasure.position) < treasure_radius){
-//        ghostpos = new_position
-//        GMbackend ! GhostPositionUpdate(uuid, ghostpos)
-//        scheduler()
-//    }else{
-//        mood = GhostMood.CALM
-//        random_move(ghostpos)
-//   }else{
-//      ghostpos = position
-//    }
-//       
+   if ((new_position.x < width-icon_size) || (new_position.y < height-icon_size)) {  
+     if(distanceBetween(new_position, position_treasure) < treasure_radius){
+       ghostpos = new_position
+       GMbackend ! GhostPositionUpdate(uuid, ghostpos, mood)
+       scheduler()
+     }else{
+       mood = GhostMood.CALM
+       random_move(ghostpos)
+     }
+   }else{
+      ghostpos = position
+      GMbackend ! GhostPositionUpdate(uuid, ghostpos, mood)
+      scheduler()
+   }
+       
   }
+ 
+
   
   // Calculate distance
   def distanceBetween(pos1: Point, pos2: Point) : Double = {
