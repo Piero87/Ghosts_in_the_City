@@ -9,7 +9,7 @@ class CustomLogger (o: String) {
   def log(msg: String) {
     val date = new java.util.Date()
     val timestamp = new java.sql.Timestamp(date.getTime)
-    Logger.info("[" + origin + " - " + timestamp + "]: " + msg)
+    Logger.info("[" + timestamp + " - " + origin + "]: " + msg)
   }
 }
 
