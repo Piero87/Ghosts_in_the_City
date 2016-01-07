@@ -206,6 +206,9 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 				event: "leave_game"
 			)
 		
+		playAgain: ->
+			@changeGameStatus(-1)
+		
 		changeGameStatus: (s) ->
 			status = s
 			switch status
