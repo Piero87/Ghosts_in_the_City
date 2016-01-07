@@ -27,7 +27,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
   
   def receive = {
     case msg: JsValue =>
-      logger.log(msg.toString())
+      logger.log(msg.toString() + " (" + sender.path + ")")
       ((__ \ "event").read[String]).reads(msg) map {
         case "new_game" =>
           val newGameResult: JsResult[NewGameJSON] = msg.validate[NewGameJSON](CommonMessages.newGameReads)
@@ -37,7 +37,6 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
               val future = frontendManager ? NewGame(s.get.name.replaceAll(" ", "_")+"_"+System.currentTimeMillis(),s.get.n_players,user_info,self)
               future.onSuccess {
                 case GameHandler(game,ref) => 
-                  logger.log("path: "+sender.path)
                   if (ref != null) gameManagerClient = ref
                   game_id = game.id
                   for( user <- game.players) {
@@ -49,8 +48,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
                   val json = Json.toJson(g_json)(CommonMessages.gameJSONWrites)
                   upstream ! json
               }
-            case e: JsError => 
-              logger.log("Ops NewGame: "+e.toString())
+            case e: JsError => logger.log("NEW GAME ERROR: " + e.toString() + " FROM " + sender.path)
           }
           
         case "games_list" =>
@@ -69,7 +67,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
               val future = frontendManager ? JoinGame(s.get.game,user_info,self)
               future.onSuccess {
                 case GameHandler(game,ref) =>  
-                  logger.log("Frontend Game Manager path: "+sender.path)
+                  logger.log("GameManagerClient path: " + sender.path)
                   if (ref != null) gameManagerClient = ref
                   game_id = game.id
                   for( user <- game.players) {
@@ -81,8 +79,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
                   val json = Json.toJson(g_json)(CommonMessages.gameJSONWrites)
                   upstream ! json
               }
-            case e: JsError => 
-              logger.log("Ops JoinGame: "+e.toString())
+            case e: JsError => logger.log("JOIN GAME ERROR: " + e.toString() + " FROM " + sender.path)
           }
          case "leave_game" =>
            game_id = ""
@@ -94,8 +91,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
             case s: JsSuccess[UpdatePositionJSON] =>
               var userInfo = new UserInfo(uid,username,team, s.get.pos)
               gameManagerClient ! UpdatePosition(userInfo)
-            case e: JsError => 
-              logger.log("Ops JoinGame: "+e.toString())
+            case e: JsError => logger.log("UPDATE PLAYER POSITION ERROR: " + e.toString() + " FROM " + sender.path)
            }
          case "resume_game" =>
            val resumeGameResult: JsResult[ResumeGameJSON] = msg.validate[ResumeGameJSON](CommonMessages.resumeGameReads)
@@ -105,7 +101,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
               val future = frontendManager ? ResumeGame(s.get.game_id,user_info, self)
               future.onSuccess {
                 case GameHandler(game,ref) =>  
-                  logger.log("Frontend Game Manager path: "+sender.path)
+                  logger.log("GameManagerClient path: " + sender.path)
                   if (ref != null) gameManagerClient = ref
                   game_id = game.id
                   for( user <- game.players) {
@@ -117,8 +113,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
                   val json = Json.toJson(g_json)(CommonMessages.gameJSONWrites)
                   upstream ! json
               }
-            case e: JsError => 
-              logger.log("Ops ResumeGame: "+e.toString())
+            case e: JsError => logger.log("RESUME GAME ERROR: " + e.toString() + " FROM " + sender.path)
           }
            
       }
