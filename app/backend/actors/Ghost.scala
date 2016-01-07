@@ -46,7 +46,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
       GMbackend = sender
       scheduler()
     case UpdateGhostPosition => 
-      Logger.info("Ghost: Updated position received")
+      //Logger.info("Ghost: Updated position received")
       // Ciclo di vita del fantasma: chiedo al GMBackend le posizioni dei player, calcolo la distanza da ciascuno di essi 
       // se rientra nel range di azione attacco altrimenti mi muovo random
       val future = GMbackend ? PlayersPositions
