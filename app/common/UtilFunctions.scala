@@ -2,8 +2,20 @@ package common
 
 import scala.util.Random
 import com.typesafe.config.ConfigFactory
+import play.api.Logger
+
+class CustomLogger (o: String) {
+  var origin = o
+  def log(msg: String) {
+    val date = new java.util.Date()
+    val timestamp = new java.sql.Timestamp(date.getTime)
+    Logger.info("[" + origin + " - " + timestamp + "]: " + msg)
+  }
+}
 
 object UtilFunctions {
+  
+  
   
   def randomPositionTreasure(space: (Double,Double,Double,Double,Boolean)): (Double,Double) = {
     val rnd = new Random()

@@ -12,17 +12,15 @@ import backend.Backend
 
 class FrontendManager extends Actor {
   
+  var logger = new CustomLogger("Frontend Manager")
   var backends: List[ActorRef] = List()
   var game_manager_frontends :List[ActorRef] = List()
   
   var backendCounter = 0
   
   def receive = {
-//    case EnterMatch(username) if backends.isEmpty =>
-//      sender() ! JobFailed("Service unavailable, try again later", job)
-
     case NewGame(name,n_players,user,ref) =>
-      Logger.info("FrontendManager: NewGame request")
+      logger.log("NewGame request")
       newGame(name,n_players,user,ref)
     case GamesList =>
       gamesList(sender)
@@ -36,11 +34,12 @@ class FrontendManager extends Actor {
       } 
     
     case "BackendRegistration" if !backends.contains(sender()) =>
-      Logger.info("Backend Received "+sender.path)
+      logger.log("Backend Received "+sender.path)
       context watch sender()
       backends = backends :+ sender()
     case Terminated(a) =>
       if (a.actorRef == GameManagerClient) {
+        logger.log("Backend Received "+sender.path)
         Logger.info("FRONTEND: Ho eliminato un GMBackend")
         game_manager_frontends = game_manager_frontends.filterNot(_ == a)
         
