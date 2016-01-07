@@ -50,7 +50,7 @@
         </div>
         
         <div data-bind="if: connected" align="center">
-        	<div data-bind="if: (!gameready() && !gamestarted() && !gameended())" align="center" >
+        	<div data-bind="if: (!gameready() && !gamestarted() && !gamepaused() && !gameended())" align="center" >
 	        	<div class="bordered" style="max-width: 500px;">
 	        		<div class="container">
 	        			<form>
