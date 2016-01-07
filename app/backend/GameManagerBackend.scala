@@ -28,6 +28,8 @@ class GameManagerBackend () extends Actor {
   var game_n_players = 0
   var game_status = StatusGame.WAITING
   
+  var paused_players:MutableList[Tuple2[String, Long]] = MutableList()
+  
   implicit val timeout = Timeout(5 seconds)
   implicit val ec = context.dispatcher
   
@@ -132,6 +134,21 @@ class GameManagerBackend () extends Actor {
         //***Failure message
         Logger.info("GMB: non ci sono più posti per la partita, attaccati al cazzo")
       }
+    case ResumeGame(gameid: String, user: UserInfo, ref: ActorRef) =>
+      Logger.info("GMBackend: ResumeGame Request")
+      paused_players = paused_players.filterNot(elm => elm._1 == user.uid)
+      // Svegliamo il giocatore che è appena tornato!
+      val tmp_g = ghosts.map(x => x._1)
+      val tmp_t = treasures.map(x => x._1)
+      sender ! Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t)
+      gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
+    case PauseGame(user: UserInfo) =>
+      paused_players = paused_players :+ Tuple2(user.uid, System.currentTimeMillis())
+      scheduler()
+      game_status = StatusGame.PAUSED
+      val tmp_g = ghosts.map(x => x._1)
+      val tmp_t = treasures.map(x => x._1)
+      gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
     case LeaveGame(user: UserInfo) =>
       Logger.info("GMBackend: LeaveGame Request") 
       players = players.filterNot(elm => elm.uid == user.uid)
@@ -180,7 +197,28 @@ class GameManagerBackend () extends Actor {
       }
     case PlayersPositions =>
       sender ! Players(players)
-      
+    case CheckPaused =>
+      var now = System.currentTimeMillis()
+      if (paused_players.size > 0) {
+        for (player <- paused_players) {
+          if (now - player._2 > 5000) {
+            game_status = StatusGame.FINISHED
+            val tmp_g = ghosts.map(x => x._1)
+            val tmp_t = treasures.map(x => x._1)
+            gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
+            val future = gameManagerClient ? KillYourself
+            future.onSuccess { 
+              case KillMyself => 
+                Logger.info ("GameManagerBackend: GMClient will die")
+                self ! PoisonPill
+            }
+            future onFailure {
+              case e: Exception => Logger.info("******GAME MANAGER BACKEND KILL ERROR ******")
+            }
+          }
+        }
+        scheduler()
+      }
   }
   
   def newGame () = {
@@ -201,4 +239,8 @@ class GameManagerBackend () extends Actor {
   }
   
   def randomString(length: Int) = scala.util.Random.alphanumeric.take(length).mkString
+  
+  def scheduler() = {
+     context.system.scheduler.scheduleOnce(1000 millis, self, CheckPaused) 
+  }
 }

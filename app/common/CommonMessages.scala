@@ -35,6 +35,7 @@ case object GamesList
 case object GameStatus
 case object KillYourself
 case object KillMyself
+case object CheckPaused
 case object PlayersPositions
 case object UpdateGhostsPositions
 case class UpdatePosition(user: UserInfo)
@@ -45,14 +46,17 @@ case object GhostStart
 
 case class GameStatusBroadcast(game: Game)
 case class JoinGame(game: Game, user: UserInfo, ref: ActorRef = null)
+case class ResumeGame(game_id: String, user: UserInfo, ref: ActorRef)
 case class GameHandler(game: Game, ref: ActorRef = null)
 case class LeaveGame(user: UserInfo)
+case class PauseGame(user: UserInfo)
 case class NewGameJSON(event: String, name: String, n_players: Int)
 case class GameJSON(event: String, game: Game)
 case class GamesListResponseJSON(event: String, list: List[Game])
 case class GamesListRequestJSON(event: String)
 case class JoinGameJSON(event: String, game: Game)
 case class LeaveGameJSON(event: String)
+case class ResumeGameJSON(event:String, game_id: String)
 case class UpdatePositionJSON(event: String, pos: Point)
 case class BroadcastUpdatePositionJSON(event: String, user: UserInfo)
 case class BroadcastGhostsPositionsJSON(event: String, ghosts: MutableList[GhostInfo])
@@ -93,6 +97,9 @@ object CommonMessages {
   
   implicit val joinGameReads = Json.reads[JoinGameJSON]
   implicit val joinGameWrites = Json.writes[JoinGameJSON]
+  
+  implicit val resumeGameReads = Json.reads[ResumeGameJSON]
+  implicit val resumeGameWrites = Json.writes[ResumeGameJSON]
   
   implicit val updatePositionReads = Json.reads[UpdatePositionJSON]
   implicit val updatePositionWrites = Json.writes[UpdatePositionJSON]

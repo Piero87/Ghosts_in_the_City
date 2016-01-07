@@ -97,6 +97,29 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
             case e: JsError => 
               Logger.info("Ops JoinGame: "+e.toString())
            }
+         case "resume_game" =>
+           val resumeGameResult: JsResult[ResumeGameJSON] = msg.validate[ResumeGameJSON](CommonMessages.resumeGameReads)
+           resumeGameResult match {
+            case s: JsSuccess[ResumeGameJSON] =>
+              var user_info = new UserInfo(uid,username,team,Point(0,0))
+              val future = frontendManager ? ResumeGame(s.get.game_id,user_info, self)
+              future.onSuccess {
+                case GameHandler(game,ref) =>  
+                  Logger.info ("ClientConnection: Frontend Game Manager path: "+sender.path)
+                  if (ref != null) gameManagerClient = ref
+                  game_id = game.id
+                  for( user <- game.players) {
+                     if (user.uid == uid) {
+                       team = user.team
+                     } 
+                  }
+                  var g_json = new GameJSON("game_status",game)
+                  val json = Json.toJson(g_json)(CommonMessages.gameJSONWrites)
+                  upstream ! json
+              }
+            case e: JsError => 
+              Logger.info("Ops ResumeGame: "+e.toString())
+          }
            
       }
     case GameStatusBroadcast(game: Game) =>
@@ -116,7 +139,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
   override def postStop() = {
     if (game_id != "") {
       var userInfo = new UserInfo(uid,username,team, Point(0,0))
-      gameManagerClient ! LeaveGame(userInfo)
+      gameManagerClient ! PauseGame(userInfo)
     }
   }
 }
