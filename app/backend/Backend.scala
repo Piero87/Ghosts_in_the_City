@@ -6,7 +6,6 @@ import com.typesafe.config.ConfigFactory
 import akka.actor._
 import akka.cluster.MemberStatus
 import akka.cluster.Member
-import play.api.Logger
 import common._
 import akka.pattern.ask
 import scala.concurrent.duration._
@@ -34,6 +33,8 @@ class Backend extends Actor {
   val cluster = Cluster(context.system)
   var game_manager_backends: List[ActorRef] = List()
   
+  val logger = new CustomLogger("Backend")
+  
   // subscribe to cluster changes, MemberUp
   // re-subscribe when restart
   override def preStart(): Unit = cluster.subscribe(self, classOf[MemberUp])
@@ -45,7 +46,7 @@ class Backend extends Actor {
     case MemberUp(m) => register(m)
     
     case NewGame(name,n_players,user,ref) =>
-      Logger.info("Backend: NewGame request")
+      logger.log("NewGame request")
       newGame(name,n_players,user,ref)
     case GamesList =>
       gamesList(sender)
@@ -58,13 +59,14 @@ class Backend extends Actor {
     val gm_backend = context.actorOf(Props[GameManagerBackend], name = name)
     context watch gm_backend
     game_manager_backends = game_manager_backends :+ gm_backend
-    Logger.info("Backend: Actor created, forward message...")
-    Logger.info("Backend PreForward: "+ref.toString())
+    logger.log("Backend: Actor created, forward message...")
+    logger.log("Backend PreForward: "+ref.toString())
     gm_backend forward NewGame(name,n_players,user,ref)
     
   }
   
   def gamesList (origin: ActorRef) = {
+    logger.log("GameList request")
     implicit val ec = context.dispatcher
     val taskFutures: List[Future[Game]] = game_manager_backends map { gm_be =>
         implicit val timeout = Timeout(5 seconds)
@@ -82,6 +84,5 @@ class Backend extends Actor {
     
   def register(member: Member): Unit =
     if (member.hasRole("frontend"))
-      context.actorSelection(RootActorPath(member.address) / "user" / "frontend") !
-        "BackendRegistration"
+      context.actorSelection(RootActorPath(member.address) / "user" / "frontend") ! "BackendRegistration"
 }

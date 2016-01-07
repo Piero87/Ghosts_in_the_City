@@ -1,7 +1,6 @@
 package backend
 
 import akka.actor._
-import play.api.Logger
 import common._
 import scala.concurrent.duration.Duration
 import java.util.concurrent.TimeUnit
@@ -30,16 +29,18 @@ class GameManagerBackend () extends Actor {
   
   var paused_players:MutableList[Tuple2[String, Long]] = MutableList()
   
+  val logger = new CustomLogger("GameManagerBackend")
+  
   implicit val timeout = Timeout(5 seconds)
   implicit val ec = context.dispatcher
   
   def receive = {
     case NewGame(name,n_players,user,ref) =>
-      Logger.info("GameManagerBackend: NewGame request")
+      logger.log("NewGame request")
       game_name = name
       game_n_players = n_players
       game_status = StatusGame.WAITING
-      Logger.info("GMBackend NewGame From: "+ref.toString())
+      logger.log("GMBackend NewGame From: "+ref.toString())
       gameManagerClient = ref
       var rnd_team = selectTeam()
       val p = new UserInfo(user.uid,user.name,rnd_team,user.pos)
@@ -53,9 +54,9 @@ class GameManagerBackend () extends Actor {
       val tmp_t = treasures.map(x => x._1)
       sender ! Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t)
     case JoinGame(game,user,ref) =>
-      Logger.info("GMBackend richiesta join ricevuta")
+      logger.log("Join Request riceived")
       if (players.size < game_n_players) {
-        Logger.info("GMBackend richiesta join accettata")
+        logger.log("Join Request accepted")
         //Scegliamo un Team Random Blu o Rosso
         var rnd_team = selectTeam()
         
@@ -132,16 +133,17 @@ class GameManagerBackend () extends Actor {
         }
       } else {
         //***Failure message
-        Logger.info("GMB: non ci sono più posti per la partita, attaccati al cazzo")
+        logger.log("GMB: non ci sono più posti per la partita, attaccati al cazzo")
       }
     case ResumeGame(gameid: String, user: UserInfo, ref: ActorRef) =>
-      Logger.info("GMBackend: ResumeGame Request")
+      logger.log("ResumeGame Request")
       paused_players = paused_players.filterNot(elm => elm._1 == user.uid)
       // Svegliamo il giocatore che è appena tornato!
       val tmp_g = ghosts.map(x => x._1)
       val tmp_t = treasures.map(x => x._1)
       sender ! Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t)
     case PauseGame(user: UserInfo) =>
+      logger.log("PauseGame Request")
       paused_players = paused_players :+ Tuple2(user.uid, System.currentTimeMillis())
       //for(ghost <- )
       scheduler()
@@ -150,7 +152,7 @@ class GameManagerBackend () extends Actor {
       val tmp_t = treasures.map(x => x._1)
       gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
     case LeaveGame(user: UserInfo) =>
-      Logger.info("GMBackend: LeaveGame Request") 
+      logger.log("LeaveGame Request") 
       players = players.filterNot(elm => elm.uid == user.uid)
       sender ! Success
      
@@ -160,11 +162,11 @@ class GameManagerBackend () extends Actor {
         val future = gameManagerClient ? KillYourself
           future.onSuccess { 
             case KillMyself => 
-              Logger.info ("GameManagerBackend: GMClient will die")
+              logger.log("GMClient will die")
               self ! PoisonPill
           }
           future onFailure {
-            case e: Exception => Logger.info("******GAME MANAGER BACKEND KILL ERROR ******")
+            case e: Exception => logger.log("******GAME MANAGER BACKEND KILL ERROR ******")
           }
       } else {
         val tmp_g = ghosts.map(x => x._1)
@@ -206,11 +208,11 @@ class GameManagerBackend () extends Actor {
             val future = gameManagerClient ? KillYourself
             future.onSuccess { 
               case KillMyself => 
-                Logger.info ("GameManagerBackend: GMClient will die")
+                logger.log("GameManagerBackend: GMClient will die")
                 self ! PoisonPill
             }
             future onFailure {
-              case e: Exception => Logger.info("******GAME MANAGER BACKEND KILL ERROR ******")
+              case e: Exception => logger.log("******GAME MANAGER BACKEND KILL ERROR ******")
             }
           }
         }

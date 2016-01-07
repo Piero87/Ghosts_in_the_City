@@ -1,7 +1,6 @@
 package actors
 
 import akka.actor._
-import play.api.Logger
 import scala.concurrent.duration._
 import akka.util.Timeout
 import akka.pattern.ask
@@ -24,9 +23,11 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
   var game_id = ""
   var team = Team.UNKNOWN
   
+  val logger = new CustomLogger("ClientConnection")
+  
   def receive = {
     case msg: JsValue =>
-      Logger.info(msg.toString())
+      logger.log(msg.toString())
       ((__ \ "event").read[String]).reads(msg) map {
         case "new_game" =>
           val newGameResult: JsResult[NewGameJSON] = msg.validate[NewGameJSON](CommonMessages.newGameReads)
@@ -36,7 +37,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
               val future = frontendManager ? NewGame(s.get.name.replaceAll(" ", "_")+"_"+System.currentTimeMillis(),s.get.n_players,user_info,self)
               future.onSuccess {
                 case GameHandler(game,ref) => 
-                  Logger.info ("ClientConnection: Frontend Game Manager path: "+sender.path)
+                  logger.log("path: "+sender.path)
                   if (ref != null) gameManagerClient = ref
                   game_id = game.id
                   for( user <- game.players) {
@@ -49,7 +50,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
                   upstream ! json
               }
             case e: JsError => 
-              Logger.info("Ops NewGame: "+e.toString())
+              logger.log("Ops NewGame: "+e.toString())
           }
           
         case "games_list" =>
@@ -68,7 +69,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
               val future = frontendManager ? JoinGame(s.get.game,user_info,self)
               future.onSuccess {
                 case GameHandler(game,ref) =>  
-                  Logger.info ("ClientConnection: Frontend Game Manager path: "+sender.path)
+                  logger.log("Frontend Game Manager path: "+sender.path)
                   if (ref != null) gameManagerClient = ref
                   game_id = game.id
                   for( user <- game.players) {
@@ -81,10 +82,9 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
                   upstream ! json
               }
             case e: JsError => 
-              Logger.info("Ops JoinGame: "+e.toString())
+              logger.log("Ops JoinGame: "+e.toString())
           }
          case "leave_game" =>
-           Logger.info("CC: LeaveGame request")
            game_id = ""
            var userInfo = new UserInfo(uid,username,team, Point(0,0))
            gameManagerClient ! LeaveGame(userInfo)
@@ -95,7 +95,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
               var userInfo = new UserInfo(uid,username,team, s.get.pos)
               gameManagerClient ! UpdatePosition(userInfo)
             case e: JsError => 
-              Logger.info("Ops JoinGame: "+e.toString())
+              logger.log("Ops JoinGame: "+e.toString())
            }
          case "resume_game" =>
            val resumeGameResult: JsResult[ResumeGameJSON] = msg.validate[ResumeGameJSON](CommonMessages.resumeGameReads)
@@ -105,7 +105,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
               val future = frontendManager ? ResumeGame(s.get.game_id,user_info, self)
               future.onSuccess {
                 case GameHandler(game,ref) =>  
-                  Logger.info ("ClientConnection: Frontend Game Manager path: "+sender.path)
+                  logger.log("Frontend Game Manager path: "+sender.path)
                   if (ref != null) gameManagerClient = ref
                   game_id = game.id
                   for( user <- game.players) {
@@ -118,7 +118,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
                   upstream ! json
               }
             case e: JsError => 
-              Logger.info("Ops ResumeGame: "+e.toString())
+              logger.log("Ops ResumeGame: "+e.toString())
           }
            
       }

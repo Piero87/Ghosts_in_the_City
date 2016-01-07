@@ -2,7 +2,6 @@ package backend.actors
 
 import akka.actor._
 import scala.math._
-import play.api.Logger
 import scala.concurrent.duration.Duration
 import scala.concurrent.duration._
 import java.util.concurrent.TimeUnit
@@ -39,6 +38,8 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
   val width = ConfigFactory.load().getDouble("space_width")
   val height = ConfigFactory.load().getDouble("space_height")
   val icon_size = ConfigFactory.load().getDouble("icon_size")
+  
+  val logger = new CustomLogger("Ghost "+uuid)
  
   
   def receive = {
@@ -86,7 +87,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
           }
         }
       future onFailure {
-        case e: Exception => Logger.info("******GHOST REQUEST PLAYER POSITION ERROR ******")
+        case e: Exception => logger.log("******GHOST REQUEST PLAYER POSITION ERROR ******")
       }
   }
   
@@ -166,7 +167,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
   }
   
   def attackPlayer(player_pos: Point) = {
-    Logger.info("ATTACCO GIOCATORE POS: "+player_pos+" POS FANTASMA: "+ghostpos)
+    logger.log("ATTACCO GIOCATORE POS: "+player_pos+" POS FANTASMA: "+ghostpos)
     var ghost_move : Int = -1
     var new_position : Point = ghostpos
     var distance_x = player_pos.x - ghostpos.x
@@ -205,7 +206,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
           new_position = new Point(ghostpos.x - ghostmovement, ghostpos.y)
       }
       case -1 => {
-          Logger.info("CASE -1")
+          logger.log("CASE -1")
       }
    }
    
