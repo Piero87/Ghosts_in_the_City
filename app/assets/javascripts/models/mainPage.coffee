@@ -74,6 +74,7 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 			@ws.onclose = (event) =>
 				# Handle the reconnection in case of errors
 				if (!event.wasClean && ! self.closing)
+					@connected(false)
 					@connect()
 					@connecting("Reconnecting ...")
 				else
