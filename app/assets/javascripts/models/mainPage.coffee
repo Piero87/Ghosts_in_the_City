@@ -83,6 +83,7 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 					@closing = false
 					localStorage.removeItem("uid")
 					localStorage.removeItem("username")
+					localStorage.removeItem("gameid")
 			
 			# Handle the stream
 			@ws.onmessage = (event) =>
@@ -160,14 +161,12 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 		
 		# Games list
 		gamesList: ->
-			#console.log("Games List")
 			@ws.send(JSON.stringify
 				event: "games_list"
 			)
 		
 		# Join Game 
 		joinGame: (game) ->
-			console.log("Join Game")
 			@ws.send(JSON.stringify
 				event: "join_game"
 				game: game
