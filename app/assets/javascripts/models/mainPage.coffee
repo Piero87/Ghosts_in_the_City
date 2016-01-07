@@ -65,10 +65,10 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 				if localStorage.gameid
 					@gameid(localStorage.gameid)
 					@resumeGame()
-				
-				# Setting the interval for refresh games list
-				callback = @gamesList.bind(this)
-				@interval = setInterval(callback, 1000)
+				else
+					# Setting the interval for refresh games list
+					callback = @gamesList.bind(this)
+					@interval = setInterval(callback, 1000)
 				
 			# When the websocket closes
 			@ws.onclose = (event) =>
@@ -208,6 +208,9 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 		
 		playAgain: ->
 			@changeGameStatus(-1)
+			# Setting the interval for refresh games list
+			callback = @gamesList.bind(this)
+			@interval = setInterval(callback, 1000)
 		
 		changeGameStatus: (s) ->
 			status = s
