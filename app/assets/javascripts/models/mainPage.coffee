@@ -49,10 +49,6 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 				@user.uid = localStorage.uid
 				
 				@connect()
-				
-				if localStorage.gameid
-					@gameid(localStorage.gameid)
-					@resumeGame()
 		
 		# Connect
 		connect: ->
@@ -65,6 +61,10 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 			@ws.onopen = (event) =>
 				@connecting(null)
 				@connected(true)
+				
+				if localStorage.gameid
+					@gameid(localStorage.gameid)
+					@resumeGame()
 				
 				# Setting the interval for refresh games list
 				callback = @gamesList.bind(this)
