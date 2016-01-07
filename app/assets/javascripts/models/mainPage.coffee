@@ -48,10 +48,11 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 				@user.name = localStorage.username
 				@user.uid = localStorage.uid
 				
+				@connect()
+				
 				if localStorage.gameid
 					@gameid(localStorage.gameid)
-				
-				@connect()
+					@resumeGame()
 		
 		# Connect
 		connect: ->
@@ -59,13 +60,6 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 			@disconnected(null)
 			
 			@ws = new WebSocket(jsRoutes.controllers.Application.login(@user.name, @user.uid).webSocketURL())
-			
-			# Open Web Socket
-			if @gameid()
-				@ws.send(JSON.stringify
-					event: "resume_game"
-					game_id: @gameid()
-				)
 			
 			# When the websocket opens
 			@ws.onopen = (event) =>
@@ -177,6 +171,13 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 			@ws.send(JSON.stringify
 				event: "join_game"
 				game: game
+			)
+		
+		# Resume Game
+		resumeGame: ->
+			@ws.send(JSON.stringify
+				event: "resume_game"
+				game_id: @gameid()
 			)
 		
 		# Disconnect the ws
