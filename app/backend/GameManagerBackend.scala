@@ -141,7 +141,6 @@ class GameManagerBackend () extends Actor {
       val tmp_g = ghosts.map(x => x._1)
       val tmp_t = treasures.map(x => x._1)
       sender ! Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t)
-      gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
     case PauseGame(user: UserInfo) =>
       paused_players = paused_players :+ Tuple2(user.uid, System.currentTimeMillis())
       //for(ghost <- )
@@ -204,9 +203,6 @@ class GameManagerBackend () extends Actor {
         for (player <- paused_players) {
           if (now - player._2 > 10000) {
             game_status = StatusGame.FINISHED
-            val tmp_g = ghosts.map(x => x._1)
-            val tmp_t = treasures.map(x => x._1)
-            gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
             val future = gameManagerClient ? KillYourself
             future.onSuccess { 
               case KillMyself => 
@@ -218,9 +214,15 @@ class GameManagerBackend () extends Actor {
             }
           }
         }
+        val tmp_g = ghosts.map(x => x._1)
+        val tmp_t = treasures.map(x => x._1)
+        gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
         scheduler()
       } else {
         game_status = StatusGame.STARTED
+        val tmp_g = ghosts.map(x => x._1)
+        val tmp_t = treasures.map(x => x._1)
+        gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
       }
   }
   
