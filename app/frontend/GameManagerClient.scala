@@ -71,7 +71,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       }
     case ResumeGame(gameid,user,ref) =>
       Logger.info("GMClient, richiesta RESUME ricevuta")
-      if (game_status == StatusGame.FINISHED && game_id == gameid) {
+      if (game_id == gameid) {
         var p = user
         var ccref = ref
         val origin = sender
