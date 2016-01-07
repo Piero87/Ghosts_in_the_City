@@ -69,67 +69,7 @@ class GameManagerBackend () extends Actor {
         //appena Joinato?
         gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
         if (players.size == game_n_players) {
-          
-          var width = ConfigFactory.load().getDouble("space_width")
-          var height = ConfigFactory.load().getDouble("space_height")
-
-          var polygon = new Polygon(List(Point(0,0),Point(0,height),Point(width,0),Point(width,height)))
-          
-          val n_treasure = game_n_players+1
-          
-          var spaces = UtilFunctions.createSpaces(n_treasure)
-          var position_treasure = new Array[(Double,Double)](n_treasure)
-          var position_ghosts = new Array[(Double,Double)](n_treasure)
-          
-          var position_players = new Array[(Double,Double)](game_n_players)
-          position_players = UtilFunctions.randomPositionPlayers(spaces(spaces.length - 1), n_treasure-1)
-          
-          for(i <- 0 to game_n_players-1){
-            val user = players(i)
-            val p = new UserInfo(user.uid,user.name,user.team,Point(position_players(i)._1,position_players(i)._2))
-            players(i) = p
-          }
-          
-          for(i <- 0 to n_treasure-1){
-            position_treasure(i) = UtilFunctions.randomPositionTreasure(spaces(i))
-            System.out.println("position tesoro "+i+" ("+position_treasure(i)._1 +", "+position_treasure(i)._2 +")")
-          }
-          
-          for(j <- 0 to n_treasure-1){ //l'ultimo space è dei giocatori e non ha fantasmi
-            position_ghosts(j) = UtilFunctions.randomPositionGhost(position_treasure(j))
-            System.out.println("position ghost "+j+" ("+position_ghosts(j)._1 +", "+position_ghosts(j)._2 +")")
-          }
-          
-          //Qui dovrà generare i fantasmi e i tesori
-          for (i <- 0 to game_n_players) {
-    
-            var treasure_id = randomString(8)
-            //il boolean qui sotto si può fare random
-            var key = new Key(true,randomString(8))
-            //qui entrmabi i valori sono random
-            var gold = new Gold(true, 100)
-            var p_t = new Point (position_treasure(i)._1,position_treasure(i)._2)
-            var treasure_info = new TreasureInfo(treasure_id,0,p_t) 
-            val treasure = context.actorOf(Props(new Treasure(treasure_id,p_t,key,gold,key)), name = treasure_id)
-            treasures = treasures :+ Tuple2(treasure_info,treasure)
-            
-            var ghost_id = randomString(8)
-            var p_g = new Point (position_ghosts(i)._1,position_ghosts(i)._2)
-            val g_level = nextInt(2)+1
-            val ghost = context.actorOf(Props(new Ghost(ghost_id,polygon,p_g,g_level,treasure,p_t)), name = ghost_id)
-            var ghost_info = new GhostInfo(ghost_id,g_level,GhostMood.CALM,p_g)
-            ghosts = ghosts :+ Tuple2(ghost_info,ghost)
-          }
-          
-          game_status = StatusGame.STARTED
-          val tmp_g = ghosts.map(x => x._1)
-          val tmp_t = treasures.map(x => x._1)
-          gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
-          for (i <- 0 to ghosts.size-1) {
-            ghosts(i)._2 ! GhostStart
-          }
-            
-          context.system.scheduler.scheduleOnce(500 millis, self, UpdateGhostsPositions)
+          newGame ()
         }
       } else {
         //***Failure message
@@ -230,6 +170,67 @@ class GameManagerBackend () extends Actor {
   
   def newGame () = {
       //...inizializza attori partita
+    var width = ConfigFactory.load().getDouble("space_width")
+    var height = ConfigFactory.load().getDouble("space_height")
+
+    var polygon = new Polygon(List(Point(0,0),Point(0,height),Point(width,0),Point(width,height)))
+    
+    val n_treasure = game_n_players+1
+    
+    var spaces = UtilFunctions.createSpaces(n_treasure)
+    var position_treasure = new Array[(Double,Double)](n_treasure)
+    var position_ghosts = new Array[(Double,Double)](n_treasure)
+    
+    var position_players = new Array[(Double,Double)](game_n_players)
+    position_players = UtilFunctions.randomPositionPlayers(spaces(spaces.length - 1), n_treasure-1)
+    
+    for(i <- 0 to game_n_players-1){
+      val user = players(i)
+      val p = new UserInfo(user.uid,user.name,user.team,Point(position_players(i)._1,position_players(i)._2))
+      players(i) = p
+    }
+    
+    for(i <- 0 to n_treasure-1){
+      position_treasure(i) = UtilFunctions.randomPositionTreasure(spaces(i))
+      System.out.println("position tesoro "+i+" ("+position_treasure(i)._1 +", "+position_treasure(i)._2 +")")
+    }
+    
+    for(j <- 0 to n_treasure-1){ //l'ultimo space è dei giocatori e non ha fantasmi
+      position_ghosts(j) = UtilFunctions.randomPositionGhost(position_treasure(j))
+      System.out.println("position ghost "+j+" ("+position_ghosts(j)._1 +", "+position_ghosts(j)._2 +")")
+      }
+    
+    //Qui dovrà generare i fantasmi e i tesori
+    for (i <- 0 to game_n_players) {
+
+      var treasure_id = randomString(8)
+      //il boolean qui sotto si può fare random
+      var key = new Key(true,randomString(8))
+      //qui entrmabi i valori sono random
+      var gold = new Gold(true, 100)
+      var p_t = new Point (position_treasure(i)._1,position_treasure(i)._2)
+      var treasure_info = new TreasureInfo(treasure_id,0,p_t) 
+      val treasure = context.actorOf(Props(new Treasure(treasure_id,p_t,key,gold,key)), name = treasure_id)
+      treasures = treasures :+ Tuple2(treasure_info,treasure)
+      
+      var ghost_id = randomString(8)
+      var p_g = new Point (position_ghosts(i)._1,position_ghosts(i)._2)
+      val g_level = nextInt(2)+1
+      val ghost = context.actorOf(Props(new Ghost(ghost_id,polygon,p_g,g_level,treasure,p_t)), name = ghost_id)
+      var ghost_info = new GhostInfo(ghost_id,g_level,GhostMood.CALM,p_g)
+      ghosts = ghosts :+ Tuple2(ghost_info,ghost)
+    }
+    
+    game_status = StatusGame.STARTED
+    val tmp_g = ghosts.map(x => x._1)
+    val tmp_t = treasures.map(x => x._1)
+    gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
+    for (i <- 0 to ghosts.size-1) {
+      ghosts(i)._2 ! GhostStart
+    }
+      
+    context.system.scheduler.scheduleOnce(500 millis, self, UpdateGhostsPositions)
+    
   }
   
   def selectTeam() = {
