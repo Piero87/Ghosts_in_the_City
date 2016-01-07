@@ -1,7 +1,6 @@
 package frontend
 
 import akka.actor._
-import play.api.Logger
 import akka.util.Timeout
 import common._
 import akka.pattern.ask
@@ -12,7 +11,7 @@ import backend.Backend
 
 class FrontendManager extends Actor {
   
-  var logger = new CustomLogger("Frontend Manager")
+  val logger = new CustomLogger("FrontendManager")
   var backends: List[ActorRef] = List()
   var game_manager_frontends :List[ActorRef] = List()
   
@@ -39,12 +38,11 @@ class FrontendManager extends Actor {
       backends = backends :+ sender()
     case Terminated(a) =>
       if (a.actorRef == GameManagerClient) {
-        logger.log("Backend Received "+sender.path)
-        Logger.info("FRONTEND: Ho eliminato un GMBackend")
+        logger.log("GMBackend removed")
         game_manager_frontends = game_manager_frontends.filterNot(_ == a)
         
       } else if (a.actorRef == Backend) {
-        Logger.info("FRONTEND: Ho eliminato un Backend")
+        logger.log("Backend removed")
         backends = backends.filterNot(_ == a)
       }
       
@@ -56,7 +54,7 @@ class FrontendManager extends Actor {
     val gm_client = context.actorOf(Props(new GameManagerClient(b)), name = name)
     context watch gm_client
     game_manager_frontends = game_manager_frontends :+ gm_client
-    Logger.info("FrontendManager: Backend selected and Actor created, forward message...")
+    logger.log("Backend selected and Actor created, forwarding message...")
     gm_client forward NewGame(name,n_players, user,ref)
   }
   

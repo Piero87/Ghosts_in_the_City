@@ -5,7 +5,6 @@ import scala.concurrent.duration._
 import akka.util.Timeout
 import akka.pattern.ask
 import scala.util.{Failure, Success}
-import play.api.Logger
 import common._
 import akka.actor.PoisonPill
 import scala.collection.mutable.MutableList
@@ -21,6 +20,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
   implicit val timeout = Timeout(5 seconds)
   implicit val ec = context.dispatcher
   
+  val logger = new CustomLogger("GameManagerClient")
   var gameManagerBackend: ActorRef = _
   var clientsConnections: MutableList[Tuple2[UserInfo, ActorRef]] = MutableList()
   var game_name = ""
@@ -30,7 +30,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
   
   def receive = {
     case NewGame(name,n_players,user,ref) =>
-      Logger.info("GameManagerClient: NewGame request")
+      logger.log("NewGame request (" + user.name + ")")
       game_name = name
       game_n_players = n_players
       val origin = sender
@@ -40,19 +40,19 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       val future = backend ? NewGame(name,n_players,user,self)
       future.onSuccess { 
         case GameHandler(game,ref) => 
-          Logger.info ("GameManagerClient: Backend Game Manager path: "+sender.path)
+          logger.log("GameManagerBackend path: "+sender.path)
           game_id = game.id
           game_status = game.status
           gameManagerBackend = ref
           origin ! GameHandler(game,self)
       }
       future onFailure {
-        case e: Exception => Logger.info("******GAME MANAGER CLIENT NEW GAME ERRORE ******")
+        case e: Exception => logger.log("NEW GAME ERROR: " + e.getMessage + " FROM " + sender.path)
       }
     case JoinGame(game,user,ref) =>
-      Logger.info("GMClient, richiesta JOIN ricevuta")
+      logger.log("JoinGame request, GameID: " + game_id + " (" + user.name + ")")
       if (game_status == 0 && game_id == game.id) {
-        Logger.info("GMClient, richiesta JOIN accettata, id: "+game_id)
+        logger.log("JoinGame request ACCEPTED, GameID: " + game_id + " (" + user.name + ")")
         // Per sicurezza ci salviamo i dati del client connection che ci ha mandato la richiesta di join
         var p = user
         var ccref = ref
@@ -60,18 +60,18 @@ class GameManagerClient (backend: ActorRef) extends Actor {
         val future = gameManagerBackend ? JoinGame(game,user)
         future.onSuccess { 
           case Game(id,name,n_players, status,players,ghosts,treasures) => 
-            Logger.info ("GameManagerClient: Backend Game Manager path: "+sender.path)
+            logger.log("GameManagerBackend path: "+sender.path)
             clientsConnections = clientsConnections :+ Tuple2(p,ccref)
             var g = new Game(id,name,n_players,status,players,ghosts,treasures)
             origin ! GameHandler(g,self)
         }
         future onFailure {
-          case e => Logger.info("****** GAME MANAGER CLIENT JOIN ERRORE ****** =>"+e.getMessage)
+          case e => logger.log("JOIN GAME ERROR: " + e.getMessage + " FROM " + sender.path)
         }
       }
     case ResumeGame(gameid,user,ref) =>
-      Logger.info("GMClient, richiesta RESUME ricevuta")
       if (game_id == gameid) {
+        logger.log("ResumeGame request, GameID: " + gameid + " (" + user.name + ")")
         var p = user
         var ccref = ref
         val origin = sender
@@ -87,7 +87,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
             origin ! GameHandler(g,self)
         }
         future onFailure {
-          case e => Logger.info("****** GAME MANAGER CLIENT JOIN ERRORE ****** =>"+e.getMessage)
+          case e => logger.log("RESUME GAME ERROR: " + e.getMessage + " FROM " + sender.path)
         } 
       }
       
@@ -98,20 +98,22 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       }
       
     case PauseGame(user:UserInfo) =>
-      Logger.info("GMClient: PauseGame Request")
+      logger.log("PauseGame request (" + user.name + ")")
       gameManagerBackend ! PauseGame(user)
+    
     case LeaveGame(user: UserInfo) =>
-      Logger.info("GMClient: LeaveGame Request")
+      logger.log("LeaveGame request (" + user.name + ")")
       val future = gameManagerBackend ? LeaveGame(user)
       future.onSuccess { 
         case Success =>
           clientsConnections = clientsConnections.filterNot(elm => elm._1.uid == user.uid)       
       }
       future onFailure {
-        case e: Exception => Logger.info("******GAME MANAGER BACKEND KILL ERROR ******")
+        case e: Exception => logger.log("LEAVE GAME ERROR: " + e.getMessage + " FROM " + sender.path)
       }
+    
     case KillYourself => 
-       Logger.info ("GameManagerBackend: GMClient will die")
+       logger.log("Goodbye cruel cluster!")
        game_status = StatusGame.FINISHED
        if (clientsConnections.size > 0) {
          var g = new Game(game_id,game_name,game_n_players,game_status,MutableList(),MutableList(),MutableList())
@@ -119,12 +121,15 @@ class GameManagerClient (backend: ActorRef) extends Actor {
        }
        sender ! KillMyself
        self ! PoisonPill
+    
     case UpdatePosition(user) =>
       gameManagerBackend ! UpdatePosition(user)
+    
     case BroadcastUpdatePosition(user) =>
       clientsConnections.map {cc =>
         if (cc._1.uid != user.uid) cc._2 forward BroadcastUpdatePosition(user)
       }
+    
     case BroadcastGhostsPositions(ghosts) =>
       clientsConnections.map {cc =>
         cc._2 forward BroadcastGhostsPositions(ghosts)
