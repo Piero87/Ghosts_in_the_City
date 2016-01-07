@@ -22,7 +22,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
   implicit val ec = context.dispatcher
   
   var gameManagerBackend: ActorRef = _
-  var clientsConnections: List[Tuple2[UserInfo, ActorRef]] = List()
+  var clientsConnections: MutableList[Tuple2[UserInfo, ActorRef]] = MutableList()
   var game_name = ""
   var game_id = ""
   var game_n_players = 0
@@ -69,11 +69,37 @@ class GameManagerClient (backend: ActorRef) extends Actor {
           case e => Logger.info("****** GAME MANAGER CLIENT JOIN ERRORE ****** =>"+e.getMessage)
         }
       }
+    case ResumeGame(gameid,user,ref) =>
+      Logger.info("GMClient, richiesta RESUME ricevuta")
+      if (game_status == StatusGame.FINISHED && game_id == gameid) {
+        var p = user
+        var ccref = ref
+        val origin = sender
+        val future = gameManagerBackend ? ResumeGame(gameid,user,ref)
+        future.onSuccess { 
+          case Game(id,name,n_players, status,players,ghosts,treasures) => 
+            for (i <- 0 to clientsConnections.size-1) {
+              if (clientsConnections(i)._1.uid == user.uid) {
+                clientsConnections(i) = clientsConnections(i).copy(_2 = ref)
+              }
+            }
+            var g = new Game(id,name,n_players,status,players,ghosts,treasures)
+            origin ! GameHandler(g,self)
+        }
+        future onFailure {
+          case e => Logger.info("****** GAME MANAGER CLIENT JOIN ERRORE ****** =>"+e.getMessage)
+        } 
+      }
+      
     case GameStatusBroadcast(game: Game) =>
       game_status = game.status
       clientsConnections.map {cc =>
         cc._2 forward GameStatusBroadcast(game)
       }
+      
+    case PauseGame(user:UserInfo) =>
+      Logger.info("GMClient: PauseGame Request")
+      gameManagerBackend ! PauseGame(user)
     case LeaveGame(user: UserInfo) =>
       Logger.info("GMClient: LeaveGame Request")
       val future = gameManagerBackend ? LeaveGame(user)

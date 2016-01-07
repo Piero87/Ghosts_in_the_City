@@ -30,6 +30,10 @@ class FrontendManager extends Actor {
       game_manager_frontends.map {gm_fe =>
         gm_fe forward JoinGame(game,user,ref)
       }
+    case ResumeGame(game_id, user, ref) =>
+       game_manager_frontends.map {gm_fe =>
+        gm_fe forward ResumeGame(game_id,user,ref)
+      } 
     
     case "BackendRegistration" if !backends.contains(sender()) =>
       Logger.info("Backend Received "+sender.path)
