@@ -134,11 +134,14 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 							console.log('Game Over!')
 							localStorage.removeItem("gameid")			
 				else if json.event == "update_player_position"
-					@game_map.busterMove(json.user.uid, json.user.pos.x, json.user.pos.y)
+					if @gamestarted()
+						@game_map.busterMove(json.user.uid, json.user.pos.x, json.user.pos.y)
 				else if json.event == "update_ghosts_positions"
-					@game_map.ghostMove(ghost.uid, ghost.mood, ghost.pos.x, ghost.pos.y) for ghost in json.ghosts
+					if @gamestarted()
+						@game_map.ghostMove(ghost.uid, ghost.mood, ghost.pos.x, ghost.pos.y) for ghost in json.ghosts
 				else if json.event == "update_treasures"
-					@game_map.updateTreasure(treasure.uid, treasure.status) for treasure in json.treasures
+					if @gamestarted()
+						@game_map.updateTreasure(treasure.uid, treasure.status) for treasure in json.treasures
 							
 		# The user clicked connect
 		submitUsername: ->
