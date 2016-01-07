@@ -34,7 +34,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
           newGameResult match {
             case s: JsSuccess[NewGameJSON] => 
               var user_info = new UserInfo(uid,username,team,Point(0,0))
-              val future = frontendManager ? NewGame(s.get.name.replaceAll(" ", "_")+"_"+System.currentTimeMillis(),s.get.n_players,user_info,self)
+              val future = frontendManager ? NewGame(s.get.name.replaceAll(" ", "_"),s.get.n_players,user_info,self)
               future.onSuccess {
                 case GameHandler(game,ref) => 
                   if (ref != null) gameManagerClient = ref
