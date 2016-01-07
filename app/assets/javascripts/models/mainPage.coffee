@@ -58,11 +58,14 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 			@connecting("Connecting...")
 			@disconnected(null)
 			
+			@ws = new WebSocket(jsRoutes.controllers.Application.login(@user.name, @user.uid).webSocketURL())
+			
 			# Open Web Socket
 			if @gameid()
-				@ws = new WebSocket(jsRoutes.controllers.Application.stream(@user.name, @user.uid).webSocketURL())
-			else
-				@ws = new WebSocket(jsRoutes.controllers.Application.stream(@user.name, @user.uid).webSocketURL())
+				@ws.send(JSON.stringify
+					event: "resume_game"
+					game_id: @gameid()
+				)
 			
 			# When the websocket opens
 			@ws.onopen = (event) =>
