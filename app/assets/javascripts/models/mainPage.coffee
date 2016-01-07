@@ -122,9 +122,11 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 					@changeGameStatus(json.game.status)
 					switch json.game.status
 						when 0 # game waiting
+							console.log('Ready!')
 							@refreshPlayerList(json)
 						when 1 # game started
 							console.log(JSON.stringify(json))
+							console.log('Fight!')
 							@refreshPlayerList(json)
 							@game_map = new GameMap(@user.uid, json.game.players, json.game.ghosts, json.game.treasures, @ws)
 							@game_map.startGame()
