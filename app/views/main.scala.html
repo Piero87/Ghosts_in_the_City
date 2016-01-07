@@ -16,7 +16,7 @@
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
 
         @helper.javascriptRouter("jsRoutes")(
-            routes.javascript.Application.stream
+            routes.javascript.Application.login
         )
         <script data-main="@routes.Assets.versioned("javascripts/main.js")" type="text/javascript" src="@routes.Assets.versioned("lib/requirejs/require.js")"></script>
     </head>
