@@ -10,6 +10,7 @@ define () ->
 			@treasure_radius = $("#conf_treasure_radius").val()
 			
 			@gameLoop = null
+			@gamePaused = false
 			
 			@ws = websocket
 			@user_id = id_user
@@ -46,7 +47,7 @@ define () ->
 		
 		startGame: ->
 			console.log "GAME MAP - Start Game!"
-			
+			@gamePaused = false
 			@initCanvas()
 			# Play the game until the until the game is over.
 			callback_interval = @doGameLoop.bind(this)
@@ -55,20 +56,17 @@ define () ->
 			callback_key = @whatKey.bind(this)
 			window.addEventListener 'keydown', @whatKey.bind(this), true
 		
-		gameStarted: ->
-			if(@gameLoop)
-				true
-			else
-				false
+		gamePaused: ->
+			@gamePaused
 		
 		pauseGame: ->
 			console.log "GAME MAP - Pause Game!"
-			if (@gameLoop)
-				clearInterval(@gameLoop)
-				@gameLoop = null
+			@gamePaused = true
+			clearInterval(@gameLoop) if (@gameLoop)
 			
 		resumeGame: ->
 			console.log "GAME MAP - Resume Game!"
+			@gamePaused = false
 			@initCanvas()
 			callback_interval = @doGameLoop.bind(this)
 			@gameLoop = setInterval(callback_interval, 60)
