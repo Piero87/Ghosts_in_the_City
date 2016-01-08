@@ -107,7 +107,9 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 						@gamesavailable(false)
 				else if json.event == "game_ready"
 					console.log('Ready!')
-					clearInterval(@interval) if(@interval)
+					if (@interval)
+						clearInterval(@interval)
+						@interval = null
 					@gameready(true)
 					@gameid(json.game.id)
 					localStorage.setItem("gameid", @gameid())
@@ -135,16 +137,19 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 							@game_map.setBusters(json.game.players)
 							@game_map.setGhosts(json.game.ghosts)
 							@game_map.setTreasures(json.game.treasures)
-							@game_map.startGame()
-							console.log "Start Game"
+							if (@game_map.gameIsPaused())
+								@game_map.resumeGame()
+								console.log "Resume Game"
+							else
+								@game_map.startGame()
+								console.log "Start Game"		
 						when 2 # game paused
 							console.log('Hold on!')
-							if (@game_map)
-								@game_map.pauseGame()
-								console.log "Pause Game"
+							@game_map.pauseGame()
 						when 3 # game ended
 							@game_map = null
-							console.log('Game Over!')
+							console.log 'Game Over!'
+							@gamename("")
 							localStorage.removeItem("gameid")			
 				else if json.event == "update_player_position"
 					if @gamestarted()
@@ -198,7 +203,9 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 		
 		# Disconnect the ws
 		disconnect: ->
-			clearInterval(@interval) if(@interval)
+			if (@interval)
+				clearInterval(@interval)
+				@interval = null
 			@changeGameStatus(-1)
 			@closing = true
 			@ws.close()
@@ -266,15 +273,13 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
   			@game_team_RED.removeAll()
   			@game_team_BLUE.removeAll()
   			if json.game.players.length > 0
-  				index = 0
+  				i = 0
   				for player in json.game.players
-  					index = index + 1
-  					player.n = index
+  					i = i + 1
+  					player.index = i
   					if (player.team == 0)
   						@game_team_RED.push(player)
   					else if (player.team == 1)
   						@game_team_BLUE.push(player)
-  				console.log @game_team_RED
-  				console.log @game_team_BLUE
 	return MainPageModel
 
