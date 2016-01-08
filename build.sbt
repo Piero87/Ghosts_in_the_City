@@ -1,4 +1,4 @@
-name := """treasures_hunters"""
+name := """ghosts_in_the_city"""
 
 version := "1.0-SNAPSHOT"
 

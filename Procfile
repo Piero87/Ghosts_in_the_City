@@ -1,2 +1,2 @@
-web: target/universal/stage/bin/treasures_hunters -Dhttp.port=${PORT} -Dplay.evolutions.db.default.autoApply=true
+web: target/universal/stage/bin/ghosts_in_the_city -Dhttp.port=${PORT}
 
