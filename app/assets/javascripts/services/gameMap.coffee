@@ -18,7 +18,9 @@ define () ->
 			@ctx = undefined
 			# context
 			@emptyBack = new Image
-			@initCanvas()
+			@canvas = document.getElementById("gameArena")
+			@canvas.width = @space_width
+			@canvas.height = @space_height
 			
 			@sensible_area = new Image
 			@sensible_area.src = '/assets/images/Area.png'
@@ -30,12 +32,6 @@ define () ->
 			@team_blue.src = '/assets/images/Team_blue.png'
 			
 		initCanvas: ->
-			@canvas = document.getElementById("gameArena")
-			@canvas.width = @space_width
-			@canvas.height = @space_height
-		
-		startGame: ->
-			console.log "GAME MAP - Start Game!"
 			# Make sure you got the context.
 			if @canvas.getContext
 				# If you have it, create a canvas user interface element.
@@ -47,12 +43,23 @@ define () ->
 				@ctx.fill()
 				# Save the initial background.
 				@emptyBack = @ctx.getImageData(0, 0, @space_width, @space_height)
+		
+		startGame: ->
+			console.log "GAME MAP - Start Game!"
+			
+			@initCanvas()
 			# Play the game until the until the game is over.
 			callback_interval = @doGameLoop.bind(this)
 			@gameLoop = setInterval(callback_interval, 60)
 			# Add keyboard listener.
 			callback_key = @whatKey.bind(this)
 			window.addEventListener 'keydown', @whatKey.bind(this), true
+		
+		gameStarted: ->
+			if(@gameLoop)
+				true
+			else
+				false
 		
 		pauseGame: ->
 			console.log "GAME MAP - Pause Game!"

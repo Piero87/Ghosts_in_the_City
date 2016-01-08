@@ -135,16 +135,21 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 							@game_map.setBusters(json.game.players)
 							@game_map.setGhosts(json.game.ghosts)
 							@game_map.setTreasures(json.game.treasures)
-							@game_map.startGame()
-							console.log "Start Game"
+							if (@game_map.gameStarted())
+								@game_map.startGame()
+								console.log "Start Game"
+							else
+								@game_map.resumeGame()
+								console.log "Resume Game"
 						when 2 # game paused
 							console.log('Hold on!')
-							if (@game_map)
+							if (@game_map.gameStarted())
 								@game_map.pauseGame()
 								console.log "Pause Game"
 						when 3 # game ended
 							@game_map = null
-							console.log('Game Over!')
+							console.log 'Game Over!'
+							@gamename("")
 							localStorage.removeItem("gameid")			
 				else if json.event == "update_player_position"
 					if @gamestarted()
@@ -274,7 +279,5 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
   						@game_team_RED.push(player)
   					else if (player.team == 1)
   						@game_team_BLUE.push(player)
-  				console.log @game_team_RED()
-  				console.log @game_team_BLUE()
 	return MainPageModel
 
