@@ -8,7 +8,7 @@ class CustomLogger (o: String) {
   var origin = o
   def log(msg: String) {
     var milliseconds = System.currentTimeMillis()
-    var seconds = (milliseconds / 1000) % 60 ;
+    var seconds = (milliseconds / 1000) % 60;
     var minutes = ((milliseconds / (1000*60)) % 60);
     var hours = ((milliseconds / (1000*60*60)) % 24);
     Logger.info("[" + hours + ":" + minutes + ":" + seconds + " - " + origin + "]: " + msg)
@@ -17,29 +17,33 @@ class CustomLogger (o: String) {
 
 object UtilFunctions {
   
-  
-  
   def randomPositionInSpace(space: (Double,Double,Double,Double,Boolean)): Point = {
     val rnd = new Random()
-    var lat = space._1 + rnd.nextInt(space._2.toInt - space._1.toInt + 1)
-    var lng = space._3 + rnd.nextInt(space._4.toInt - space._3.toInt + 1)
-    return new Point(lat,lng)
+    var x_inital = space._1
+    var x_final = space._2
+    var y_inital = space._3
+    var y_final = space._4
+    var lat = x_inital + rnd.nextInt(x_final.toInt - x_inital.toInt)
+    var lng = y_inital + rnd.nextInt(y_final.toInt - y_inital.toInt)
+    return Point(lat,lng)
   }
   
   def randomPositionsInSpace(space: (Double,Double,Double,Double,Boolean), n_player: Int): Array[Point] = {
     val rnd = new Random()
+    var x_inital = space._1
+    var x_final = space._2
+    var y_inital = space._3
+    var y_final = space._4
     var pos = new Array[Point](n_player)
-    var i = 0
     for(i <- 0 to (n_player-1)){
-      var lat = space._1 + rnd.nextInt( space._2.toInt - space._1.toInt + 1)
-      var lng = space._3 + rnd.nextInt( space._4.toInt - space._3.toInt + 1)
-      pos(i) = new Point(lat,lng)
-      System.out.println("position player "+i+": ("+pos(i).x+", "+pos(i).y+")")
+      var lat = x_inital + rnd.nextInt(x_final.toInt - x_inital.toInt)
+      var lng = y_inital + rnd.nextInt(y_final.toInt - y_inital.toInt)
+      pos(i) = Point(lat,lng)
     }
     return pos 
   }
   
-  def randomPositionAroundPoint(pos_treasure : Point) : Point = {
+  def randomPositionAroundPoint(point : Point) : Point = {
     var icon_size = ConfigFactory.load().getInt("icon_size")
     var treasure_radius = ConfigFactory.load().getInt("treasure_radius")
     var space_height = ConfigFactory.load().getDouble("space_height")
@@ -50,8 +54,8 @@ object UtilFunctions {
     val rnd = new Random()
     var lat_rnd = rnd.nextInt(tmp_dist) - rnd.nextInt(tmp_dist)
     var lng_rnd = rnd.nextInt(tmp_dist) - rnd.nextInt(tmp_dist)
-    var lat = pos_treasure.x + lat_rnd
-    var lng = pos_treasure.y + lng_rnd
+    var lat = point.x + lat_rnd
+    var lng = point.y + lng_rnd
     
     val min_lat = icon_size
     val max_lat = space_width - icon_size
@@ -63,11 +67,10 @@ object UtilFunctions {
     if(lng < min_lng) lng = min_lng
     if(lng > max_lng) lng = max_lng
     
-    System.out.println("initial position ghost: (" + lat + ", " + lng + ")")
-    new Point(lat,lng)
+    Point(lat,lng)
   }
   
-  def createSpaces(n_treasure : Int ): Array[(Double,Double,Double,Double,Boolean)] = {
+  def createSpaces(number : Int ): Array[(Double,Double,Double,Double,Boolean)] = {
     
     var icon_size = ConfigFactory.load().getDouble("icon_size")
     var ghost_radius = ConfigFactory.load().getDouble("ghost_radius")
@@ -78,10 +81,10 @@ object UtilFunctions {
     //divido sempre lo spazio totale per un numero pari di spaces dove in ognuno andrà un tesoro e in uno i giocatori
     // che sono sempre pari
     var nro_spaces = 0
-    if(n_treasure % 2 > 0){
-      nro_spaces = n_treasure + 1
+    if(number % 2 > 0){
+      nro_spaces = number + 1
     }else{
-      nro_spaces = n_treasure
+      nro_spaces = number
     }
     
     var column = 0

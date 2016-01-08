@@ -201,7 +201,7 @@ class GameManagerBackend () extends Actor {
     
     for(j <- 0 to game_n_players){ //l'ultimo space è dei giocatori e non ha fantasmi
       position_ghosts(j) = UtilFunctions.randomPositionAroundPoint(position_treasure(j))
-      logger.log("Treasure[" + j + "] position: ("+ position_ghosts(j).x +","+ position_ghosts(j).y +")")
+      logger.log("Ghost[" + j + "] position: ("+ position_ghosts(j).x +","+ position_ghosts(j).y +")")
     }
     
     for(j <- 0 to game_n_players){ //l'ultimo space è dei giocatori e non ha fantasmi
