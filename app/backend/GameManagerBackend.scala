@@ -190,22 +190,23 @@ class GameManagerBackend () extends Actor {
     for(i <- 0 to game_n_players-1){
       val user = players(i)
       val p = new UserInfo(user.uid,user.name,user.team,Point(position_players(i).x,position_players(i).y))
+      // attore player
       players(i) = p
     }
     
-    for(i <- 0 to n_treasure-1){
+    for(i <- 0 to game_n_players){
       position_treasure(i) = UtilFunctions.randomPositionInSpace(spaces(i))
       logger.log("Treasure[" + i + "] position: ("+ position_treasure(i).x +","+ position_treasure(i).y +")")
     }
     
-    for(j <- 0 to n_treasure-1){ //l'ultimo space è dei giocatori e non ha fantasmi
+    for(j <- 0 to game_n_players){ //l'ultimo space è dei giocatori e non ha fantasmi
       position_ghosts(j) = UtilFunctions.randomPositionAroundPoint(position_treasure(j))
       logger.log("Treasure[" + j + "] position: ("+ position_ghosts(j).x +","+ position_ghosts(j).y +")")
     }
     
-    for(j <- 0 to n_treasure-1){ //l'ultimo space è dei giocatori e non ha fantasmi
+    for(j <- 0 to game_n_players){ //l'ultimo space è dei giocatori e non ha fantasmi
       free_position_ghosts(j) = UtilFunctions.randomPositionInSpace(spaces(j))
-      logger.log("Treasure[" + j + "] position: ("+ free_position_ghosts(j).x +","+ free_position_ghosts(j).y +")")
+      logger.log("Free Ghost[" + j + "] position: ("+ free_position_ghosts(j).x +","+ free_position_ghosts(j).y +")")
     }
     
     //Qui dovrà generare i fantasmi e i tesori
