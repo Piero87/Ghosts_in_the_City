@@ -13,15 +13,12 @@ define () ->
 			
 			@ws = websocket
 			@user_id = id_user
-			# Y position of buster
-			@canvas = document.getElementById("gameArena")
-			@canvas.width = @space_width
-			@canvas.height = @space_height
+			
 			# canvas
 			@ctx = undefined
 			# context
 			@emptyBack = new Image
-			
+			@initCanvas()
 			@busters = []
 			@busters_images = []
 			
@@ -52,6 +49,11 @@ define () ->
 			@team_blue = new Image
 			@team_blue.src = '/assets/images/Team_blue.png'
 			
+		initCanvas: ->
+			@canvas = document.getElementById("gameArena")
+			@canvas.width = @space_width
+			@canvas.height = @space_height
+		
 		startGame: ->
 			console.log "GAME MAP - Start Game!"
 			# Make sure you got the context.
@@ -71,7 +73,6 @@ define () ->
 			# Add keyboard listener.
 			callback_key = @whatKey.bind(this)
 			window.addEventListener 'keydown', @whatKey.bind(this), true
-			return
 		
 		pauseGame: ->
 			console.log "GAME MAP - Pause Game!"
@@ -79,6 +80,7 @@ define () ->
 			
 		resumeGame: ->
 			console.log "GAME MAP - Resume Game!"
+			@initCanvas()
 			callback_interval = @doGameLoop.bind(this)
 			@gameLoop = setInterval(callback_interval, 60)
 			
@@ -100,7 +102,6 @@ define () ->
 			# buster
 			buster_img.src = '/assets/images/G' + @busters.length + '.png'
 			@busters_images.push buster_img
-			return
 		
 		busterMove: (uid, x, y) ->
 			for buster, i in @busters when buster.uid == uid
@@ -108,7 +109,6 @@ define () ->
 				@busters[i].old_y = buster.y
 				@busters[i].x = x
 				@busters[i].y = y
-			return
 			
 		addGhost: (uid, level, mood, x, y) ->
 			ghost = {}
@@ -128,7 +128,6 @@ define () ->
 			# ghost
 			ghost_img.src = '/assets/images/Ghost_L' + level + '_right.png'
 			@ghosts_images.push ghost_img
-			return
 		
 		ghostMove: (uid, mood, x, y) ->
 			for ghost, i in @ghosts when ghost.uid == uid
@@ -147,7 +146,6 @@ define () ->
 				@ghosts[i].old_y = ghost.y
 				@ghosts[i].x = x
 				@ghosts[i].y = y
-			return
 		
 		addTreasure: (uid, status, x, y) ->
 			treasure = {}
@@ -165,7 +163,6 @@ define () ->
 			else if status == 1 #open
 				treasure_img.src = '/assets/images/Treasure_open.png'
 			@treasures_images.push treasure_img
-			return
 		
 		updateTreasure: (uid, status) ->
 			for treasure, i in @treasures when treasure.uid == uid
@@ -174,7 +171,6 @@ define () ->
 					@treasures_images[i].src = '/assets/images/Treasure_close.png'
 				else if status == 1 #open
 					@treasures_images[i].src = '/assets/images/Treasure_open.png'
-			return
 			
 		doGameLoop: ->
 			
@@ -248,8 +244,6 @@ define () ->
 					@icon_size
 					@icon_size
 				)
-				
-			return
 		
 		# Get key press.
 		
@@ -313,7 +307,5 @@ define () ->
 						x: @busters[i].x
 						y: @busters[i].y
 				)
-				
-			return
 	        	
 	return GameMap
