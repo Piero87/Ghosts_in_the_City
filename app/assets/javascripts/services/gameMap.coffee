@@ -1,6 +1,6 @@
 define () ->
 	class GameMap
-		constructor: (id_user, players, ghosts, treasures, websocket) ->
+		constructor: (id_user, websocket) ->
 			
 			@space_width = $("#conf_space_width").val()
 			@space_height = $("#conf_space_height").val()
@@ -19,26 +19,6 @@ define () ->
 			# context
 			@emptyBack = new Image
 			@initCanvas()
-			@busters = []
-			@busters_images = []
-			
-			@addBuster(
-				buster.uid, buster.name, buster.team, buster.pos.x, buster.pos.y
-			) for buster in players
-			
-			@ghosts = []
-			@ghosts_images = []
-			
-			@addGhost(
-				ghost.uid, ghost.level, ghost.mood, ghost.pos.x, ghost.pos.y
-			) for ghost in ghosts
-			
-			@treasures = []
-			@treasures_images = []
-			
-			@addTreasure(
-				treasure.uid, treasure.status, treasure.pos.x, treasure.pos.y
-			) for treasure in treasures
 			
 			@sensible_area = new Image
 			@sensible_area.src = '/assets/images/Area.png'
@@ -55,8 +35,6 @@ define () ->
 			@canvas.height = @space_height
 		
 		startGame: ->
-			console.log @busters
-			console.log @ghosts
 			console.log "GAME MAP - Start Game!"
 			# Make sure you got the context.
 			if @canvas.getContext
@@ -86,6 +64,13 @@ define () ->
 			callback_interval = @doGameLoop.bind(this)
 			@gameLoop = setInterval(callback_interval, 60)
 			
+		setBusters: (players) ->
+			@busters = []
+			@busters_images = []
+			@addBuster(
+				buster.uid, buster.name, buster.team, buster.pos.x, buster.pos.y
+			) for buster in players
+			
 		addBuster: (uid, name, team, x, y) ->
 			buster = {}
 			buster.uid = uid
@@ -111,6 +96,13 @@ define () ->
 				@busters[i].old_y = buster.y
 				@busters[i].x = x
 				@busters[i].y = y
+		
+		setGhosts: (ghosts) ->
+			@ghosts = []
+			@ghosts_images = []
+			@addGhost(
+				ghost.uid, ghost.level, ghost.mood, ghost.pos.x, ghost.pos.y
+			) for ghost in ghosts
 			
 		addGhost: (uid, level, mood, x, y) ->
 			ghost = {}
@@ -148,6 +140,14 @@ define () ->
 				@ghosts[i].old_y = ghost.y
 				@ghosts[i].x = x
 				@ghosts[i].y = y
+		
+		setTreasures: (treasures) ->
+			@treasures = []
+			@treasures_images = []
+			
+			@addTreasure(
+				treasure.uid, treasure.status, treasure.pos.x, treasure.pos.y
+			) for treasure in treasures
 		
 		addTreasure: (uid, status, x, y) ->
 			treasure = {}
