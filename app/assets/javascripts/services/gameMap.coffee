@@ -53,7 +53,7 @@ define () ->
 			@team_blue.src = '/assets/images/Team_blue.png'
 			
 		startGame: ->
-			console.log("Start Game!")
+			console.log "GAME MAP - Start Game!"
 			# Make sure you got the context.
 			if @canvas.getContext
 				# If you have it, create a canvas user interface element.
@@ -74,9 +74,11 @@ define () ->
 			return
 		
 		pauseGame: ->
+			console.log "GAME MAP - Pause Game!"
 			clearInterval(@gameLoop) if (@gameLoop)
 			
 		resumeGame: ->
+			console.log "GAME MAP - Resume Game!"
 			callback_interval = @doGameLoop.bind(this)
 			@gameLoop = setInterval(callback_interval, 60)
 			
@@ -129,7 +131,6 @@ define () ->
 			return
 		
 		ghostMove: (uid, mood, x, y) ->
-			console.log "GHOST MOVE: {uid: " + uid + ", mood:" + mood + ", x: " + x + ", y: " + y + "}"
 			for ghost, i in @ghosts when ghost.uid == uid
 				@ghosts[i].mood = mood
 				if @ghosts[i].mood == 1 # Oh oh, someone is angry...
