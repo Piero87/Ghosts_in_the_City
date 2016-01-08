@@ -22,7 +22,8 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 			@gamename = ko.observable()
 			@gamemaxplayers = ko.observable(2)
 			@gameplayersmissing = ko.observable()
-			@gameplayers = ko.observableArray()
+			@game_team_RED = ko.observableArray()
+			@game_team_BLUE = ko.observableArray()
 			@game_map = null
 			
 			# Interval to send a lot of request for available games
@@ -63,7 +64,7 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 				@connecting(null)
 				@connected(true)
 				
-				@game_map = null
+				@game_map = new GameMap(@user.uid, @ws)
 				if localStorage.gameid
 					@gameid(localStorage.gameid)
 					@resumeGame()
@@ -131,8 +132,9 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 							console.log('Fight!')
 							@refreshPlayerList(json)
 							@gamename(json.game.name)
-							@game_map = null
-							@game_map = new GameMap(@user.uid, json.game.players, json.game.ghosts, json.game.treasures, @ws)
+							@game_map.setBusters(json.game.players)
+							@game_map.setGhosts(json.game.ghosts)
+							@game_map.setTreasures(json.game.treasures)
 							@game_map.startGame()
 							console.log "Start Game"
 						when 2 # game paused
@@ -206,7 +208,8 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 			@changeGameStatus(-1)
 			@gamename("")
 			@gamemaxplayers(2)
-			@gameplayers.removeAll()
+			@game_team_RED.removeAll()
+			@game_team_BLUE.removeAll()
 			
 			callback = @gamesList.bind(this)
 			@interval = setInterval(callback, 1000)
@@ -260,11 +263,14 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
   			@gamemaxplayers(json.game.n_players)
   			playersmissing = json.game.n_players - json.game.players.length
   			@gameplayersmissing(playersmissing)
-  			@gameplayers.removeAll()
+  			@game_team_RED.removeAll()
+  			@game_team_BLUE.removeAll()
   			if json.game.players.length > 0
   				for player in json.game.players
-  					console.log("giocatore in attesa:" + player.name)
-  					@gameplayers.push(player)
+  					if (player.team == 0)
+  						@game_team_RED.push(player)
+  					else if (player.team == 1)
+  						@game_team_BLUE.push(player)
   					
 	return MainPageModel
 
