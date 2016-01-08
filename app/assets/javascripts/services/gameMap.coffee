@@ -74,7 +74,7 @@ define () ->
 			return
 		
 		pauseGame: ->
-			clearInterval(@gameLoop) if(@gameLoop)
+			clearInterval(@gameLoop) if (@gameLoop)
 			
 		resumeGame: ->
 			callback_interval = @doGameLoop.bind(this)

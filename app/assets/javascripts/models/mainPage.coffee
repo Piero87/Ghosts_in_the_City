@@ -131,12 +131,16 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 							@refreshPlayerList(json)
 							if (@game_map)
 								@game_map.resumeGame
+								console.log "Resume Game"
 							else
 								@game_map = new GameMap(@user.uid, json.game.players, json.game.ghosts, json.game.treasures, @ws)
 								@game_map.startGame()
+								console.log "Start New Game"
 						when 2 # game paused
 							console.log('Hold on!')
-							@game_map.pauseGame()
+							if (@game_map)
+								@game_map.pauseGame()
+								console.log "Pause Game"
 						when 3 # game ended
 							console.log('Game Over!')
 							localStorage.removeItem("gameid")			
