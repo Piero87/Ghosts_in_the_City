@@ -55,6 +55,8 @@ define () ->
 			@canvas.height = @space_height
 		
 		startGame: ->
+			console @busters
+			console @ghosts
 			console.log "GAME MAP - Start Game!"
 			# Make sure you got the context.
 			if @canvas.getContext
