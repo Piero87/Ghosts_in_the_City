@@ -130,13 +130,11 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 							console.log(JSON.stringify(json))
 							console.log('Fight!')
 							@refreshPlayerList(json)
-							if (@game_map)
-								@game_map.resumeGame()
-								console.log "Resume Game"
-							else
-								@game_map = new GameMap(@user.uid, json.game.players, json.game.ghosts, json.game.treasures, @ws)
-								@game_map.startGame()
-								console.log "Start New Game"
+							@gamename(json.game.name)
+							@game_map = null
+							@game_map = new GameMap(@user.uid, json.game.players, json.game.ghosts, json.game.treasures, @ws)
+							@game_map.startGame()
+							console.log "Start Game"
 						when 2 # game paused
 							console.log('Hold on!')
 							if (@game_map)
