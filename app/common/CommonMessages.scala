@@ -43,6 +43,7 @@ case class BroadcastUpdatePosition(user: UserInfo)
 case class BroadcastGhostsPositions(ghosts: MutableList[GhostInfo])
 case class Players(players: MutableList[UserInfo])
 case object GhostStart
+case object GhostPause
 
 case class GameStatusBroadcast(game: Game)
 case class JoinGame(game: Game, user: UserInfo, ref: ActorRef = null)

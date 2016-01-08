@@ -89,6 +89,8 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
       future onFailure {
         case e: Exception => logger.log("******GHOST REQUEST PLAYER POSITION ERROR ******")
       }
+    case GhostPause =>
+      logger.log("In pause")
   }
   
   def random_move(position: Point) : Unit = {

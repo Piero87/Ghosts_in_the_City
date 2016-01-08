@@ -86,7 +86,9 @@ class GameManagerBackend () extends Actor {
     case PauseGame(user: UserInfo) =>
       logger.log("PauseGame Request")
       paused_players = paused_players :+ Tuple2(user.uid, System.currentTimeMillis())
-      //for(ghost <- )
+      ghosts.map {ghost =>
+        ghost._2 ! GhostPause
+      }
       scheduler()
       if(game_status != StatusGame.PAUSED) previous_game_status = game_status
       game_status = StatusGame.PAUSED
