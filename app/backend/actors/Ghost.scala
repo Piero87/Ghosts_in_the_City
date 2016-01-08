@@ -141,7 +141,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
     }
     
 //    if (area.contains(new_position)) {
-      if ((new_position.x < width-icon_size) || (new_position.y < height-icon_size)) {
+      if ((new_position.x < width-icon_size) && (new_position.y < height-icon_size)) {
         if (level !=3 && distanceBetween(new_position, position_treasure) >= treasure_radius) {
           if (rnd_pos<2) {
             rnd_pos = 2-rnd_pos
@@ -156,14 +156,14 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
           //Logger.info("UUID: " + uuid + " - POS: " + ghostpos)
           scheduler()
         }
-    } else {
-      if (rnd_pos<2) {
-        rnd_pos = 2-rnd_pos
       } else {
-        rnd_pos = Math.abs(2-rnd_pos)
-      }
-      random_move(position)
-    } 
+        if (rnd_pos<2) {
+          rnd_pos = 2-rnd_pos
+        } else {
+          rnd_pos = Math.abs(2-rnd_pos)
+        }
+        random_move(position)
+      } 
   }
   
   def attackPlayer(player_pos: Point) = {
@@ -186,6 +186,9 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
 						ghost_move = 0
 				}
 			}
+      if (Math.abs(distance_x) < 10 && Math.abs(distance_y) < 10) {
+        // Giocatore raggiunto! Gli rubo i soldi
+      }
 		}
     
    ghost_move match {
@@ -211,7 +214,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
    }
    
 //   if(area.contains(new_position, area_Edge)){
-   if ((new_position.x < width-icon_size) || (new_position.y < height-icon_size)) {  
+   if ((new_position.x < width-icon_size) && (new_position.y < height-icon_size)) {  
      if(level !=3 && distanceBetween(new_position, position_treasure) >= treasure_radius){
        GMbackend ! GhostPositionUpdate(uuid, ghostpos, mood)
        scheduler()
