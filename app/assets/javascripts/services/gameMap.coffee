@@ -56,7 +56,7 @@ define () ->
 			callback_key = @whatKey.bind(this)
 			window.addEventListener 'keydown', @whatKey.bind(this), true
 		
-		gamePaused: ->
+		gameIsPaused: ->
 			@gamePaused
 		
 		pauseGame: ->
