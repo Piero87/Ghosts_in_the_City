@@ -5,6 +5,6 @@ object Global extends GlobalSettings{
   
   override def onStart(app: Application) {
     Logger.info("Applicazione partita")  
-    Backend.main(Array("2551"))
+    //Backend.main(Array("2551"))
   }
 }
