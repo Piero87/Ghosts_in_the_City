@@ -64,7 +64,7 @@ define () ->
 			callback_interval = @doGameLoop.bind(this)
 			@gameLoop = setInterval(callback_interval, 60)
 			
-		setBusters: (busters) ->
+		setBusters: (players) ->
 			@busters = []
 			@busters_images = []
 			@addBuster(
