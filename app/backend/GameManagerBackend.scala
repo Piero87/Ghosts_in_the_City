@@ -217,7 +217,7 @@ class GameManagerBackend () extends Actor {
       var key = new Key(true,randomString(8))
       //qui entrmabi i valori sono random
       var gold = new Gold(true, 100)
-      var p_t = new Point (position_treasure(i).x,position_treasure(i).x)
+      var p_t = new Point (position_treasure(i).x,position_treasure(i).y)
       var treasure_info = new TreasureInfo(treasure_id,0,p_t) 
       val treasure = context.actorOf(Props(new Treasure(treasure_id,p_t,key,gold,key)), name = treasure_id)
       treasures = treasures :+ Tuple2(treasure_info,treasure)
