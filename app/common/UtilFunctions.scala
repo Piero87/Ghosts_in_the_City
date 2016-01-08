@@ -7,9 +7,11 @@ import play.api.Logger
 class CustomLogger (o: String) {
   var origin = o
   def log(msg: String) {
-    val date = new java.util.Date()
-    val timestamp = new java.sql.Timestamp(date.getTime)
-    Logger.info("[" + timestamp + " - " + origin + "]: " + msg)
+    var milliseconds = System.currentTimeMillis()
+    var seconds = (milliseconds / 1000) % 60 ;
+    var minutes = ((milliseconds / (1000*60)) % 60);
+    var hours = ((milliseconds / (1000*60*60)) % 24);
+    Logger.info("[" + hours + ":" + minutes + ":" + seconds + " - " + origin + "]: " + msg)
   }
 }
 
