@@ -212,8 +212,18 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 		
 		# Leave Game
 		leaveGame: ->
+			@clearGameData()
+			@ws.send(JSON.stringify
+				event: "leave_game"
+			)
+		
+		playAgain: ->
+			@clearGameData()
+		
+		clearGameData: ->
 			@changeGameStatus(-1)
 			@gamename("")
+			localStorage.removeItem("gameid")
 			@gamemaxplayers(2)
 			@game_team_RED.removeAll()
 			@game_team_BLUE.removeAll()
@@ -221,15 +231,6 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 			callback = @gamesList.bind(this)
 			@interval = setInterval(callback, 1000)
 			
-			@ws.send(JSON.stringify
-				event: "leave_game"
-			)
-		
-		playAgain: ->
-			@changeGameStatus(-1)
-			# Setting the interval for refresh games list
-			callback = @gamesList.bind(this)
-			@interval = setInterval(callback, 1000)
 		
 		changeGameStatus: (s) ->
 			status = s
