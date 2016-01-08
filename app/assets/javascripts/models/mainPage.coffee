@@ -131,7 +131,7 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 							console.log('Fight!')
 							@refreshPlayerList(json)
 							if (@game_map)
-								@game_map.resumeGame
+								@game_map.resumeGame()
 								console.log "Resume Game"
 							else
 								@game_map = new GameMap(@user.uid, json.game.players, json.game.ghosts, json.game.treasures, @ws)
