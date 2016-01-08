@@ -88,7 +88,7 @@ class GameManagerBackend () extends Actor {
       paused_players = paused_players :+ Tuple2(user.uid, System.currentTimeMillis())
       //for(ghost <- )
       scheduler()
-      previous_game_status = game_status
+      if(game_status != StatusGame.PAUSED) previous_game_status = game_status
       game_status = StatusGame.PAUSED
       val tmp_g = ghosts.map(x => x._1)
       val tmp_t = treasures.map(x => x._1)
@@ -180,27 +180,33 @@ class GameManagerBackend () extends Actor {
     val n_treasure = game_n_players+1
     
     var spaces = UtilFunctions.createSpaces(n_treasure)
-    var position_treasure = new Array[(Double,Double)](n_treasure)
-    var position_ghosts = new Array[(Double,Double)](n_treasure)
+    var position_treasure = new Array[Point](n_treasure)
+    var position_ghosts = new Array[Point](n_treasure)
+    var free_position_ghosts = new Array[Point](n_treasure)
     
-    var position_players = new Array[(Double,Double)](game_n_players)
-    position_players = UtilFunctions.randomPositionPlayers(spaces(spaces.length - 1), n_treasure-1)
+    var position_players = new Array[Point](game_n_players)
+    position_players = UtilFunctions.randomPositionsInSpace(spaces(spaces.length - 1), n_treasure-1)
     
     for(i <- 0 to game_n_players-1){
       val user = players(i)
-      val p = new UserInfo(user.uid,user.name,user.team,Point(position_players(i)._1,position_players(i)._2))
+      val p = new UserInfo(user.uid,user.name,user.team,Point(position_players(i).x,position_players(i).y))
       players(i) = p
     }
     
     for(i <- 0 to n_treasure-1){
-      position_treasure(i) = UtilFunctions.randomPositionTreasure(spaces(i))
-      System.out.println("position tesoro "+i+" ("+position_treasure(i)._1 +", "+position_treasure(i)._2 +")")
+      position_treasure(i) = UtilFunctions.randomPositionInSpace(spaces(i))
+      System.out.println("position tesoro "+i+" ("+position_treasure(i).x +", "+position_treasure(i).y +")")
     }
     
     for(j <- 0 to n_treasure-1){ //l'ultimo space è dei giocatori e non ha fantasmi
-      position_ghosts(j) = UtilFunctions.randomPositionGhost(position_treasure(j))
-      System.out.println("position ghost "+j+" ("+position_ghosts(j)._1 +", "+position_ghosts(j)._2 +")")
-      }
+      position_ghosts(j) = UtilFunctions.randomPositionAroundPoint(position_treasure(j))
+      System.out.println("position ghost "+j+" ("+position_ghosts(j).x +", "+position_ghosts(j).y +")")
+    }
+    
+    for(j <- 0 to n_treasure-1){ //l'ultimo space è dei giocatori e non ha fantasmi
+      free_position_ghosts(j) = UtilFunctions.randomPositionInSpace(spaces(j))
+      System.out.println("position ghost "+j+" ("+free_position_ghosts(j).x +", "+free_position_ghosts(j).y +")")
+    }
     
     //Qui dovrà generare i fantasmi e i tesori
     for (i <- 0 to game_n_players) {
@@ -210,17 +216,26 @@ class GameManagerBackend () extends Actor {
       var key = new Key(true,randomString(8))
       //qui entrmabi i valori sono random
       var gold = new Gold(true, 100)
-      var p_t = new Point (position_treasure(i)._1,position_treasure(i)._2)
+      var p_t = new Point (position_treasure(i).x,position_treasure(i).x)
       var treasure_info = new TreasureInfo(treasure_id,0,p_t) 
       val treasure = context.actorOf(Props(new Treasure(treasure_id,p_t,key,gold,key)), name = treasure_id)
       treasures = treasures :+ Tuple2(treasure_info,treasure)
       
+      // Fantasmi a guardia dei tesori
       var ghost_id = randomString(8)
-      var p_g = new Point (position_ghosts(i)._1,position_ghosts(i)._2)
+      var p_g = new Point (position_ghosts(i).x,position_ghosts(i).y)
       val g_level = nextInt(2)+1
       val ghost = context.actorOf(Props(new Ghost(ghost_id,polygon,p_g,g_level,treasure,p_t)), name = ghost_id)
       var ghost_info = new GhostInfo(ghost_id,g_level,GhostMood.CALM,p_g)
       ghosts = ghosts :+ Tuple2(ghost_info,ghost)
+      
+      // Fantasmi liberi di girare per tutta l'area
+      var free_ghost_id = randomString(8)
+      var free_p_g = new Point (free_position_ghosts(i).x,free_position_ghosts(i).y)
+      val n_treasure = nextInt(treasures.size)
+      val free_ghost = context.actorOf(Props(new Ghost(free_ghost_id,polygon,free_p_g,3,treasures(n_treasure)._2,treasures(n_treasure)._1.pos)), name = free_ghost_id)
+      var free_ghost_info = new GhostInfo(ghost_id,3,GhostMood.CALM,p_g)
+      ghosts = ghosts :+ Tuple2(free_ghost_info,free_ghost)
     }
     
     game_status = StatusGame.STARTED

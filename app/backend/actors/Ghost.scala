@@ -34,7 +34,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
   val ghost_radius = level * ConfigFactory.load().getDouble("ghost_radius")
   val treasure_radius = ConfigFactory.load().getDouble("treasure_radius")
   var past_move : Int = -1
-  val ghostmovement: Int = 5
+  val ghostmovement: Int = 5 + 2 * level
   val width = ConfigFactory.load().getDouble("space_width")
   val height = ConfigFactory.load().getDouble("space_height")
   val icon_size = ConfigFactory.load().getDouble("icon_size")
@@ -142,19 +142,19 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
     
 //    if (area.contains(new_position)) {
       if ((new_position.x < width-icon_size) || (new_position.y < height-icon_size)) {
-        if (distanceBetween(new_position, position_treasure) < treasure_radius) {
-            ghostpos = new_position
-            //Logger.info("GHOST: SEND NEW POSITION")
-            GMbackend ! GhostPositionUpdate(uuid, ghostpos , mood)
-            //Logger.info("UUID: " + uuid + " - POS: " + ghostpos)
-            scheduler()
-        } else {
+        if (level !=3 && distanceBetween(new_position, position_treasure) >= treasure_radius) {
           if (rnd_pos<2) {
             rnd_pos = 2-rnd_pos
           } else {
             rnd_pos = Math.abs(2-rnd_pos)
           }
           random_move(position)
+        } else {
+          ghostpos = new_position
+          //Logger.info("GHOST: SEND NEW POSITION")
+          GMbackend ! GhostPositionUpdate(uuid, ghostpos , mood)
+          //Logger.info("UUID: " + uuid + " - POS: " + ghostpos)
+          scheduler()
         }
     } else {
       if (rnd_pos<2) {
@@ -212,13 +212,13 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
    
 //   if(area.contains(new_position, area_Edge)){
    if ((new_position.x < width-icon_size) || (new_position.y < height-icon_size)) {  
-     if(distanceBetween(new_position, position_treasure) < treasure_radius){
-       ghostpos = new_position
+     if(level !=3 && distanceBetween(new_position, position_treasure) >= treasure_radius){
        GMbackend ! GhostPositionUpdate(uuid, ghostpos, mood)
        scheduler()
      }else{
-      GMbackend ! GhostPositionUpdate(uuid, ghostpos, mood)
-      scheduler()
+       ghostpos = new_position
+       GMbackend ! GhostPositionUpdate(uuid, ghostpos, mood)
+       scheduler()
      }
    }else{
      GMbackend ! GhostPositionUpdate(uuid, ghostpos, mood)

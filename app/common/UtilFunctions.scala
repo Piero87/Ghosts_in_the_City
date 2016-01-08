@@ -17,27 +17,27 @@ object UtilFunctions {
   
   
   
-  def randomPositionTreasure(space: (Double,Double,Double,Double,Boolean)): (Double,Double) = {
+  def randomPositionInSpace(space: (Double,Double,Double,Double,Boolean)): Point = {
     val rnd = new Random()
     var lat = space._1 + rnd.nextInt(space._2.toInt - space._1.toInt + 1)
     var lng = space._3 + rnd.nextInt(space._4.toInt - space._3.toInt + 1)
-    return (lat,lng)
+    return new Point(lat,lng)
   }
   
-  def randomPositionPlayers(space: (Double,Double,Double,Double,Boolean), n_player: Int): Array[(Double,Double)] = {
+  def randomPositionsInSpace(space: (Double,Double,Double,Double,Boolean), n_player: Int): Array[Point] = {
     val rnd = new Random()
-    var pos = new Array[(Double,Double)](n_player)
+    var pos = new Array[Point](n_player)
     var i = 0
     for(i <- 0 to (n_player-1)){
       var lat = space._1 + rnd.nextInt( space._2.toInt - space._1.toInt + 1)
       var lng = space._3 + rnd.nextInt( space._4.toInt - space._3.toInt + 1)
-      pos(i) = (lat,lng)
-      System.out.println("position player "+i+": ("+pos(i)._1+", "+pos(i)._2+")")
+      pos(i) = new Point(lat,lng)
+      System.out.println("position player "+i+": ("+pos(i).x+", "+pos(i).y+")")
     }
     return pos 
   }
   
-  def randomPositionGhost(pos_treasure : (Double,Double)) : (Double,Double) = {
+  def randomPositionAroundPoint(pos_treasure : Point) : Point = {
     var icon_size = ConfigFactory.load().getInt("icon_size")
     var treasure_radius = ConfigFactory.load().getInt("treasure_radius")
     var space_height = ConfigFactory.load().getDouble("space_height")
@@ -48,8 +48,8 @@ object UtilFunctions {
     val rnd = new Random()
     var lat_rnd = rnd.nextInt(tmp_dist) - rnd.nextInt(tmp_dist)
     var lng_rnd = rnd.nextInt(tmp_dist) - rnd.nextInt(tmp_dist)
-    var lat = pos_treasure._1 + lat_rnd
-    var lng = pos_treasure._2 + lng_rnd
+    var lat = pos_treasure.x + lat_rnd
+    var lng = pos_treasure.y + lng_rnd
     
     val min_lat = icon_size
     val max_lat = space_width - icon_size
@@ -62,7 +62,7 @@ object UtilFunctions {
     if(lng > max_lng) lng = max_lng
     
     System.out.println("initial position ghost: (" + lat + ", " + lng + ")")
-    (lat,lng)
+    new Point(lat,lng)
   }
   
   def createSpaces(n_treasure : Int ): Array[(Double,Double,Double,Double,Boolean)] = {
