@@ -109,4 +109,5 @@ object CommonMessages {
   
   implicit val broadcastGhostsPositionReads = Json.reads[BroadcastGhostsPositionsJSON]
   implicit val broadcastGhostsPositionWrites = Json.writes[BroadcastGhostsPositionsJSON]
+  
 }

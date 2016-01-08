@@ -21,7 +21,7 @@ object Backend {
       withFallback(ConfigFactory.parseString("akka.cluster.roles = [backend]")).
       withFallback(ConfigFactory.load())
 
-    val system = ActorSystem("TreasuresSystem", config)
+    val system = ActorSystem("GhostsSystem", config)
     system.actorOf(Props[Backend], name = "backend")
   }
 }
