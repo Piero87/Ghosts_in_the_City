@@ -63,6 +63,7 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 				@connecting(null)
 				@connected(true)
 				
+				@game_map = null
 				if localStorage.gameid
 					@gameid(localStorage.gameid)
 					@resumeGame()
@@ -142,6 +143,7 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 								@game_map.pauseGame()
 								console.log "Pause Game"
 						when 3 # game ended
+							@game_map = null
 							console.log('Game Over!')
 							localStorage.removeItem("gameid")			
 				else if json.event == "update_player_position"
