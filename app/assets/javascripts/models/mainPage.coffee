@@ -107,7 +107,9 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 						@gamesavailable(false)
 				else if json.event == "game_ready"
 					console.log('Ready!')
-					clearInterval(@interval) if(@interval)
+					if (@interval)
+						clearInterval(@interval)
+						@interval = null
 					@gameready(true)
 					@gameid(json.game.id)
 					localStorage.setItem("gameid", @gameid())
@@ -203,7 +205,9 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 		
 		# Disconnect the ws
 		disconnect: ->
-			clearInterval(@interval) if(@interval)
+			if (@interval)
+				clearInterval(@interval)
+				@interval = null
 			@changeGameStatus(-1)
 			@closing = true
 			@ws.close()

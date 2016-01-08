@@ -63,7 +63,9 @@ define () ->
 		
 		pauseGame: ->
 			console.log "GAME MAP - Pause Game!"
-			clearInterval(@gameLoop) if (@gameLoop)
+			if (@gameLoop)
+				clearInterval(@gameLoop)
+				@gameLoop = null
 			
 		resumeGame: ->
 			console.log "GAME MAP - Resume Game!"
