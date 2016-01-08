@@ -23,6 +23,7 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 			@gamemaxplayers = ko.observable(2)
 			@gameplayersmissing = ko.observable()
 			@gameplayers = ko.observableArray()
+			@game_map = null
 			
 			# Interval to send a lot of request for available games
 			@interval = null
@@ -128,10 +129,14 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 							console.log(JSON.stringify(json))
 							console.log('Fight!')
 							@refreshPlayerList(json)
-							@game_map = new GameMap(@user.uid, json.game.players, json.game.ghosts, json.game.treasures, @ws)
-							@game_map.startGame()
+							if (@game_map)
+								@game_map.resumeGame
+							else
+								@game_map = new GameMap(@user.uid, json.game.players, json.game.ghosts, json.game.treasures, @ws)
+								@game_map.startGame()
 						when 2 # game paused
 							console.log('Hold on!')
+							@game_map.pauseGame()
 						when 3 # game ended
 							console.log('Game Over!')
 							localStorage.removeItem("gameid")			

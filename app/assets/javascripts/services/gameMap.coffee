@@ -9,6 +9,8 @@ define () ->
 			@ghost_radius = $("#conf_ghost_radius").val()
 			@treasure_radius = $("#conf_treasure_radius").val()
 			
+			@gameLoop = null
+			
 			@ws = websocket
 			@user_id = id_user
 			# Y position of buster
@@ -65,12 +67,19 @@ define () ->
 				@emptyBack = @ctx.getImageData(0, 0, @space_width, @space_height)
 			# Play the game until the until the game is over.
 			callback_interval = @doGameLoop.bind(this)
-			gameLoop = setInterval(callback_interval, 60)
+			@gameLoop = setInterval(callback_interval, 60)
 			# Add keyboard listener.
 			callback_key = @whatKey.bind(this)
 			window.addEventListener 'keydown', @whatKey.bind(this), true
 			return
 		
+		pauseGame: ->
+			clearInterval(@gameLoop) if(@gameLoop)
+			
+		resumeGame: ->
+			callback_interval = @doGameLoop.bind(this)
+			@gameLoop = setInterval(callback_interval, 60)
+			
 		addBuster: (uid, name, team, x, y) ->
 			buster = {}
 			buster.uid = uid
