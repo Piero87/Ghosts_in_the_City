@@ -274,6 +274,7 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
   						@game_team_RED.push(player)
   					else if (player.team == 1)
   						@game_team_BLUE.push(player)
-  					
+  				console.log @game_team_RED
+  				console.log @game_team_BLUE
 	return MainPageModel
 
