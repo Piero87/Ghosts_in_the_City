@@ -17,6 +17,7 @@ class FrontendManager extends Actor {
   
   var backendCounter = 0
   
+  
   def receive = {
     case NewGame(name,n_players,user,ref) =>
       logger.log("NewGame request")
@@ -28,9 +29,10 @@ class FrontendManager extends Actor {
         gm_fe forward JoinGame(game,user,ref)
       }
     case ResumeGame(game_id, user, ref) =>
+       logger.log("ResumeGame request")
        game_manager_frontends.map {gm_fe =>
-        gm_fe forward ResumeGame(game_id,user,ref)
-      } 
+         gm_fe forward ResumeGame(game_id,user,ref)
+       } 
     
     case "BackendRegistration" if !backends.contains(sender()) =>
       logger.log("Backend Received "+sender.path)
