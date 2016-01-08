@@ -142,13 +142,10 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 								console.log "Resume Game"
 							else
 								@game_map.startGame()
-								console.log "Start Game"	
-								
+								console.log "Start Game"		
 						when 2 # game paused
 							console.log('Hold on!')
-							if (@game_map.gameStarted())
-								@game_map.pauseGame()
-								console.log "Pause Game"
+							@game_map.pauseGame()
 						when 3 # game ended
 							@game_map = null
 							console.log 'Game Over!'
