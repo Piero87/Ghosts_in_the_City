@@ -3,9 +3,12 @@ package backend.actors.models
 /**
  * Class to create a Key
  */
-class Gold(isPresent: Boolean, quantity: Int) {
+class Gold(quantity: Int) {
   
-  var present = isPresent
   var amount = quantity
+  
+  def getAmount = {
+    amount
+  }
    
 }

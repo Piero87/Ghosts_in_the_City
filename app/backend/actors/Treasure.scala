@@ -4,85 +4,65 @@ import akka.actor.{ ActorRef, Actor }
 import akka.actor.Props
 import play.api.Logger
 import common._
-
+import scala.util.control.Breaks._
 import backend.actors.models._
 
 object Treasure {
   
   /**
-   * Open Events from the client for treasures locked with a key
-   */
-  case class Open(Key: Key)
-  
-  /**
-   * TakeGold Events from the client side
-   */
-  case object TakeGold
-  
-  /**
-   * ReceiveGold Events from the Ghost who guards the treasure
-   */
-  case class ReceiveGold(ghostGold: Gold)
-  
-  /**
    * Actor Props 
    */
-  def props(uid: String, position: Point, key: Key, gold: Gold, keyIn: Key) = Props(new Treasure(uid,position, key, gold, keyIn))
+  def props(uid: String, position: Point, loot: Tuple2[Key,Gold], needKey: Tuple2[Boolean, Key]) = Props(new Treasure(uid,position,loot,needKey))
 }
 
-class Treasure(uid: String, position: Point, key: Key, gold: Gold, keyIn: Key) extends Actor{
+class Treasure(uid: String, position: Point, loot: Tuple2[Key,Gold], needKey: Tuple2[Boolean, Key]) extends Actor{
   
-  import Treasure._
-  
-  val treasure_pos = position
-  var treasure_gold = gold
-  var treasure_key = key
-  var treasure_keyIn = keyIn
+  val logger = new CustomLogger("Treasure")
+  var treasure_loot = loot
+  var treasure_need_key = needKey
   
   def receive = {  
  
-    case Open(key) => 
-      Logger.info("Try to open the treasure")
-      if (treasure_key.requested) {
-        if (treasure_key.key_id == key.key_id) {
-          // C'è un tesoro o una chiave? Controllo solo l'oro perché al momento della creazione del tesoro se metto true  
-          // nel gold implicitamente abbiamo false nel key
-          if (treasure_gold.present) {
-            // Gold
-            var award = new Gold(treasure_gold.present, treasure_gold.amount)
-            treasure_gold.present = false
-            treasure_gold.amount = 0
-          } else {
-            // Key
-            var key_recovered = new Key(treasure_keyIn.requested, treasure_keyIn.key_id)
-            treasure_keyIn.requested = false
-            //treasure_keyIn.key_id = 0
+    case Open(keys) =>
+      var origin = sender
+      logger.log("Try to open")
+      if (needKey._1 && (keys.size != 0)) {
+        //Controlliamo se tra le chiavi passate c'è quella giusta
+        var check = false
+        breakable {
+          for (key <- keys)
+          {
+            if (key.getKeyID == needKey._2.getKeyID)
+            {
+              logger.log("Opened")
+              origin ! LootRetrieved(treasure_loot)
+              treasure_loot = Tuple2(null,null)
+              treasure_need_key = treasure_need_key.copy(_1 = false)
+              check = true
+              break
+            }
           }
-          sender ! "Opened" // Aggiungerò anche quello che ho raccolto
-        } else {
-          sender ! "Wrong key"
         }
-      } else {
-        // Nessuna chiave richiesta controllo il contenuto(se è una chiave o dell'oro) e lo prendo
-        if (treasure_gold.present) {
-            // Gold
-            var award = new Gold(treasure_gold.present, treasure_gold.amount)
-            treasure_gold.present = false
-            treasure_gold.amount = 0
-          } else {
-            // Key
-            var key_recovered = new Key(treasure_keyIn.requested, treasure_keyIn.key_id)
-            treasure_keyIn.requested = false
-            //treasure_keyIn.key_id = 0
-          }
+        
+        if (!check)  {
+          logger.log("Not Open: Wrong key")
+          origin ! TreasureError("Non hai la chiave giusta per questo tesoro")
+        }
+        
+      } else if (needKey._1 && (keys.size == 0))  {
+        //Serve una chiave ma non è stata passata nessuna chiave
+        logger.log("Not Open: Need Key")
+        origin ! TreasureError("Ti serve una chiave per aprire il tesoro")
+      } else if (!needKey._1) {
+        //Non serve nessuna chiave tesoro aperto
+        logger.log("Opened: without key")
+        origin ! LootRetrieved(treasure_loot)
       }
-      sender ! "Opened"// Aggiungerò anche quello che ho raccolto
+    case IncreaseGold(gold) =>
+      logger.log("Increase gold")
+      treasure_loot = treasure_loot.copy(_2 = new Gold(treasure_loot._2.getAmount+gold.getAmount))
     
-    case ReceiveGold(gold) =>
-      Logger.info("Ghost restore gold")
-      // Ripristino l'oro recuperato dall'utente
-      treasure_gold.present = gold.present
-      treasure_gold.amount = gold.amount
   }
+  
   
 }

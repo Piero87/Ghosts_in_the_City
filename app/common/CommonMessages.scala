@@ -2,6 +2,7 @@ package common
 
 import akka.actor._
 import scala.collection.mutable.MutableList
+import backend.actors.models._
 
 object StatusGame extends Enumeration {
   type StatusGame = Int
@@ -44,6 +45,11 @@ case class BroadcastGhostsPositions(ghosts: MutableList[GhostInfo])
 case class Players(players: MutableList[UserInfo])
 case object GhostStart
 case object GhostPause
+case class Open(keys: List[Key])
+case class IncreaseGold(gold: Gold)
+case class LootRetrieved(loot: Tuple2[Key,Gold])
+case class TreasureError(msg : String)
+
 
 case class GameStatusBroadcast(game: Game)
 case class JoinGame(game: Game, user: UserInfo, ref: ActorRef = null)

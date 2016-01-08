@@ -3,9 +3,11 @@ package backend.actors.models
 /**
  * Class to create a Key
  */
-class Key(isNecessary: Boolean, id: String) {
+class Key(id: String) {
   
-  var requested = isNecessary
   var key_id = id
-   
+
+  def getKeyID = {
+    key_id
+  }
 }
