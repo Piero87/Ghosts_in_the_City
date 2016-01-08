@@ -26,6 +26,7 @@ class GameManagerBackend () extends Actor {
   var game_id = java.util.UUID.randomUUID.toString
   var game_n_players = 0
   var game_status = StatusGame.WAITING
+  var previous_game_status = -1
   
   var paused_players:MutableList[Tuple2[String, Long]] = MutableList()
   
@@ -87,6 +88,7 @@ class GameManagerBackend () extends Actor {
       paused_players = paused_players :+ Tuple2(user.uid, System.currentTimeMillis())
       //for(ghost <- )
       scheduler()
+      previous_game_status = game_status
       game_status = StatusGame.PAUSED
       val tmp_g = ghosts.map(x => x._1)
       val tmp_t = treasures.map(x => x._1)
@@ -161,7 +163,7 @@ class GameManagerBackend () extends Actor {
         gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
         scheduler()
       } else {
-        game_status = StatusGame.STARTED
+        game_status = previous_game_status
         val tmp_g = ghosts.map(x => x._1)
         val tmp_t = treasures.map(x => x._1)
         gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
