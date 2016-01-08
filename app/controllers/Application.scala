@@ -19,7 +19,7 @@ class Application extends Controller {
   val config = ConfigFactory.parseString(s"akka.remote.netty.tcp.port=$port").
       withFallback(ConfigFactory.parseString("akka.cluster.roles = [frontend]")).
       withFallback(ConfigFactory.load())
-  val system = ActorSystem("TreasuresSystem", config)
+  val system = ActorSystem("GhostsSystem", config)
   val frontendManager = system.actorOf(Props[FrontendManager], name = "frontend")
   
   Logger.info("Application Started")
