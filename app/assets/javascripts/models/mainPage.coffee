@@ -266,10 +266,10 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
   			@game_team_RED.removeAll()
   			@game_team_BLUE.removeAll()
   			if json.game.players.length > 0
-  				index = 0
+  				i = 0
   				for player in json.game.players
-  					index = index + 1
-  					player.n = index
+  					i = i + 1
+  					player.index = i
   					if (player.team == 0)
   						@game_team_RED.push(player)
   					else if (player.team == 1)
