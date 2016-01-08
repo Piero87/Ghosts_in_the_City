@@ -166,6 +166,9 @@ class GameManagerBackend () extends Actor {
         scheduler()
       } else {
         game_status = previous_game_status
+        ghosts.map {ghost =>
+          ghost._2 ! GhostStart
+        }
         val tmp_g = ghosts.map(x => x._1)
         val tmp_t = treasures.map(x => x._1)
         gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
