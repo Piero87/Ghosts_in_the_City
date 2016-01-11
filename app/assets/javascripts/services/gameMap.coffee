@@ -19,6 +19,8 @@ define () ->
 			# context
 			@emptyBack = new Image
 			
+			@callback_key = @whatKey.bind(this)
+			
 			@sensible_area = new Image
 			@sensible_area.src = '/assets/images/Area.png'
 			
@@ -58,16 +60,14 @@ define () ->
 			callback_interval = @doGameLoop.bind(this)
 			@gameLoop = setInterval(callback_interval, 60)
 			# Add keyboard listener.
-			callback_key = @whatKey.bind(this)
-			window.addEventListener 'keydown', @whatKey.bind(this), true
+			window.addEventListener 'keydown', @callback_key, true
 		
 		pauseGame: ->
 			console.log "GAME MAP - Pause Game!"
 			if (@gameLoop)
 				clearInterval(@gameLoop)
 				# Add keyboard listener.
-				callback_key = @whatKey.bind(this)
-				window.removeEventListener 'keydown', @whatKey.bind(this), true
+				window.removeEventListener 'keydown', @callback_key, true
 				@resetCanvas()
 		
 		setBusters: (players) ->
@@ -273,8 +273,7 @@ define () ->
 				if arrows.indexOf(evt.keyCode) == -1
 					return false
 				evt.preventDefault();
-				d = new Date
-				console.log "Movimento!" + d.getTime
+				console.log "Movimento!"
 				switch evt.keyCode
 					# Left arrow.
 					when 37
