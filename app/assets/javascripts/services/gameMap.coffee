@@ -220,17 +220,19 @@ define () ->
 				)
 				# Draw team square color in the corner bottom-right
 				if buster.team == 0
-					team_img = @team_red
+					@ctx.fillStyle = "red";
 				else if buster.team == 1
-					team_img = @team_blue
-				@ctx.drawImage(
-						team_img
-						(buster_x + (@icon_size - 8))
-						(buster_y + (@icon_size - 8))
-						8
-						8
-					)
-			
+					@ctx.fillStyle = "blue";
+				@ctx.font = "10px Ghostbuster";
+				@ctx.fillText(buster.name, buster_x, (buster_y + (@icon_size - 8)));
+				
+#				@ctx.drawImage(
+#						team_img
+#						(buster_x + (@icon_size - 8))
+#						(buster_y + (@icon_size - 8))
+#						8
+#						8
+#					)
 			for ghost, i in @ghosts
 				# To center the images in their position point
 				ghost_x = @ghosts[i].x - (@icon_size / 2)
