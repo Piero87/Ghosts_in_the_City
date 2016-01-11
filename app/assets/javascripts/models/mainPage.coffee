@@ -137,12 +137,7 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 							@game_map.setBusters(json.game.players)
 							@game_map.setGhosts(json.game.ghosts)
 							@game_map.setTreasures(json.game.treasures)
-							if (@game_map.gameIsPaused())
-								@game_map.resumeGame()
-								console.log "Resume Game"
-							else
-								@game_map.startGame()
-								console.log "Start Game"		
+							@game_map.startGame()	
 						when 2 # game paused
 							console.log('Hold on!')
 							@game_map.pauseGame()

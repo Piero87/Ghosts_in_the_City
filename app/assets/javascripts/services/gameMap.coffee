@@ -19,9 +19,6 @@ define () ->
 			@ctx = undefined
 			# context
 			@emptyBack = new Image
-			@canvas = document.getElementById("gameArena")
-			@canvas.width = @space_width
-			@canvas.height = @space_height
 			
 			@sensible_area = new Image
 			@sensible_area.src = '/assets/images/Area.png'
@@ -33,6 +30,11 @@ define () ->
 			@team_blue.src = '/assets/images/Team_blue.png'
 			
 		initCanvas: ->
+			canvas_container = document.getElementById("gameArenaContainer")
+			@canvas = document.createElement("canvas")
+			@canvas.width = @space_width
+			@canvas.height = @space_height
+			canvas_container.appendChild(@canvas)
 			# Make sure you got the context.
 			if @canvas.getContext
 				# If you have it, create a canvas user interface element.
@@ -56,29 +58,25 @@ define () ->
 			callback_key = @whatKey.bind(this)
 			window.addEventListener 'keydown', @whatKey.bind(this), true
 		
-		gameIsPaused: ->
-			@gamePaused
-		
 		pauseGame: ->
 			console.log "GAME MAP - Pause Game!"
 			if (@gameLoop)
 				clearInterval(@gameLoop)
 				@gamePaused = true
-			
-		resumeGame: ->
-			console.log "GAME MAP - Resume Game!"
-			@gamePaused = false
-			@initCanvas()
-			callback_interval = @doGameLoop.bind(this)
-			@gameLoop = setInterval(callback_interval, 60)
-			
+				# Add keyboard listener.
+				callback_key = @whatKey.bind(this)
+				window.removeEventListener 'keydown', @whatKey.bind(this), true
+				canvas_container = document.getElementById("gameArenaContainer")
+				while canvas_container.firstChild
+					canvas_container.removeChild(canvas_container.firstChild)
+		
 		setBusters: (players) ->
 			@busters = []
 			@busters_images = []
 			@addBuster(
 				buster.uid, buster.name, buster.team, buster.pos.x, buster.pos.y
 			) for buster in players
-			
+		
 		addBuster: (uid, name, team, x, y) ->
 			buster = {}
 			buster.uid = uid
