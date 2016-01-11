@@ -224,7 +224,7 @@ define () ->
 				else if buster.team == 1
 					team_img = @team_blue
 				if buster.uid == @user_id
-					team_img = "YOU_" + team_img
+					team_img.src = team_img.src.replace "Team_", "YOU_Team_"
 				@ctx.drawImage(
 						team_img
 						(buster_x + (@icon_size - 8))
