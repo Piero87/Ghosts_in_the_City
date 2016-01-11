@@ -30,6 +30,12 @@ define () ->
 			@team_blue = new Image
 			@team_blue.src = '/assets/images/Team_blue.png'
 			
+			@team_red_you = new Image
+			@team_red_you.src = '/assets/images/YOU_Team_red.png'
+			
+			@team_blue_you = new Image
+			@team_blue_you.src = '/assets/images/YOU_Team_blue.png'
+			
 		initCanvas: ->
 			canvas_container = document.getElementById("gameArenaContainer")
 			@canvas = document.createElement("canvas")
@@ -219,12 +225,18 @@ define () ->
 					@icon_size
 				)
 				# Draw team square color in the corner bottom-right
-				if buster.team == 0
-					team_img = @team_red
-				else if buster.team == 1
-					team_img = @team_blue
+				
 				if buster.uid == @user_id
-					team_img.src = team_img.src.replace "Team_", "YOU_Team_"
+					if buster.team == 0
+						team_img = @team_red_you
+					else if buster.team == 1
+						team_img = @team_blue_you
+				else
+					if buster.team == 0
+						team_img = @team_red
+					else if buster.team == 1
+						team_img = @team_blue
+				
 				@ctx.drawImage(
 						team_img
 						(buster_x + (@icon_size - 8))
