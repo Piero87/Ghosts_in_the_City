@@ -11,3 +11,7 @@ class Key(id: String) {
     key_id
   }
 }
+
+//class Empty (override val id: String) extends Key (id) {
+//  
+//}

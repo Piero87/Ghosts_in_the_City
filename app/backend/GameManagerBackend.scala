@@ -144,34 +144,38 @@ class GameManagerBackend () extends Actor {
     case PlayersPositions =>
       sender ! Players(players)
     case CheckPaused =>
-      var now = System.currentTimeMillis()
-      if (paused_players.size > 0) {
-        for (player <- paused_players) {
-          if (now - player._2 > 10000) {
-            game_status = StatusGame.FINISHED
-            val future = gameManagerClient ? KillYourself
-            future.onSuccess { 
-              case KillMyself => 
-                logger.log("GameManagerBackend: GMClient will die")
-                self ! PoisonPill
-            }
-            future onFailure {
-              case e: Exception => logger.log("******GAME MANAGER BACKEND KILL ERROR ******")
+      if (game_status == StatusGame.PAUSED) {
+        
+        var now = System.currentTimeMillis()
+        if (paused_players.size > 0) {
+          for (player <- paused_players) {
+            if (now - player._2 > 10000) {
+              game_status = StatusGame.FINISHED
+              val future = gameManagerClient ? KillYourself
+              future.onSuccess { 
+                case KillMyself => 
+                  logger.log("GameManagerBackend: GMClient will die")
+                  self ! PoisonPill
+              }
+              future onFailure {
+                case e: Exception => logger.log("******GAME MANAGER BACKEND KILL ERROR ******")
+              }
             }
           }
+          val tmp_g = ghosts.map(x => x._1)
+          val tmp_t = treasures.map(x => x._1)
+          gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
+          scheduler()
+        } else {
+          game_status = previous_game_status
+          ghosts.map {ghost =>
+            ghost._2 ! GhostStart
+          }
+          val tmp_g = ghosts.map(x => x._1)
+          val tmp_t = treasures.map(x => x._1)
+          gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
         }
-        val tmp_g = ghosts.map(x => x._1)
-        val tmp_t = treasures.map(x => x._1)
-        gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
-        scheduler()
-      } else {
-        game_status = previous_game_status
-        ghosts.map {ghost =>
-          ghost._2 ! GhostStart
-        }
-        val tmp_g = ghosts.map(x => x._1)
-        val tmp_t = treasures.map(x => x._1)
-        gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,players,tmp_g,tmp_t))
+        
       }
   }
   
@@ -213,19 +217,33 @@ class GameManagerBackend () extends Actor {
       free_position_ghosts(j) = UtilFunctions.randomPositionInSpace(spaces(j))
       logger.log("Free Ghost[" + j + "] position: ("+ free_position_ghosts(j).x +","+ free_position_ghosts(j).y +")")
     }
+//    val rnd_key = new Random()
+//    
+//    var n_keys = rnd_key.nextInt(game_n_players/2)
+//    var keys = MutableList[Key]()
+//    
+//    for (i <- 0 to n_keys) {
+//      
+//      if (rnd_key.nextInt(2) == 1) {
+//        //Creare chiave
+//        var key = new Key(randomString(8))
+//        keys = keys :+ key
+//      }
+//    }
     
     //Qui dovrà generare i fantasmi e i tesori
     for (i <- 0 to game_n_players) {
 
       var treasure_id = randomString(8)
       //il boolean qui sotto si può fare random
-      var key = new Key(randomString(8))
+      
       //qui entrmabi i valori sono random
       val rnd = new Random()
       var gold = new Gold(rnd.nextInt(500))
       var pos_t = new Point (position_treasure(i).x,position_treasure(i).y)
       var treasure_info = new TreasureInfo(treasure_id,0,pos_t)
       var rnd_bool = rnd.nextInt(2)
+      var key = new Key(randomString(8))
       val treasure = context.actorOf(Props(new Treasure(treasure_id,pos_t,Tuple2(key,gold),Tuple2(rnd_bool == 1,key))), name = treasure_id)
       treasures = treasures :+ Tuple2(treasure_info,treasure)
       
