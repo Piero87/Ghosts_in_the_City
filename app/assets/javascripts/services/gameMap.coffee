@@ -273,22 +273,38 @@ define () ->
 			for buster, i in @busters when buster.uid == @user_id
 				
 				# Arrows keys
-				arrows = [
+				keys = [
 					37
 					38
 					39
 					40
+					65
+					83
+					68
 				]
+				# 65 = "a" => set a trap
+				# 83 = "s" => hit other player
+				# 68 = "d" => open treasure
+				
 				# Flag to put variables back if we hit an edge of the board.
 				flag = 0
 				# Get where the buster was before key process.
 				@busters[i].old_x = @busters[i].x
 				@busters[i].old_y = @busters[i].y
-				if arrows.indexOf(evt.keyCode) == -1
+				if keys.indexOf(evt.keyCode) == -1
 					return false
 				evt.preventDefault();
 				console.log "Movimento!"
 				switch evt.keyCode
+					# "a" key
+					when 65
+						console.log "Set a trap!"
+					# "s" key
+					when 83
+						console.log "Hit player!"
+					# "d" key
+					when 68
+						console.log "Open treasure!"
 					# Left arrow.
 					when 37
 						@busters[i].x = @busters[i].x - @move
