@@ -273,6 +273,8 @@ define () ->
 				if arrows.indexOf(evt.keyCode) == -1
 					return false
 				evt.preventDefault();
+				d = new Date
+				console.log "Movimento!" + d.getTime
 				switch evt.keyCode
 					# Left arrow.
 					when 37
