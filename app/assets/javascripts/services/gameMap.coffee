@@ -223,6 +223,8 @@ define () ->
 					team_img = @team_red
 				else if buster.team == 1
 					team_img = @team_blue
+				if buster.uid == @user_id
+					team_img = "YOU_" + team_img
 				@ctx.drawImage(
 						team_img
 						(buster_x + (@icon_size - 8))
