@@ -224,7 +224,7 @@ define () ->
 				else if buster.team == 1
 					@ctx.fillStyle = "blue";
 				@ctx.font = "10px Ghostbuster";
-				@ctx.fillText(buster.name, buster_x, (buster_y + (@icon_size - 2)));
+				@ctx.fillText(buster.name, buster_x, (buster_y + (@icon_size + 5)));
 				
 #				@ctx.drawImage(
 #						team_img
