@@ -10,7 +10,6 @@ define () ->
 			@treasure_radius = $("#conf_treasure_radius").val()
 			
 			@gameLoop = null
-			@gamePaused = false
 			
 			@ws = websocket
 			@user_id = id_user
@@ -47,9 +46,13 @@ define () ->
 				# Save the initial background.
 				@emptyBack = @ctx.getImageData(0, 0, @space_width, @space_height)
 		
+		resetCanvas: ->
+			canvas_container = document.getElementById("gameArenaContainer")
+			while canvas_container.firstChild
+				canvas_container.removeChild(canvas_container.firstChild)
+		
 		startGame: ->
 			console.log "GAME MAP - Start Game!"
-			@gamePaused = false
 			@initCanvas()
 			# Play the game until the until the game is over.
 			callback_interval = @doGameLoop.bind(this)
@@ -62,13 +65,10 @@ define () ->
 			console.log "GAME MAP - Pause Game!"
 			if (@gameLoop)
 				clearInterval(@gameLoop)
-				@gamePaused = true
 				# Add keyboard listener.
 				callback_key = @whatKey.bind(this)
 				window.removeEventListener 'keydown', @whatKey.bind(this), true
-				canvas_container = document.getElementById("gameArenaContainer")
-				while canvas_container.firstChild
-					canvas_container.removeChild(canvas_container.firstChild)
+				@resetCanvas()
 		
 		setBusters: (players) ->
 			@busters = []
