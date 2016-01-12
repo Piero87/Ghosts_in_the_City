@@ -356,6 +356,10 @@ define () ->
 			trap.y = y
 			@traps.push trap
 		
+		trapTriggered: (trap_uid) ->
+			for trap, i in @traps when trap.uid == trap_uid
+				trap.status = 1
+			
 		openTreasure: (uid, status) ->
 			for treasure, i in @treasures when treasure.uid == uid
 				@treasures[i].status = status
