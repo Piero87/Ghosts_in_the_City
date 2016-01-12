@@ -157,7 +157,7 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 						@game_map.updateTreasure(treasure.uid, treasure.status) for treasure in json.treasures
 				else if json.event == "new_trap"
 					if @gamestarted()
-						@game_map.newTrap(trap.uid, trap.status, trap.x, trap.y) for trap in json.traps
+						@game_map.newTrap(json.trap.uid, json.trap.pos.x, json.trap.pos.y)
 				else if json.event == "trap_triggered"
 					if @gamestarted()
 						@game_map.trapTriggered(json.trap.uid)

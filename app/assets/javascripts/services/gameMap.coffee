@@ -347,10 +347,10 @@ define () ->
 					when 37, 38, 39, 40
 						@movement(evt.keyCode, i)
 		
-		newTrap: (uid, status, x, y) ->
+		newTrap: (uid, x, y) ->
 			trap = {}
 			trap.uid = uid
-			trap.status = status # unactive
+			trap.status = 0 # unactive
 			trap.x = x
 			# current buster position X
 			trap.y = y
