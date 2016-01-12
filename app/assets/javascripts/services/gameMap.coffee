@@ -8,6 +8,7 @@ define () ->
 			@move = 5
 			@ghost_radius = $("#conf_ghost_radius").val()
 			@treasure_radius = $("#conf_treasure_radius").val()
+			@trap_radius = $("#conf_trap_radius").val()
 			
 			@gameLoop = null
 			
@@ -19,10 +20,15 @@ define () ->
 			# context
 			@emptyBack = new Image
 			
+			@traps = []
+			@traps_images = []
+			
 			@callback_key = @whatKey.bind(this)
 			
 			@sensible_area = new Image
 			@sensible_area.src = '/assets/images/Area.png'
+			
+			# Colori squadre
 			
 			@team_red = new Image
 			@team_red.src = '/assets/images/Team_red.png'
@@ -35,6 +41,22 @@ define () ->
 			
 			@team_blue_you = new Image
 			@team_blue_you.src = '/assets/images/YOU_Team_blue.png'
+			
+			# Treasure
+			
+			@treasure_open = new Image
+			@treasure_open.src = '/assets/images/Treasure_open.png'
+			
+			@treasure_close = new Image
+			@treasure_close.src = '/assets/images/Treasure_close.png'
+			
+			# Trap
+			
+			@trap_active = new Image
+			@trap_active.src = '/assets/images/Trap_active.png'
+			
+			@trap_unactive = new Image
+			@trap_unactive.src = '/assets/images/Trap_unactive.png'
 			
 		initCanvas: ->
 			canvas_container = document.getElementById("gameArenaContainer")
@@ -155,7 +177,6 @@ define () ->
 		
 		setTreasures: (treasures) ->
 			@treasures = []
-			@treasures_images = []
 			
 			@addTreasure(
 				treasure.uid, treasure.status, treasure.pos.x, treasure.pos.y
@@ -170,21 +191,10 @@ define () ->
 			treasure.y = y
 			# current buster position Y
 			@treasures.push treasure
-			treasure_img = new Image
-			# buster
-			if status == 0 #close
-				treasure_img.src = '/assets/images/Treasure_close.png'
-			else if status == 1 #open
-				treasure_img.src = '/assets/images/Treasure_open.png'
-			@treasures_images.push treasure_img
 		
 		updateTreasure: (uid, status) ->
 			for treasure, i in @treasures when treasure.uid == uid
 				@treasures[i].status = status
-				if status == 0 #close
-					@treasures_images[i].src = '/assets/images/Treasure_close.png'
-				else if status == 1 #open
-					@treasures_images[i].src = '/assets/images/Treasure_open.png'
 			
 		doGameLoop: ->
 			
@@ -204,8 +214,14 @@ define () ->
 					(@treasure_radius * 2)
 					(@treasure_radius * 2)
 				)
+				
+				if (@treasures[i].status == 0)
+					treasure_img = @treasure_close
+				else if (@treasures[i].status == 1)
+					treasure_img = @treasure_open
+				
 				@ctx.drawImage(
-					@treasures_images[i]
+					treasure_img
 					treasure_x
 					treasure_y
 					@icon_size
@@ -244,6 +260,34 @@ define () ->
 						8
 						8
 					)
+			
+			for trap, i in @traps
+				# To center the images in their position point
+				trap_x = @traps[i].x - (@icon_size / 2)
+				trap_y = @traps[i].y - (@icon_size / 2)
+				area_x =  @traps[i].x -  @trap_radius
+				area_y =  @traps[i].y -  @trap_radius
+				# Drawings
+				@ctx.drawImage(
+					@sensible_area
+					area_x 
+					area_y 
+					(@trap_radius * 2)
+					(@trap_radius * 2)
+				)
+				
+				if (@traps[i].status == 0)
+					trap_img = @trap_active
+				else if (@traps[i].status == 1)
+					trap_img = @trap_unactive
+				
+				@ctx.drawImage(
+					trap_img
+					trap_x
+					trap_y
+					@icon_size
+					@icon_size
+				)
 			
 			for ghost, i in @ghosts
 				# To center the images in their position point
@@ -286,65 +330,87 @@ define () ->
 				# 83 = "s" => hit other player
 				# 68 = "d" => open treasure
 				
-				# Flag to put variables back if we hit an edge of the board.
-				flag = 0
-				# Get where the buster was before key process.
-				@busters[i].old_x = @busters[i].x
-				@busters[i].old_y = @busters[i].y
 				if keys.indexOf(evt.keyCode) == -1
 					return false
 				evt.preventDefault();
-				console.log "Movimento!"
 				switch evt.keyCode
 					# "a" key
 					when 65
-						console.log "Set a trap!"
+						@setTrap(@generateUID(), buster.x, buster.y)
 					# "s" key
 					when 83
 						console.log "Hit player!"
 					# "d" key
 					when 68
 						console.log "Open treasure!"
-					# Left arrow.
-					when 37
-						@busters[i].x = @busters[i].x - @move
-						if @busters[i].x < (@icon_size / 2)
-							# If at edge, reset buster position and set flag.
-							@busters[i].x = (@icon_size / 2)
-							flag = 1
-					# Right arrow.
-					when 39
-						@busters[i].x = @busters[i].x + @move
-						if @busters[i].x > @space_width - (@icon_size / 2)
-							# If at edge, reset buster position and set flag.
-							@busters[i].x = @space_width - @move
-							flag = 1
-					# Down arrow
-					when 40
-						@busters[i].y = @busters[i].y + @move
-						if @busters[i].y > @space_height - (@icon_size / 2)
-							# If at edge, reset buster position and set flag.
-							@busters[i].y = @space_height - @move
-							flag = 1
-					# Up arrow 
-					when 38
-						@busters[i].y = @busters[i].y - @move
-						if @busters[i].y < (@icon_size / 2)
-							# If at edge, reset buster position and set flag.
-							@busters[i].y = (@icon_size / 2)
-							flag = 1
-				
-				# If flag is set, the buster did not move.
-				# Put everything backBuster the way it was.
-				if flag
-					@busters[i].x = @busters[i].old_x
-					@busters[i].y = @busters[i].old_y
-				
-				@ws.send(JSON.stringify
-					event: "update_player_position"
-					pos:
-						x: @busters[i].x
-						y: @busters[i].y
-				)
-	        	
+					when 37, 38, 39, 40
+						@movement(evt.keyCode, i)
+		
+		setTrap: (uid, x, y) ->
+			trap = {}
+			trap.uid = uid
+			trap.status = 0 # unactive
+			trap.x = x
+			# current buster position X
+			trap.y = y
+			@traps.push trap
+			trap_img = new Image
+			# buster
+			trap_img.src = '/assets/images/Trap_unactive.png'
+			@traps_images.push trap_img
+		
+		movement: (direction, i) ->
+			# Flag to put variables back if we hit an edge of the board.
+			flag = 0
+			# Get where the buster was before key process.
+			@busters[i].old_x = @busters[i].x
+			@busters[i].old_y = @busters[i].y
+			switch direction
+				# Left arrow.
+				when 37
+					@busters[i].x = @busters[i].x - @move
+					if @busters[i].x < (@icon_size / 2)
+						# If at edge, reset buster position and set flag.
+						@busters[i].x = (@icon_size / 2)
+						flag = 1
+				# Right arrow.
+				when 39
+					@busters[i].x = @busters[i].x + @move
+					if @busters[i].x > @space_width - (@icon_size / 2)
+						# If at edge, reset buster position and set flag.
+						@busters[i].x = @space_width - @move
+						flag = 1
+				# Down arrow
+				when 40
+					@busters[i].y = @busters[i].y + @move
+					if @busters[i].y > @space_height - (@icon_size / 2)
+						# If at edge, reset buster position and set flag.
+						@busters[i].y = @space_height - @move
+						flag = 1
+				# Up arrow 
+				when 38
+					@busters[i].y = @busters[i].y - @move
+					if @busters[i].y < (@icon_size / 2)
+						# If at edge, reset buster position and set flag.
+						@busters[i].y = (@icon_size / 2)
+						flag = 1
+			
+			# If flag is set, the buster did not move.
+			# Put everything backBuster the way it was.
+			if flag
+				@busters[i].x = @busters[i].old_x
+				@busters[i].y = @busters[i].old_y
+			
+			@ws.send(JSON.stringify
+				event: "update_player_position"
+				pos:
+					x: @busters[i].x
+					y: @busters[i].y
+			)
+		
+		generateUID: ->
+  			id = ""
+  			id += Math.random().toString(36).substr(2) while id.length < 8
+  			id.substr 0, 8
+			
 	return GameMap
