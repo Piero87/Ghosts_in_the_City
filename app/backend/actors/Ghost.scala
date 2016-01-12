@@ -18,10 +18,10 @@ object Ghost{
    */
   case object UpdateGhostPosition
   
-  def props(uuid: String, area: Polygon, position: Point, level: Int, treasure: ActorRef,position_treasure: Point) = Props(new Ghost(uuid, area,position, level, treasure,position_treasure))
+  def props(uid: String, area: Polygon, position: Point, level: Int, treasure: ActorRef,position_treasure: Point) = Props(new Ghost(uid, area,position, level, treasure,position_treasure))
 }
 
-class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure: ActorRef, position_treasure: Point) extends Actor {
+class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: ActorRef, position_treasure: Point) extends Actor {
   
   import context._
   import Ghost._
@@ -39,7 +39,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
   val height = ConfigFactory.load().getDouble("space_height")
   val icon_size = ConfigFactory.load().getDouble("icon_size")
   
-  val logger = new CustomLogger("Ghost "+uuid)
+  val logger = new CustomLogger("Ghost "+uid)
  
   
   def receive = {
@@ -154,7 +154,7 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
         } else {
           ghostpos = new_position
           //Logger.info("GHOST: SEND NEW POSITION")
-          GMbackend ! GhostPositionUpdate(uuid, ghostpos , mood)
+          GMbackend ! GhostPositionUpdate(uid, ghostpos , mood)
           //Logger.info("UUID: " + uuid + " - POS: " + ghostpos)
           scheduler()
         }
@@ -218,15 +218,15 @@ class Ghost(uuid: String, area : Polygon, position: Point, level: Int, treasure:
 //   if(area.contains(new_position, area_Edge)){
    if ((new_position.x < width-icon_size) && (new_position.y < height-icon_size)) {  
      if(level !=3 && distanceBetween(new_position, position_treasure) >= treasure_radius){
-       GMbackend ! GhostPositionUpdate(uuid, ghostpos, mood)
+       GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
        scheduler()
      }else{
        ghostpos = new_position
-       GMbackend ! GhostPositionUpdate(uuid, ghostpos, mood)
+       GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
        scheduler()
      }
    }else{
-     GMbackend ! GhostPositionUpdate(uuid, ghostpos, mood)
+     GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
      scheduler()
    }
        

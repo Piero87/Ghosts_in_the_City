@@ -3,11 +3,11 @@ package backend.actors.models
 /**
  * Class to create a Key
  */
-class Key(id: String) {
+class Key(uid: String) {
   
-  var key_id = id
+  var key_uid = uid
 
-  def getKeyID = {
-    key_id
+  def getKeyUID = {
+    key_uid
   }
 }

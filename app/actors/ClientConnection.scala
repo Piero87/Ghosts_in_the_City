@@ -115,6 +115,9 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
               }
             case e: JsError => logger.log("RESUME GAME ERROR: " + e.toString() + " FROM " + sender.path)
           }
+         case "set_trap" =>
+           var user_info = new UserInfo(uid,username,team,Point(0,0))
+           gameManagerClient ! SetTrap(user_info)
            
       }
     case GameStatusBroadcast(game: Game) =>
@@ -128,6 +131,10 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
     case BroadcastGhostsPositions(ghosts) =>
       var g_json = new BroadcastGhostsPositionsJSON("update_ghosts_positions",ghosts)
       val json = Json.toJson(g_json)(CommonMessages.broadcastGhostsPositionWrites)
+      upstream ! json
+    case BroadcastNewTrap(trap) =>
+      var g_json = new BroadcastNewTrapJSON("new_trap",trap)
+      val json = Json.toJson(g_json)(CommonMessages.broadcastNewTrapJSONWrites)
       upstream ! json
   }
   

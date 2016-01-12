@@ -32,7 +32,7 @@ class Treasure(uid: String, position: Point, loot: Tuple2[Key,Gold], needKey: Tu
         breakable {
           for (key <- keys)
           {
-            if (key.getKeyID == needKey._2.getKeyID)
+            if (key.getKeyUID == needKey._2.getKeyUID)
             {
               logger.log("Opened")
               origin ! LootRetrieved(treasure_loot)

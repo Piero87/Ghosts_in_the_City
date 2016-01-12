@@ -11,15 +11,24 @@ object Player {
   /**
    * Actor Props 
    */
-  def props(area : Polygon, position: Point): Props = Props(new Player(area, position))
+  def props(uid: String, name: String, team: Int, area : Polygon): Props = Props(new Player(uid, name, team, area))
   
 }
 
-class Player(area : Polygon, position: Point) extends Actor{
+class Player(uid: String, name: String, team: Int, area : Polygon) extends Actor{
+  
+  var gold = 0
+  var position = Point(0,0)
   
   def receive = {
-   case "test" => 
-      Logger.info("Test")
+    case SetTrap =>
+      var origin = sender
+      if (gold == 0) {
+        //Puoi mettere la trappola
+        gold = gold - 100
+        origin ! NewTrap(position)
+      }
+    case UpdatePlayerPos(pos) =>
+      position = pos
   }
-  
 }

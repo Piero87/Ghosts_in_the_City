@@ -49,7 +49,12 @@ case class Open(keys: List[Key])
 case class IncreaseGold(gold: Gold)
 case class LootRetrieved(loot: Tuple2[Key,Gold])
 case class TreasureError(msg : String)
-
+case class SetTrap(user: UserInfo)
+case object SetTrap
+case class UpdatePlayerPos(pos: Point)
+case class Trap(uid: String, pos: Point)
+case class NewTrap(pos: Point)
+case class BroadcastNewTrap(trap: Trap)
 
 case class GameStatusBroadcast(game: Game)
 case class JoinGame(game: Game, user: UserInfo, ref: ActorRef = null)
@@ -67,6 +72,8 @@ case class ResumeGameJSON(event:String, game_id: String)
 case class UpdatePositionJSON(event: String, pos: Point)
 case class BroadcastUpdatePositionJSON(event: String, user: UserInfo)
 case class BroadcastGhostsPositionsJSON(event: String, ghosts: MutableList[GhostInfo])
+case class SetTrapJSON(event: String)
+case class BroadcastNewTrapJSON(event: String, trap: Trap)
 
 import play.api.libs.json._
 
@@ -116,5 +123,14 @@ object CommonMessages {
   
   implicit val broadcastGhostsPositionReads = Json.reads[BroadcastGhostsPositionsJSON]
   implicit val broadcastGhostsPositionWrites = Json.writes[BroadcastGhostsPositionsJSON]
+  
+  implicit val trapReads = Json.reads[Trap]
+  implicit val trapWrites = Json.writes[Trap]
+  
+  implicit val setTrapReads = Json.reads[SetTrapJSON]
+  implicit val setTrapWrites = Json.writes[SetTrapJSON]
+  
+  implicit val broadcastNewTrapJSONReads = Json.reads[BroadcastNewTrapJSON]
+  implicit val broadcastNewTrapJSONWrites = Json.writes[BroadcastNewTrapJSON]
   
 }
