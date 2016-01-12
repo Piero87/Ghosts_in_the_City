@@ -1,7 +1,7 @@
 define () ->
 	class GameMap
 		constructor: (id_user, websocket) ->
-			
+
 			@space_width = $("#conf_space_width").val()
 			@space_height = $("#conf_space_height").val()
 			@icon_size = $("#conf_icon_size").val()
@@ -9,41 +9,40 @@ define () ->
 			@ghost_radius = $("#conf_ghost_radius").val()
 			@treasure_radius = $("#conf_treasure_radius").val()
 			@trap_radius = $("#conf_trap_radius").val()
-			
+
 			@gameLoop = null
-			
+
 			@ws = websocket
 			@user_id = id_user
-			
+
 			# canvas
 			@ctx = undefined
 			# context
 			@emptyBack = new Image
-			
+
 			@traps = []
-			@traps_images = []
-			
+
 			@callback_key = @whatKey.bind(this)
-			
+
 			@sensible_area = new Image
 			@sensible_area.src = '/assets/images/Area.png'
-			
+
 			# Colori squadre
-			
+
 			@team_red = new Image
 			@team_red.src = '/assets/images/Team_red.png'
-			
+
 			@team_blue = new Image
 			@team_blue.src = '/assets/images/Team_blue.png'
-			
+
 			@team_red_you = new Image
 			@team_red_you.src = '/assets/images/YOU_Team_red.png'
-			
+
 			@team_blue_you = new Image
 			@team_blue_you.src = '/assets/images/YOU_Team_blue.png'
-			
+
 			# Treasure
-			
+
 			@treasure_open = new Image
 			@treasure_open.src = '/assets/images/Treasure_open.png'
 			
@@ -186,6 +185,7 @@ define () ->
 			treasure = {}
 			treasure.uid = uid
 			treasure.name = name
+			treasure.status = status
 			treasure.x = x
 			# current buster position X
 			treasure.y = y
@@ -260,7 +260,7 @@ define () ->
 						8
 						8
 					)
-			
+				
 			for trap, i in @traps
 				# To center the images in their position point
 				trap_x = @traps[i].x - (@icon_size / 2)
@@ -270,17 +270,16 @@ define () ->
 				# Drawings
 				@ctx.drawImage(
 					@sensible_area
-					area_x 
-					area_y 
+					area_x
+					area_y
 					(@trap_radius * 2)
 					(@trap_radius * 2)
 				)
-				
 				if (@traps[i].status == 0)
-					trap_img = @trap_active
-				else if (@traps[i].status == 1)
 					trap_img = @trap_unactive
-				
+				else if (@traps[i].status == 1)
+					trap_img = @trap_active
+
 				@ctx.drawImage(
 					trap_img
 					trap_x
@@ -288,7 +287,7 @@ define () ->
 					@icon_size
 					@icon_size
 				)
-			
+
 			for ghost, i in @ghosts
 				# To center the images in their position point
 				ghost_x = @ghosts[i].x - (@icon_size / 2)
@@ -336,7 +335,7 @@ define () ->
 				switch evt.keyCode
 					# "a" key
 					when 65
-						@setTrap(@generateUID(), buster.x, buster.y)
+						@setTrap(@generateUID(), 0, buster.x, buster.y)
 					# "s" key
 					when 83
 						console.log "Hit player!"
@@ -346,18 +345,14 @@ define () ->
 					when 37, 38, 39, 40
 						@movement(evt.keyCode, i)
 		
-		setTrap: (uid, x, y) ->
+		setTrap: (uid, status, x, y) ->
 			trap = {}
 			trap.uid = uid
-			trap.status = 0 # unactive
+			trap.status = status # unactive
 			trap.x = x
 			# current buster position X
 			trap.y = y
 			@traps.push trap
-			trap_img = new Image
-			# buster
-			trap_img.src = '/assets/images/Trap_unactive.png'
-			@traps_images.push trap_img
 		
 		movement: (direction, i) ->
 			# Flag to put variables back if we hit an edge of the board.
