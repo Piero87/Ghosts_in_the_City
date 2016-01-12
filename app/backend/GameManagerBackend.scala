@@ -217,19 +217,21 @@ class GameManagerBackend () extends Actor {
       free_position_ghosts(j) = UtilFunctions.randomPositionInSpace(spaces(j))
       logger.log("Free Ghost[" + j + "] position: ("+ free_position_ghosts(j).x +","+ free_position_ghosts(j).y +")")
     }
-//    val rnd_key = new Random()
-//    
-//    var n_keys = rnd_key.nextInt(game_n_players/2)
-//    var keys = MutableList[Key]()
-//    
-//    for (i <- 0 to n_keys) {
-//      
-//      if (rnd_key.nextInt(2) == 1) {
-//        //Creare chiave
-//        var key = new Key(randomString(8))
-//        keys = keys :+ key
-//      }
-//    }
+    val rnd_key = new Random()
+    
+    var n_keys = rnd_key.nextInt(game_n_players/2)
+    var keys_loot = MutableList[Key]()
+    var keys_needed = MutableList[Key]()
+    
+    for (i <- 0 to n_keys) {
+      
+      if (rnd_key.nextInt(2) == 1) {
+        //Creare chiave
+        var key = new Key(randomString(8))
+        keys_loot = keys_loot :+ key
+        keys_needed = keys_needed :+ key
+      }
+    }
     
     //Qui dovrà generare i fantasmi e i tesori
     for (i <- 0 to game_n_players) {
@@ -242,9 +244,34 @@ class GameManagerBackend () extends Actor {
       var gold = new Gold(rnd.nextInt(500))
       var pos_t = new Point (position_treasure(i).x,position_treasure(i).y)
       var treasure_info = new TreasureInfo(treasure_id,0,pos_t)
-      var rnd_bool = rnd.nextInt(2)
-      var key = new Key(randomString(8))
-      val treasure = context.actorOf(Props(new Treasure(treasure_id,pos_t,Tuple2(key,gold),Tuple2(rnd_bool == 1,key))), name = treasure_id)
+      //Random se contiene una chiave
+      var rnd_loot_key = rnd.nextInt(2)
+      //Random se ha bisogno di una chiave
+      var rnd_need_key = rnd.nextInt(2)
+      
+      var key = new Key("")
+      var need_key = new Key ("")
+      
+      if (rnd_loot_key == 1 && keys_loot.size != 0) {
+        key = keys_loot(0)
+        keys_loot = keys_loot.filterNot(_.getKeyID == key.getKeyID)
+      }
+      
+      var tmp_key_need = MutableList[Key]()
+      
+      for (i <- 0 to keys_needed.size-1) {
+        if (keys_needed(i).getKeyID != key.getKeyID) {
+          tmp_key_need = tmp_key_need :+ keys_needed(i)
+        }
+          
+      }
+        
+      if (rnd_need_key == 1 && tmp_key_need.size != 0) {
+        need_key = tmp_key_need(0)
+        keys_needed = keys_needed.filterNot(_.getKeyID == need_key.getKeyID)
+      }
+        
+      val treasure = context.actorOf(Props(new Treasure(treasure_id,pos_t,Tuple2(key,gold),Tuple2(rnd_need_key == 1,need_key))), name = treasure_id)
       treasures = treasures :+ Tuple2(treasure_info,treasure)
       
       // Fantasmi a guardia dei tesori
