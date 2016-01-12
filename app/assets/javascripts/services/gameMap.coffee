@@ -347,7 +347,7 @@ define () ->
 					when 37, 38, 39, 40
 						@movement(evt.keyCode, i)
 		
-		setTrap: (uid, status, x, y) ->
+		newTrap: (uid, status, x, y) ->
 			trap = {}
 			trap.uid = uid
 			trap.status = status # unactive
