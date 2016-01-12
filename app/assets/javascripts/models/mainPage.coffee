@@ -155,6 +155,9 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 				else if json.event == "update_treasures"
 					if @gamestarted()
 						@game_map.updateTreasure(treasure.uid, treasure.status) for treasure in json.treasures
+				else if json.event == "set_trap"
+					if @gamestarted()
+						@game_map.setTrap(trap.uid, trap.status, trap.x, trap.y) for trap in json.traps
 							
 		# The user clicked connect
 		submitUsername: ->

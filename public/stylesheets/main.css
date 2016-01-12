@@ -41,6 +41,14 @@
 	padding: 20px;
 }
 
+.key {
+	border: solid 1px black;
+	border-radius: 4px;
+	display: table;
+	padding: 4px;
+	margin: 4px 4px 0px 4px;
+}
+
 .btn.fedora-font {
 	padding-top: 15px !important;
 }

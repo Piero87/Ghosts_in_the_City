@@ -192,10 +192,6 @@ define () ->
 			# current buster position Y
 			@treasures.push treasure
 		
-		updateTreasure: (uid, status) ->
-			for treasure, i in @treasures when treasure.uid == uid
-				@treasures[i].status = status
-			
 		doGameLoop: ->
 			
 			@ctx.putImageData(@emptyBack, 0, 0);
@@ -335,13 +331,19 @@ define () ->
 				switch evt.keyCode
 					# "a" key
 					when 65
-						@setTrap(@generateUID(), 0, buster.x, buster.y)
+						@ws.send(JSON.stringify
+							event: "set_trap"
+						)
 					# "s" key
 					when 83
-						console.log "Hit player!"
+						@ws.send(JSON.stringify
+							event: "hit_player"
+						)
 					# "d" key
 					when 68
-						console.log "Open treasure!"
+						@ws.send(JSON.stringify
+							event: "open_treasure"
+						)
 					when 37, 38, 39, 40
 						@movement(evt.keyCode, i)
 		
@@ -353,6 +355,10 @@ define () ->
 			# current buster position X
 			trap.y = y
 			@traps.push trap
+		
+		openTreasure: (uid, status) ->
+			for treasure, i in @treasures when treasure.uid == uid
+				@treasures[i].status = status
 		
 		movement: (direction, i) ->
 			# Flag to put variables back if we hit an edge of the board.
