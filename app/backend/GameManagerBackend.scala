@@ -131,6 +131,7 @@ class GameManagerBackend () extends Actor {
         if (players(i)._1.uid == user.uid) {
           val p = new UserInfo(user.uid,user.name,user.team,user.pos)
           players(i) = players(i).copy(_1 = p)
+          players(i)._2 ! UpdatePlayerPos(user.pos)
         }
       }
       sender ! BroadcastUpdatePosition(user)
