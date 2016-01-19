@@ -158,9 +158,12 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 				else if json.event == "new_trap"
 					if @gamestarted()
 						@game_map.newTrap(json.trap.uid, json.trap.pos.x, json.trap.pos.y)
-				else if json.event == "trap_triggered"
+				else if json.event == "active_trap"
 					if @gamestarted()
-						@game_map.trapTriggered(json.trap.uid)
+						@game_map.activeTrap(json.trap.uid) if (json.trap.status == 1)
+				else if json.event == "remove_trap"
+					if @gamestarted()
+						@game_map.removeTrap(json.trap.uid)
 							
 		# The user clicked connect
 		submitUsername: ->

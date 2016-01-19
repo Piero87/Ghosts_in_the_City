@@ -1,7 +1,7 @@
 package backend.actors.models
 
 /**
- * Class to create a Key
+ * Class to create a Gold
  */
 class Gold(quantity: Int) {
   

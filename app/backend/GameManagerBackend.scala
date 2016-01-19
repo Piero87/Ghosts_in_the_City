@@ -146,10 +146,19 @@ class GameManagerBackend () extends Actor {
       var ghost_mood = mood
       var ghost_point = point
       for (i <- 0 to traps.size-1) {
-        if (point.isNearby(traps(i).pos, trap_radius)) {
+        if (traps(i).status == TrapStatus.IDLE && point.isNearby(traps(i).pos, trap_radius)) {
+          /* La trappola traps(i) ha catturato un fantasma!
+           * Settiamo il fantasma come TRAPPED, lo spostiamo forzatamente
+           * dentro la trappola e iniziamo a contare 10 secondi per poi 
+           * toglierla e liberarlo. Dobbiamo anche dire a tutti i client 
+           * che la trappola è piena */
           ghost_mood = GhostMood.TRAPPED
           ghost_point = traps(i).pos
+          traps(i).status = TrapStatus.ACTIVE
+          traps(i).trapped_ghost_uid = uid
+          gameManagerClient ! BroadcastTrapActivated(traps(i).getTrapInfo)
           sender ! GhostTrapped(ghost_point)
+          removeTrapScheduler(traps(i).uid)
         }
       }
       for (i <- 0 to ghosts.size-1) {
@@ -208,14 +217,22 @@ class GameManagerBackend () extends Actor {
     case NewTrap(pos) =>
       /* L'attore Player ci ha detto di mettere una nuova trappola,
        * lui sa le cose, quindi la piazziamo senza fare domande */
-      var trap = new Trap(randomString(8),pos)
+      var trap = new Trap(pos)
       traps = traps :+ trap
-      gameManagerClient ! BroadcastNewTrap(trap)
+      gameManagerClient ! BroadcastNewTrap(trap.getTrapInfo)
     case RemoveTrap(uid) =>
       /* Una trappola è scattata 10 secondi fa e ora è tempo che venga rimossa */
       for (i <- 0 to traps.size-1) {
         if (traps(i).uid == uid) {
-          gameManagerClient ! BroadcastRemoveTrap(traps(i))
+          gameManagerClient ! BroadcastRemoveTrap(traps(i).getTrapInfo)
+          /* Liberiramo il fantasma intrappolato */
+          for (j <- 0 to ghosts.size-1) {
+            if (ghosts(j)._1.uid == traps(i).trapped_ghost_uid) {
+              var g = new GhostInfo(ghosts(j)._1.uid,ghosts(j)._1.level,GhostMood.CALM,ghosts(j)._1.pos)
+              ghosts(j) = ghosts(j).copy(_1 = g)
+              ghosts(j)._2 ! GhostStart
+            }
+          }
           traps = traps.filterNot {_.uid == uid }
         }
       }
@@ -225,6 +242,8 @@ class GameManagerBackend () extends Actor {
       //...inizializza attori partita
     var width = ConfigFactory.load().getDouble("space_width")
     var height = ConfigFactory.load().getDouble("space_height")
+    
+    // inizializziamo i parametri di partita
     trap_radius = ConfigFactory.load().getDouble("trap_radius")
 
     var polygon = new Polygon(List(Point(0,0),Point(0,height),Point(width,0),Point(width,height)))

@@ -159,16 +159,21 @@ define () ->
 		ghostMove: (uid, mood, x, y) ->
 			for ghost, i in @ghosts when ghost.uid == uid
 				@ghosts[i].mood = mood
-				if @ghosts[i].mood == 1 # Oh oh, someone is angry...
-					if ghost.x > x
-						@ghosts_images[i].src = '/assets/images/Ghost_L' + @ghosts[i].level + '_Angry_left.png'
-					else
-						@ghosts_images[i].src = '/assets/images/Ghost_L' + @ghosts[i].level + '_Angry_right.png'
-				else
+				if @ghosts[i].mood == 0
 					if ghost.x > x
 						@ghosts_images[i].src = '/assets/images/Ghost_L' + @ghosts[i].level + '_left.png'
 					else
 						@ghosts_images[i].src = '/assets/images/Ghost_L' + @ghosts[i].level + '_right.png'
+				else if @ghosts[i].mood == 1 # Oh oh, someone is angry...
+					if ghost.x > x
+						@ghosts_images[i].src = '/assets/images/Ghost_L' + @ghosts[i].level + '_Angry_left.png'
+					else
+						@ghosts_images[i].src = '/assets/images/Ghost_L' + @ghosts[i].level + '_Angry_right.png'
+				else if @ghosts[i].mood == 2 # Poor trapped ghost
+					if ghost.x > x
+						@ghosts_images[i].src = '/assets/images/Ghost_L' + @ghosts[i].level + '_Scared_left.png'
+					else
+						@ghosts_images[i].src = '/assets/images/Ghost_L' + @ghosts[i].level + '_Scared_right.png'
 				@ghosts[i].old_x = ghost.x
 				@ghosts[i].old_y = ghost.y
 				@ghosts[i].x = x
@@ -356,9 +361,15 @@ define () ->
 			trap.y = y
 			@traps.push trap
 		
-		trapTriggered: (trap_uid) ->
+		activeTrap: (trap_uid) ->
 			for trap, i in @traps when trap.uid == trap_uid
 				trap.status = 1
+				
+		removeTrap: (trap_uid) ->
+			trap_index = -1
+			for trap, i in @traps when trap.uid == trap_uid
+				trap_index = i
+			@traps.splice(trap_index, 1) 
 			
 		openTreasure: (uid, status) ->
 			for treasure, i in @treasures when treasure.uid == uid

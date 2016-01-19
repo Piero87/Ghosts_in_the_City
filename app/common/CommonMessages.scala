@@ -26,6 +26,12 @@ object GhostMood extends Enumeration {
    val TRAPPED = 2
 }
 
+object TrapStatus extends Enumeration {
+  type TrapStatus = Int
+   val IDLE = 0
+   val ACTIVE = 1
+}
+
 
 // Ghost messages
 case class GhostPositionUpdate(uid: String, pos: Point, mood: Int)
@@ -54,11 +60,12 @@ case class TreasureInfo(uid: String, status: Int, pos: Point)
 // Trap
 case class SetTrap(user: UserInfo)
 case object SetTrap
-case class Trap(uid: String, pos: Point)
+case class TrapInfo(uid: String, pos: Point, status: Int)
 case class NewTrap(pos: Point)
-case class BroadcastNewTrap(trap: Trap)
+case class BroadcastNewTrap(trap: TrapInfo)
+case class BroadcastTrapActivated(trap: TrapInfo)
 case class RemoveTrap(uid: String)
-case class BroadcastRemoveTrap(trap: Trap)
+case class BroadcastRemoveTrap(trap: TrapInfo)
 
 // Game
 case class GameStatusBroadcast(game: Game)
@@ -90,7 +97,9 @@ case class UpdatePositionJSON(event: String, pos: Point)
 case class BroadcastUpdatePositionJSON(event: String, user: UserInfo)
 case class BroadcastGhostsPositionsJSON(event: String, ghosts: MutableList[GhostInfo])
 case class SetTrapJSON(event: String)
-case class BroadcastNewTrapJSON(event: String, trap: Trap)
+case class BroadcastNewTrapJSON(event: String, trap: TrapInfo)
+case class BroadcastTrapActivatedJSON(event:String, trap: TrapInfo)
+case class BroadcastRemoveTrapJSON(event:String, trap: TrapInfo)
 
 import play.api.libs.json._
 
@@ -141,13 +150,19 @@ object CommonMessages {
   implicit val broadcastGhostsPositionReads = Json.reads[BroadcastGhostsPositionsJSON]
   implicit val broadcastGhostsPositionWrites = Json.writes[BroadcastGhostsPositionsJSON]
   
-  implicit val trapReads = Json.reads[Trap]
-  implicit val trapWrites = Json.writes[Trap]
+  implicit val trapReads = Json.reads[TrapInfo]
+  implicit val trapWrites = Json.writes[TrapInfo]
   
   implicit val setTrapReads = Json.reads[SetTrapJSON]
   implicit val setTrapWrites = Json.writes[SetTrapJSON]
   
   implicit val broadcastNewTrapJSONReads = Json.reads[BroadcastNewTrapJSON]
   implicit val broadcastNewTrapJSONWrites = Json.writes[BroadcastNewTrapJSON]
+  
+  implicit val broadcastTrapActivatedJSONReads = Json.reads[BroadcastTrapActivatedJSON]
+  implicit val broadcastTrapActivatedJSONWrites = Json.writes[BroadcastTrapActivatedJSON]
+  
+  implicit val broadcastRemoveTrapJSONReads = Json.reads[BroadcastRemoveTrapJSON]
+  implicit val broadcastRemoveTrapJSONWrites = Json.writes[BroadcastRemoveTrapJSON]
   
 }
