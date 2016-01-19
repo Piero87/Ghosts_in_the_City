@@ -170,6 +170,8 @@ define () ->
 					else
 						@ghosts_images[i].src = '/assets/images/Ghost_L' + @ghosts[i].level + '_Angry_right.png'
 				else if @ghosts[i].mood == 2 # Poor trapped ghost
+					console.log "Fantasma in trappola"
+					console.log @ghosts[i]
 					if ghost.x > x
 						@ghosts_images[i].src = '/assets/images/Ghost_L' + @ghosts[i].level + '_Scared_left.png'
 					else
