@@ -91,6 +91,10 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
       }
     case GhostPause =>
       logger.log("In pause")
+    case GhostTrapped(point) =>
+      logger.log("Oh no, I'm trapped")
+      mood = GhostMood.TRAPPED
+      ghostpos = point
   }
   
   def random_move(position: Point) : Unit = {

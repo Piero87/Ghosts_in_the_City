@@ -23,6 +23,7 @@ object GhostMood extends Enumeration {
   type GhostMood = Int
    val CALM = 0
    val ANGRY = 1
+   val TRAPPED = 2
 }
 
 
@@ -56,6 +57,8 @@ case object SetTrap
 case class Trap(uid: String, pos: Point)
 case class NewTrap(pos: Point)
 case class BroadcastNewTrap(trap: Trap)
+case class RemoveTrap(uid: String)
+case class BroadcastRemoveTrap(trap: Trap)
 
 // Game
 case class GameStatusBroadcast(game: Game)

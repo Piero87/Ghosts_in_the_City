@@ -23,6 +23,7 @@ class GameManagerBackend () extends Actor {
   var ghosts: MutableList[Tuple2[GhostInfo, ActorRef]] = MutableList()
   var treasures: MutableList[Tuple2[TreasureInfo, ActorRef]] = MutableList()
   var traps: MutableList[Trap] = MutableList()
+  var trap_radius: Double = 0
   
   var game_name = ""
   var game_id = java.util.UUID.randomUUID.toString
@@ -142,9 +143,18 @@ class GameManagerBackend () extends Actor {
       gameManagerClient ! BroadcastGhostsPositions(tmp_g)
       context.system.scheduler.scheduleOnce(500 millis, self, UpdateGhostsPositions)
     case GhostPositionUpdate(uid, point,mood) =>
+      var ghost_mood = mood
+      var ghost_point = point
+      for (i <- 0 to traps.size-1) {
+        if (point.isNearby(traps(i).pos, trap_radius)) {
+          ghost_mood = GhostMood.TRAPPED
+          ghost_point = traps(i).pos
+          sender ! GhostTrapped(ghost_point)
+        }
+      }
       for (i <- 0 to ghosts.size-1) {
         if (ghosts(i)._1.uid == uid) {
-          var g = new GhostInfo(ghosts(i)._1.uid,ghosts(i)._1.level,mood,point)
+          var g = new GhostInfo(ghosts(i)._1.uid,ghosts(i)._1.level,ghost_mood,ghost_point)
           ghosts(i) = ghosts(i).copy(_1 = g)
         }
       }
@@ -153,7 +163,6 @@ class GameManagerBackend () extends Actor {
       sender ! Players(tmp_p)
     case CheckPaused =>
       if (game_status == StatusGame.PAUSED) {
-        
         var now = System.currentTimeMillis()
         if (paused_players.size > 0) {
           for (player <- paused_players) {
@@ -187,22 +196,36 @@ class GameManagerBackend () extends Actor {
         }
         
       }
-    case SetTrap(user) =>
+    case SetTrap(user) => 
+      /* Il GMB ha ricevuto la richiesta del client di mettere una trappola,
+       * per controllare che il client sia consistente con il suo attore, 
+       * spediamo la richiesta all'attore player e se potrà farlo sarà lui a dire "NewTrap" */
       for (i <- 0 to players.size-1) {
         if (players(i)._1.uid == user.uid) {
           players(i)._2 ! SetTrap
         }
       }
     case NewTrap(pos) =>
+      /* L'attore Player ci ha detto di mettere una nuova trappola,
+       * lui sa le cose, quindi la piazziamo senza fare domande */
       var trap = new Trap(randomString(8),pos)
       traps = traps :+ trap
       gameManagerClient ! BroadcastNewTrap(trap)
+    case RemoveTrap(uid) =>
+      /* Una trappola è scattata 10 secondi fa e ora è tempo che venga rimossa */
+      for (i <- 0 to traps.size-1) {
+        if (traps(i).uid == uid) {
+          gameManagerClient ! BroadcastRemoveTrap(traps(i))
+          traps = traps.filterNot {_.uid == uid }
+        }
+      }
   }
   
   def newGame () = {
       //...inizializza attori partita
     var width = ConfigFactory.load().getDouble("space_width")
     var height = ConfigFactory.load().getDouble("space_height")
+    trap_radius = ConfigFactory.load().getDouble("trap_radius")
 
     var polygon = new Polygon(List(Point(0,0),Point(0,height),Point(width,0),Point(width,height)))
     
@@ -342,5 +365,10 @@ class GameManagerBackend () extends Actor {
   
   def scheduler() = {
      context.system.scheduler.scheduleOnce(1000 millis, self, CheckPaused) 
+  }
+  
+  def removeTrapScheduler(uid:String) = {
+     context.system.scheduler.scheduleOnce(10000 millis, self, RemoveTrap(uid))
+     
   }
 }
