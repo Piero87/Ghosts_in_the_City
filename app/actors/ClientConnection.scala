@@ -137,8 +137,8 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
       val json = Json.toJson(g_json)(CommonMessages.broadcastNewTrapJSONWrites)
       upstream ! json
     case BroadcastTrapActivated(trap) =>
-      var g_json = new BroadcastNewTrapJSON("active_trap",trap)
-      val json = Json.toJson(g_json)(CommonMessages.broadcastNewTrapJSONWrites)
+      var g_json = new BroadcastTrapActivatedJSON("active_trap",trap)
+      val json = Json.toJson(g_json)(CommonMessages.broadcastTrapActivatedJSONWrites)
       upstream ! json
     case BroadcastRemoveTrap(trap) =>
       var g_json = new BroadcastNewTrapJSON("remove_trap",trap)
