@@ -130,7 +130,7 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 							console.log('Ready!')
 							@refreshPlayerList(json)
 						when 1 # game started
-							console.log(JSON.stringify(json))
+							console.log(json)
 							console.log('Fight!')
 							@refreshPlayerList(json)
 							@gamename(json.game.name)

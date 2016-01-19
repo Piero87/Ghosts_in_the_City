@@ -144,12 +144,11 @@ class GameManagerBackend () extends Actor {
       context.system.scheduler.scheduleOnce(500 millis, self, UpdateGhostsPositions)
     
     case GhostPositionUpdate(uid, point,mood) =>
-      var ghost_sender = sender()
       var ghost_mood = mood
       var ghost_point = point
       for (i <- 0 to traps.size-1) {
+        logger.log("Result of isNearby function: "+ point.isNearby(traps(i).pos, trap_radius))
         if (traps(i).status == TrapStatus.IDLE && point.isNearby(traps(i).pos, trap_radius)) {
-          logger.log("Result of isNearby function: "+ point.isNearby(traps(i).pos, trap_radius))
           /* La trappola traps(i) ha catturato un fantasma!
            * Settiamo il fantasma come TRAPPED, lo spostiamo forzatamente
            * dentro la trappola e iniziamo a contare 10 secondi per poi 
@@ -160,7 +159,6 @@ class GameManagerBackend () extends Actor {
           traps(i).status = TrapStatus.ACTIVE
           traps(i).trapped_ghost_uid = uid
           gameManagerClient ! BroadcastTrapActivated(traps(i).getTrapInfo)
-          ghost_sender ! GhostTrapped(ghost_point)
           removeTrapScheduler(traps(i).uid)
         }
       }
@@ -168,6 +166,7 @@ class GameManagerBackend () extends Actor {
         if (ghosts(i)._1.uid == uid) {
           var g = new GhostInfo(ghosts(i)._1.uid,ghosts(i)._1.level,ghost_mood,ghost_point)
           ghosts(i) = ghosts(i).copy(_1 = g)
+          if (ghost_mood == GhostMood.TRAPPED) ghosts(i)._2 ! GhostTrapped(ghost_point)
         }
       }
     case PlayersPositions =>
