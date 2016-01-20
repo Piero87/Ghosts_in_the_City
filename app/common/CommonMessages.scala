@@ -39,6 +39,7 @@ case class GhostInfo(uid: String, level: Int, mood: Int, pos: Point)
 case object UpdateGhostsPositions
 case object GhostStart
 case object GhostPause
+case object GhostReleased
 case class BroadcastGhostsPositions(ghosts: MutableList[GhostInfo])
 case class GhostTrapped(pos: Point)
 
