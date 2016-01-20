@@ -128,13 +128,10 @@ class GameManagerBackend () extends Actor {
         gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,tmp_p,tmp_g,tmp_t))
       }
     case UpdatePosition(user) =>
-      for (i <- 0 to players.size-1) {
-        if (players(i)._1.uid == user.uid) {
-          val p = new UserInfo(user.uid,user.name,user.team,user.pos)
-          players(i) = players(i).copy(_1 = p)
-          players(i)._2 ! UpdatePlayerPos(user.pos)
-        }
-      }
+      var player_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == user.uid) => i}).head
+      val p = new UserInfo(user.uid,user.name,user.team,user.pos)
+      players(player_index) = players(player_index).copy(_1 = p)
+      players(player_index)._2 ! UpdatePlayerPos(user.pos)
       sender ! BroadcastUpdatePosition(user)
       
     case UpdateGhostsPositions =>
@@ -144,19 +141,19 @@ class GameManagerBackend () extends Actor {
       context.system.scheduler.scheduleOnce(500 millis, self, UpdateGhostsPositions)
     
     case GhostPositionUpdate(uid, point,mood) =>
+      var ghost_index = (ghosts.zipWithIndex.collect{case (g , i) if(g._1.uid == uid) => i}).head
       var ghost_mood = mood
       var ghost_point = point
       for (i <- 0 to traps.size-1) {
         var distance = point.distanceFrom(traps(i).pos)
-        logger.log("The distance between ghost [" + uid + "] and trap [" + traps(i).uid + "] is " + distance)
         if (traps(i).status == TrapStatus.IDLE && distance <= trap_radius) {
           /* La trappola traps(i) ha catturato un fantasma!
            * Settiamo il fantasma come TRAPPED, lo spostiamo forzatamente
            * dentro la trappola e iniziamo a contare 10 secondi per poi 
            * toglierla e liberarlo. Dobbiamo anche dire a tutti i client 
            * che la trappola è piena */
-          logger.log("Ghost [" + uid + "] is trapped!")
           ghost_mood = GhostMood.TRAPPED
+          ghosts(ghost_index)._2 ! GhostTrapped(ghost_point)
           ghost_point = traps(i).pos
           traps(i).status = TrapStatus.ACTIVE
           traps(i).trapped_ghost_uid = uid
@@ -164,13 +161,9 @@ class GameManagerBackend () extends Actor {
           removeTrapScheduler(traps(i).uid)
         }
       }
-      for (i <- 0 to ghosts.size-1) {
-        if (ghosts(i)._1.uid == uid) {
-          var g = new GhostInfo(ghosts(i)._1.uid,ghosts(i)._1.level,ghost_mood,ghost_point)
-          ghosts(i) = ghosts(i).copy(_1 = g)
-          if (ghost_mood == GhostMood.TRAPPED) ghosts(i)._2 ! GhostTrapped(ghost_point)
-        }
-      }
+      var g = new GhostInfo(ghosts(ghost_index)._1.uid,ghosts(ghost_index)._1.level,ghost_mood,ghost_point)
+      ghosts(ghost_index) = ghosts(ghost_index).copy(_1 = g)
+      
     case PlayersPositions =>
       val tmp_p = players.map(x => x._1)
       sender ! Players(tmp_p)
@@ -213,11 +206,8 @@ class GameManagerBackend () extends Actor {
       /* Il GMB ha ricevuto la richiesta del client di mettere una trappola,
        * per controllare che il client sia consistente con il suo attore, 
        * spediamo la richiesta all'attore player e se potrà farlo sarà lui a dire "NewTrap" */
-      for (i <- 0 to players.size-1) {
-        if (players(i)._1.uid == user.uid) {
-          players(i)._2 ! SetTrap
-        }
-      }
+      players.filter(_._1.uid == user.uid).head._2 ! SetTrap
+      
     case NewTrap(pos) =>
       /* L'attore Player ci ha detto di mettere una nuova trappola,
        * lui sa le cose, quindi la piazziamo senza fare domande */
@@ -230,13 +220,10 @@ class GameManagerBackend () extends Actor {
         if (traps(i).uid == uid) {
           gameManagerClient ! BroadcastRemoveTrap(traps(i).getTrapInfo)
           /* Liberiramo il fantasma intrappolato */
-          for (j <- 0 to ghosts.size-1) {
-            if (ghosts(j)._1.uid == traps(i).trapped_ghost_uid) {
-              var g = new GhostInfo(ghosts(j)._1.uid,ghosts(j)._1.level,GhostMood.CALM,ghosts(j)._1.pos)
-              ghosts(j) = ghosts(j).copy(_1 = g)
-              ghosts(j)._2 ! GhostStart
-            }
-          }
+          var ghost_index = (ghosts.zipWithIndex.collect{case (g , i) if(g._1.uid == traps(i).trapped_ghost_uid) => i}).head
+          var g = new GhostInfo(ghosts(ghost_index)._1.uid,ghosts(ghost_index)._1.level,GhostMood.CALM,ghosts(ghost_index)._1.pos)
+          ghosts(ghost_index) = ghosts(ghost_index).copy(_1 = g)
+          ghosts(ghost_index)._2 ! GhostStart
           traps = traps.filterNot {_.uid == uid }
         }
       }
