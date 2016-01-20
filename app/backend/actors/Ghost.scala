@@ -40,12 +40,12 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
   val icon_size = ConfigFactory.load().getDouble("icon_size")
   
   val logger = new CustomLogger("Ghost "+uid)
- 
+  var update_pos_scheduler : Cancellable = null
   
   def receive = {
     case GhostStart => 
       GMbackend = sender
-      scheduler()
+      update_pos_scheduler = system.scheduler.schedule(0 millis, 500 millis, self, UpdateGhostPosition)
     case UpdateGhostPosition => 
       //Logger.info("Ghost: Updated position received")
       // Ciclo di vita del fantasma: chiedo al GMBackend le posizioni dei player, calcolo la distanza da ciascuno di essi 
@@ -62,7 +62,7 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
           if(players.size != 0){
             for(player <- players){
               var currentplayerpos = player.pos
-              var distance = distanceBetween(ghostpos, currentplayerpos)
+              var distance = ghostpos.distanceFrom(currentplayerpos)
               if(distance < ghost_radius){
                 // Salvo solamente la posizone la cui distanza è minore
                 if(distance < playerdist){
@@ -91,10 +91,12 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
       }
     case GhostPause =>
       logger.log("In pause")
+      update_pos_scheduler.cancel()
     case GhostTrapped(point) =>
       logger.log("Oh no, I'm trapped [" + uid + "]")
       mood = GhostMood.TRAPPED
       ghostpos = point
+      update_pos_scheduler.cancel()
   }
   
   def random_move(position: Point) : Unit = {
@@ -148,19 +150,15 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
     
 //    if (area.contains(new_position)) {
       if ((icon_size < new_position.x && new_position.x < width-icon_size) && (icon_size < new_position.y && new_position.y < height-icon_size)) {
-        if (level !=3 && distanceBetween(new_position, position_treasure) >= treasure_radius) {
+        if (level !=3 && new_position.distanceFrom(position_treasure) >= treasure_radius) {
           if (rnd_pos<2) {
             rnd_pos = 2-rnd_pos
           } else {
             rnd_pos = Math.abs(2-rnd_pos)
           }
-          random_move(position)
         } else {
           ghostpos = new_position
-          //Logger.info("GHOST: SEND NEW POSITION")
           GMbackend ! GhostPositionUpdate(uid, ghostpos , mood)
-          //Logger.info("UUID: " + uuid + " - POS: " + ghostpos)
-          scheduler()
         }
       } else {
         if (rnd_pos<2) {
@@ -168,7 +166,6 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
         } else {
           rnd_pos = Math.abs(2-rnd_pos)
         }
-        random_move(position)
       } 
   }
   
@@ -220,33 +217,13 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
    
 //   if(area.contains(new_position, area_Edge)){
    if ((icon_size < new_position.x && new_position.x < width-icon_size) && (icon_size < new_position.y && new_position.y < height-icon_size)) {  
-     if(level !=3 && distanceBetween(new_position, position_treasure) >= treasure_radius){
-       GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
-       scheduler()
-     }else{
+     if(level ==3 || new_position.distanceFrom(position_treasure) < treasure_radius){
        ghostpos = new_position
        GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
-       scheduler()
      }
-   }else{
-     GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
-     scheduler()
    }
        
   }
- 
-
-  
-  // Calculate distance
-  def distanceBetween(pos1: Point, pos2: Point) : Double = {
-    var dist = Math.sqrt(Math.pow((pos1.x - pos2.x),2) + Math.pow((pos1.y - pos2.y),2))
-    dist
-  }
-  
-  //schedulo tramite il tick per richiamare il metodo
-  def scheduler() = {
-     system.scheduler.scheduleOnce(500 millis, self, UpdateGhostPosition)
      
-  }
   
 }
