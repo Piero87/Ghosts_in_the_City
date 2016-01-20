@@ -193,7 +193,7 @@ class GameManagerBackend () extends Actor {
         } else {
           game_status = previous_game_status
           ghosts.map {ghost =>
-            ghost._2 ! GhostStart
+            if (ghost._1.mood != GhostMood.TRAPPED) ghost._2 ! GhostStart
           }
           val tmp_g = ghosts.map(x => x._1)
           val tmp_t = treasures.map(x => x._1)
@@ -378,7 +378,7 @@ class GameManagerBackend () extends Actor {
   }
   
   def removeTrapScheduler(uid:String) = {
-     context.system.scheduler.scheduleOnce(100000 millis, self, RemoveTrap(uid))
+     context.system.scheduler.scheduleOnce(10000 millis, self, RemoveTrap(uid))
      
   }
 }
