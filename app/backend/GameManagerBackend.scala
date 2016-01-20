@@ -223,7 +223,7 @@ class GameManagerBackend () extends Actor {
           var ghost_index = (ghosts.zipWithIndex.collect{case (g , i) if(g._1.uid == traps(i).trapped_ghost_uid) => i}).head
           var g = new GhostInfo(ghosts(ghost_index)._1.uid,ghosts(ghost_index)._1.level,GhostMood.CALM,ghosts(ghost_index)._1.pos)
           ghosts(ghost_index) = ghosts(ghost_index).copy(_1 = g)
-          ghosts(ghost_index)._2 ! GhostStart
+          ghosts(ghost_index)._2 ! GhostReleased
           traps = traps.filterNot {_.uid == uid }
         }
       }

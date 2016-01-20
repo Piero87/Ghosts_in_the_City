@@ -97,6 +97,9 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
       mood = GhostMood.TRAPPED
       ghostpos = point
       update_pos_scheduler.cancel()
+    case GhostReleased =>
+      mood = GhostMood.CALM
+      update_pos_scheduler = system.scheduler.schedule(0 millis, 500 millis, self, UpdateGhostPosition)
   }
   
   def random_move(position: Point) : Unit = {
