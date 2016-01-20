@@ -147,13 +147,15 @@ class GameManagerBackend () extends Actor {
       var ghost_mood = mood
       var ghost_point = point
       for (i <- 0 to traps.size-1) {
-        logger.log("Result of isNearby function: "+ point.isNearby(traps(i).pos, trap_radius))
-        if (traps(i).status == TrapStatus.IDLE && point.isNearby(traps(i).pos, trap_radius)) {
+        var distance = point.distanceFrom(traps(i).pos)
+        logger.log("The distance between ghost [" + uid + "] and trap [" + traps(i).uid + "] is " + distance)
+        if (traps(i).status == TrapStatus.IDLE && distance <= trap_radius) {
           /* La trappola traps(i) ha catturato un fantasma!
            * Settiamo il fantasma come TRAPPED, lo spostiamo forzatamente
            * dentro la trappola e iniziamo a contare 10 secondi per poi 
            * toglierla e liberarlo. Dobbiamo anche dire a tutti i client 
            * che la trappola è piena */
+          logger.log("Ghost [" + uid + "] is trapped!")
           ghost_mood = GhostMood.TRAPPED
           ghost_point = traps(i).pos
           traps(i).status = TrapStatus.ACTIVE
@@ -389,7 +391,7 @@ class GameManagerBackend () extends Actor {
   }
   
   def removeTrapScheduler(uid:String) = {
-     context.system.scheduler.scheduleOnce(10000 millis, self, RemoveTrap(uid))
+     context.system.scheduler.scheduleOnce(100000 millis, self, RemoveTrap(uid))
      
   }
 }

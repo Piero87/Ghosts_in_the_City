@@ -7,12 +7,8 @@ sealed case class Point(x: Double, y: Double){
   var pos_x = x
   var pos_y = y
   
-  def isNearby(p: Point, range: Double): Boolean = {
-    var dist = Math.sqrt(Math.pow((p.x - pos_x),2) + Math.pow((p.y - pos_y),2))
-    if (dist <= range) {
-      true
-    }
-    false
+  def distanceFrom(p: Point): Double = {
+    Math.sqrt(Math.pow((p.x - pos_x),2) + Math.pow((p.y - pos_y),2))
   }
 }
 
