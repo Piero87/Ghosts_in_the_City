@@ -3,12 +3,12 @@ package common
 import scala.collection.mutable
 
 sealed case class Point(x: Double, y: Double){
-  def isNearby(p: Point, range: Double): Boolean = {
-    var dist = Math.sqrt(Math.pow((p.x - x),2) + Math.pow((p.y - y),2))
-    if (dist < range) {
-      true
-    }
-    false
+  
+  var pos_x = x
+  var pos_y = y
+  
+  def distanceFrom(p: Point): Double = {
+    Math.sqrt(Math.pow((p.x - pos_x),2) + Math.pow((p.y - pos_y),2))
   }
 }
 
