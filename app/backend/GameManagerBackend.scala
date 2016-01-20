@@ -137,8 +137,6 @@ class GameManagerBackend () extends Actor {
     case UpdateGhostsPositions =>
       //Logger.info("UpdateGhostsPositionsBroadcast")
       val tmp_g = ghosts.map(x => x._1)
-      logger.log("" + ghosts)
-      logger.log("" + tmp_g)
       gameManagerClient ! BroadcastGhostsPositions(tmp_g)
       context.system.scheduler.scheduleOnce(500 millis, self, UpdateGhostsPositions)
     
@@ -155,8 +153,8 @@ class GameManagerBackend () extends Actor {
            * toglierla e liberarlo. Dobbiamo anche dire a tutti i client 
            * che la trappola è piena */
           ghost_mood = GhostMood.TRAPPED
-          ghosts(ghost_index)._2 ! GhostTrapped(ghost_point)
           ghost_point = traps(i).pos
+          ghosts(ghost_index)._2 ! GhostTrapped(ghost_point)
           traps(i).status = TrapStatus.ACTIVE
           traps(i).trapped_ghost_uid = uid
           gameManagerClient ! BroadcastTrapActivated(traps(i).getTrapInfo)
@@ -216,20 +214,17 @@ class GameManagerBackend () extends Actor {
       var trap = new Trap(pos)
       traps = traps :+ trap
       gameManagerClient ! BroadcastNewTrap(trap.getTrapInfo)
+      
     case RemoveTrap(uid) =>
       /* Una trappola è scattata 10 secondi fa e ora è tempo che venga rimossa */
-      for (i <- 0 to traps.size-1) {
-        if (traps(i).uid == uid) {
-          gameManagerClient ! BroadcastRemoveTrap(traps(i).getTrapInfo)
-          /* Liberiramo il fantasma intrappolato */
-          logger.log("" + ghosts)
-          var ghost_index = (ghosts.zipWithIndex.collect{case (g , i) if(g._1.uid == traps(i).trapped_ghost_uid) => i}).head
-          var g = new GhostInfo(ghosts(ghost_index)._1.uid,ghosts(ghost_index)._1.level,GhostMood.CALM,ghosts(ghost_index)._1.pos)
-          ghosts(ghost_index) = ghosts(ghost_index).copy(_1 = g)
-          ghosts(ghost_index)._2 ! GhostReleased
-          traps = traps.filterNot {_.uid == uid }
-        }
-      }
+      var trap_index = (traps.zipWithIndex.collect{case (t, t_i) if(t.uid == uid) => t_i}).head
+      gameManagerClient ! BroadcastRemoveTrap(traps(trap_index).getTrapInfo)
+      /* Liberiramo il fantasma intrappolato */
+      var ghost_index = (ghosts.zipWithIndex.collect{case (g , i) if(g._1.uid == traps(trap_index).trapped_ghost_uid) => i}).head
+      var g = new GhostInfo(ghosts(ghost_index)._1.uid,ghosts(ghost_index)._1.level,GhostMood.CALM,ghosts(ghost_index)._1.pos)
+      ghosts(ghost_index) = ghosts(ghost_index).copy(_1 = g)
+      ghosts(ghost_index)._2 ! GhostReleased
+      traps = traps.filterNot {_.uid == uid }
   }
   
   def newGame () = {

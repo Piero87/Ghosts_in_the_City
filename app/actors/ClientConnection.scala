@@ -60,6 +60,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
               val json = Json.toJson(games_list_json)(CommonMessages.gamesListResponseWrites)
               upstream ! json
           }
+          
         case "join_game" =>
           val joinGameResult: JsResult[JoinGameJSON] = msg.validate[JoinGameJSON](CommonMessages.joinGameReads)
           joinGameResult match {
@@ -82,10 +83,12 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
               }
             case e: JsError => logger.log("JOIN GAME ERROR: " + e.toString() + " FROM " + sender.path)
           }
+          
          case "leave_game" =>
            game_id = ""
            var userInfo = new UserInfo(uid,username,team, Point(0,0))
            gameManagerClient ! LeaveGame(userInfo)
+           
          case "update_player_position" =>
            val updatePositionResult: JsResult[UpdatePositionJSON] = msg.validate[UpdatePositionJSON](CommonMessages.updatePositionReads)
            updatePositionResult match {
@@ -94,6 +97,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
               gameManagerClient ! UpdatePosition(userInfo)
             case e: JsError => logger.log("UPDATE PLAYER POSITION ERROR: " + e.toString() + " FROM " + sender.path)
            }
+           
          case "resume_game" =>
            val resumeGameResult: JsResult[ResumeGameJSON] = msg.validate[ResumeGameJSON](CommonMessages.resumeGameReads)
            resumeGameResult match {
@@ -116,9 +120,14 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
               }
             case e: JsError => logger.log("RESUME GAME ERROR: " + e.toString() + " FROM " + sender.path)
           }
+           
          case "set_trap" =>
            var user_info = new UserInfo(uid,username,team,Point(0,0))
            gameManagerClient ! SetTrap(user_info)
+         case "hit_player" =>
+           logger.log("Hit Player!")
+         case "open_treasure" =>
+           logger.log("Open Treasure")
            
       }
     case GameStatusBroadcast(game: Game) =>
