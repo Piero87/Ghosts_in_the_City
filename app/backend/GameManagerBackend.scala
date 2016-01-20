@@ -137,6 +137,8 @@ class GameManagerBackend () extends Actor {
     case UpdateGhostsPositions =>
       //Logger.info("UpdateGhostsPositionsBroadcast")
       val tmp_g = ghosts.map(x => x._1)
+      logger.log("" + ghosts)
+      logger.log("" + tmp_g)
       gameManagerClient ! BroadcastGhostsPositions(tmp_g)
       context.system.scheduler.scheduleOnce(500 millis, self, UpdateGhostsPositions)
     
@@ -220,6 +222,7 @@ class GameManagerBackend () extends Actor {
         if (traps(i).uid == uid) {
           gameManagerClient ! BroadcastRemoveTrap(traps(i).getTrapInfo)
           /* Liberiramo il fantasma intrappolato */
+          logger.log("" + ghosts)
           var ghost_index = (ghosts.zipWithIndex.collect{case (g , i) if(g._1.uid == traps(i).trapped_ghost_uid) => i}).head
           var g = new GhostInfo(ghosts(ghost_index)._1.uid,ghosts(ghost_index)._1.level,GhostMood.CALM,ghosts(ghost_index)._1.pos)
           ghosts(ghost_index) = ghosts(ghost_index).copy(_1 = g)
