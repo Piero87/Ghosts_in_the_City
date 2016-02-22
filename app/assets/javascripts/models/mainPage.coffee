@@ -11,7 +11,8 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			# User data
 			@username = ko.observable()
 			@useruid = ko.observable()
-			@user = {uid: "", name: "", team: "", x: 0, y: 0}
+			@usergold = ko.observable()
+			@userkeys = ko.observableArray()
 			
 			# Game data
 			@gameready = ko.observable(false)
@@ -47,9 +48,6 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 				@username(localStorage.username)
 				@useruid(localStorage.uid)
 				
-				@user.name = localStorage.username
-				@user.uid = localStorage.uid
-				
 				@connect()
 		
 		# Connect
@@ -57,14 +55,14 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			@connecting("Connecting...")
 			@disconnected(null)
 			
-			@ws = new WebSocket(jsRoutes.controllers.Application.login(@user.name, @user.uid).webSocketURL())
+			@ws = new WebSocket(jsRoutes.controllers.Application.login(@username(), @useruid()).webSocketURL())
 			
 			# When the websocket opens
 			@ws.onopen = (event) =>
 				@connecting(null)
 				@connected(true)
 				
-				@game_client_engine = new GameClientEngine(@user.uid, @ws)
+				@game_client_engine = new GameClientEngine(@useruid(), @ws)
 				if localStorage.gameid
 					@gameid(localStorage.gameid)
 					@resumeGame()
@@ -173,11 +171,9 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 							
 		# The user clicked connect
 		submitUsername: ->
-			@user.uid = @generateUID()
-			@useruid(@user.uid)
-			@user.name = @username()
-			localStorage.setItem("uid", @user.uid)
-			localStorage.setItem("username", @user.name)
+			@useruid(@generateUID())
+			localStorage.setItem("uid", @useruid())
+			localStorage.setItem("username", @username())
 			@connect()
 		
 		# New Game 
