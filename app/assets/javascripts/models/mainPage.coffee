@@ -64,7 +64,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 				@connecting(null)
 				@connected(true)
 				
-				@gameClientEngine = new GameClientEngine(@user.uid, @ws)
+				@game_client_engine = new GameClientEngine(@user.uid, @ws)
 				if localStorage.gameid
 					@gameid(localStorage.gameid)
 					@resumeGame()
