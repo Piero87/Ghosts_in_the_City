@@ -4,14 +4,18 @@
 # This class handles most of the user interactions with the buttons/menus/forms on the page, as well as manages
 # the WebSocket connection.	It delegates to other classes to manage everything else.
 #
-define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
+define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 	class MainPageModel
 		constructor: () ->
 		
 			# User data
 			@username = ko.observable()
 			@useruid = ko.observable()
-			@user = {uid: "", name: "", team: "", x: 0, y: 0}
+			@usergold = ko.observable()
+			@userkeys = ko.observable()
+			
+			@usergold(100)
+			@userkeys(0)
 			
 			# Game data
 			@gameready = ko.observable(false)
@@ -24,7 +28,7 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 			@gameplayersmissing = ko.observable()
 			@game_team_RED = ko.observableArray()
 			@game_team_BLUE = ko.observableArray()
-			@game_map = null
+			@game_client_engine = null
 			
 			# Interval to send a lot of request for available games
 			@interval = null
@@ -47,9 +51,6 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 				@username(localStorage.username)
 				@useruid(localStorage.uid)
 				
-				@user.name = localStorage.username
-				@user.uid = localStorage.uid
-				
 				@connect()
 		
 		# Connect
@@ -57,14 +58,14 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 			@connecting("Connecting...")
 			@disconnected(null)
 			
-			@ws = new WebSocket(jsRoutes.controllers.Application.login(@user.name, @user.uid).webSocketURL())
+			@ws = new WebSocket(jsRoutes.controllers.Application.login(@username(), @useruid()).webSocketURL())
 			
 			# When the websocket opens
 			@ws.onopen = (event) =>
 				@connecting(null)
 				@connected(true)
 				
-				@game_map = new GameMap(@user.uid, @ws)
+				@game_client_engine = new GameClientEngine(@useruid(), @ws)
 				if localStorage.gameid
 					@gameid(localStorage.gameid)
 					@resumeGame()
@@ -134,50 +135,48 @@ define ["knockout", "gps", "gameMap"], (ko, Gps, GameMap) ->
 							console.log('Fight!')
 							@refreshPlayerList(json)
 							@gamename(json.game.name)
-							@game_map.setBusters(json.game.players)
-							@game_map.setGhosts(json.game.ghosts)
-							@game_map.setTreasures(json.game.treasures)
-							@game_map.startGame()	
+							@game_client_engine.setBusters(json.game.players)
+							@game_client_engine.setGhosts(json.game.ghosts)
+							@game_client_engine.setTreasures(json.game.treasures)
+							@game_client_engine.startGame()	
 						when 2 # game paused
 							console.log('Hold on!')
-							@game_map.pauseGame()
+							@game_client_engine.pauseGame()
 						when 3 # game ended
-							@game_map = null
+							@game_client_engine = null
 							console.log 'Game Over!'
 							@gamename("")
 							localStorage.removeItem("gameid")			
 				else if json.event == "update_player_position"
 					if @gamestarted()
-						@game_map.busterMove(json.user.uid, json.user.pos.x, json.user.pos.y)
+						@game_client_engine.busterMove(json.user.uid, json.user.pos.x, json.user.pos.y)
 				else if json.event == "update_ghosts_positions"
 					if @gamestarted()
-						@game_map.ghostMove(ghost.uid, ghost.mood, ghost.pos.x, ghost.pos.y) for ghost in json.ghosts
+						@game_client_engine.ghostMove(ghost.uid, ghost.mood, ghost.pos.x, ghost.pos.y) for ghost in json.ghosts
 				else if json.event == "update_treasures"
 					if @gamestarted()
-						@game_map.updateTreasure(treasure.uid, treasure.status) for treasure in json.treasures
+						@game_client_engine.updateTreasure(treasure.uid, treasure.status) for treasure in json.treasures
 				else if json.event == "new_trap"
 					if @gamestarted()
-						@game_map.newTrap(json.trap.uid, json.trap.pos.x, json.trap.pos.y)
+						@game_client_engine.newTrap(json.trap.uid, json.trap.pos.x, json.trap.pos.y)
 						console.log "Nuova trappola!"
 						console.log json.trap
 				else if json.event == "active_trap"
 					if @gamestarted()
-						@game_map.activeTrap(json.trap.uid) if (json.trap.status == 1)
+						@game_client_engine.activeTrap(json.trap.uid) if (json.trap.status == 1)
 						console.log "Trappola attivata!"
 						console.log json.trap
 				else if json.event == "remove_trap"
 					if @gamestarted()
-						@game_map.removeTrap(json.trap.uid)
+						@game_client_engine.removeTrap(json.trap.uid)
 						console.log "Trappola rimossa!"
 						console.log json.trap
 							
 		# The user clicked connect
 		submitUsername: ->
-			@user.uid = @generateUID()
-			@useruid(@user.uid)
-			@user.name = @username()
-			localStorage.setItem("uid", @user.uid)
-			localStorage.setItem("username", @user.name)
+			@useruid(@generateUID())
+			localStorage.setItem("uid", @useruid())
+			localStorage.setItem("username", @username())
 			@connect()
 		
 		# New Game 

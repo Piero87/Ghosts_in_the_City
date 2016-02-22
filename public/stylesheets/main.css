@@ -52,6 +52,18 @@
 	color: white;
 }
 
+.gold-owned {
+	padding: 5px;
+	margin: 5px;
+	color: gold;
+}
+
+.keys-owned {
+	padding: 5px;
+	margin: 5px;
+	color: silver;
+}
+
 .btn.fedora-font {
 	padding-top: 15px !important;
 }
