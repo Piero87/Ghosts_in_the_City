@@ -52,13 +52,16 @@
 	color: white;
 }
 
-.gold {
-	border-radius: 5px;
+.gold-owned {
 	padding: 5px;
-	margin: 5px 5px 0px 5px;
-	display: inline-block;
-	background-color: gold;
-	color: white;
+	margin: 5px;
+	color: gold;
+}
+
+.keys-owned {
+	padding: 5px;
+	margin: 5px;
+	color: silver;
 }
 
 .btn.fedora-font {
