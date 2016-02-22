@@ -1,5 +1,5 @@
 define () ->
-	class GameMap
+	class GameClientEngine
 		constructor: (id_user, websocket) ->
 
 			@space_width = $("#conf_space_width").val()
@@ -431,4 +431,4 @@ define () ->
   			id += Math.random().toString(36).substr(2) while id.length < 8
   			id.substr 0, 8
 			
-	return GameMap
+	return GameClientEngine
