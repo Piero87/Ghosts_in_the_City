@@ -14,6 +14,8 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			@usergold = ko.observable()
 			@userkeys = ko.observableArray()
 			
+			@usergold(100)
+			
 			# Game data
 			@gameready = ko.observable(false)
 			@gamestarted = ko.observable(false)
