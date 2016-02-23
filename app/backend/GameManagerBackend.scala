@@ -237,7 +237,7 @@ class GameManagerBackend () extends Actor {
 
     var polygon = new Polygon(List(Point(0,0),Point(0,height),Point(width,0),Point(width,height)))
     
-    val n_treasure = game_n_players * 2
+    val n_treasure = (game_n_players * 2) + 1
     
     var spaces = UtilFunctions.createSpaces(n_treasure)
     var position_treasure = new Array[Point](n_treasure)
