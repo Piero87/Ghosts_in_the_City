@@ -21,7 +21,7 @@ class Player(uid: String, name: String, team: Int, area : Polygon) extends Actor
   
   def receive = {
     case SetTrap(gold, pos) =>
-      logger.log ("Richiesta trappola con soldi: "+gold.getAmount)
+      logger.log ("Richiesta trappola con soldi: "+gold.quantity)
       var origin = sender
       if (gold.getAmount >= 100) {
         //Puoi mettere la trappola

@@ -205,7 +205,8 @@ class GameManagerBackend () extends Actor {
       /* Il GMB ha ricevuto la richiesta del client di mettere una trappola,
        * per controllare che il client sia consistente con il suo attore, 
        * spediamo la richiesta all'attore player e se potrà farlo sarà lui a dire "NewTrap" */
-      players.filter(_._1.uid == user.uid).head._2 ! SetTrap(players.filter(_._1.uid == user.uid).head._1.gold,players.filter(_._1.uid == user.uid).head._1.pos)
+      var player = players.filter(_._1.uid == user.uid).head
+      player._2 ! SetTrap(player._1.gold,player._1.pos)
       
     case NewTrap(uid,gold,pos) =>
       /* L'attore Player ci ha detto di mettere una nuova trappola,
