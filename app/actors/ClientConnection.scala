@@ -155,6 +155,10 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
       var g_json = new BroadcastNewTrapJSON("remove_trap",trap)
       val json = Json.toJson(g_json)(CommonMessages.broadcastNewTrapJSONWrites)
       upstream ! json
+    case UpdateUserInfo(user) =>
+      var g_json = new UpdateUserInfoJSON("update_user_info",user)
+      val json = Json.toJson(g_json)(CommonMessages.updateUserInfoJSONWrites)
+      upstream ! json
   }
   
   override def postStop() = {

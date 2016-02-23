@@ -50,6 +50,7 @@ case class BroadcastUpdatePosition(user: UserInfo)
 case class Players(players: MutableList[UserInfo])
 case class UpdatePlayerPos(pos: Point)
 case class UserInfo(uid: String, name: String, team: Int, pos: Point, gold: Gold, keys: List[Key])
+case class UpdateUserInfo(user: UserInfo)
 
 // Treasure
 case class Open(keys: List[Key])
@@ -101,6 +102,7 @@ case class SetTrapJSON(event: String)
 case class BroadcastNewTrapJSON(event: String, trap: TrapInfo)
 case class BroadcastTrapActivatedJSON(event:String, trap: TrapInfo)
 case class BroadcastRemoveTrapJSON(event:String, trap: TrapInfo)
+case class UpdateUserInfoJSON(event: String, user: UserInfo)
 
 import play.api.libs.json._
 
@@ -171,5 +173,8 @@ object CommonMessages {
   
   implicit val broadcastRemoveTrapJSONReads = Json.reads[BroadcastRemoveTrapJSON]
   implicit val broadcastRemoveTrapJSONWrites = Json.writes[BroadcastRemoveTrapJSON]
+  
+  implicit val updateUserInfoJSONReads = Json.reads[UpdateUserInfoJSON]
+  implicit val updateUserInfoJSONWrites = Json.writes[UpdateUserInfoJSON]
   
 }
