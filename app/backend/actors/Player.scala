@@ -17,19 +17,13 @@ object Player {
 
 class Player(uid: String, name: String, team: Int, area : Polygon) extends Actor{
   
-  var gold = 0
-  var position = Point(0,0)
-  
   def receive = {
-    case SetTrap =>
+    case SetTrap(gold, pos) =>
       var origin = sender
-      if (gold >= 100) {
+      if (gold.getAmount >= 100) {
         //Puoi mettere la trappola
-        gold = gold - 100
-        origin ! NewTrap(position)
+        gold.setAmount(gold.getAmount - 100)
+        origin ! NewTrap(uid,gold, pos)
       }
-    
-    case UpdatePlayerPos(pos) =>
-      position = pos
   }
 }

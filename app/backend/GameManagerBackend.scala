@@ -47,7 +47,7 @@ class GameManagerBackend () extends Actor {
       logger.log("GMBackend NewGame From: "+ref.toString())
       gameManagerClient = ref
       var rnd_team = selectTeam()
-      val p = new UserInfo(user.uid,user.name,rnd_team,user.pos)
+      val p = new UserInfo(user.uid,user.name,rnd_team,user.pos,new Gold (0),List())
       players = players :+ Tuple2(p,null)
       val tmp_g = ghosts.map(x => x._1)
       val tmp_t = treasures.map(x => x._1)
@@ -66,7 +66,7 @@ class GameManagerBackend () extends Actor {
         //Scegliamo un Team Random Blu o Rosso
         var rnd_team = selectTeam()
         
-        val p = new UserInfo(user.uid,user.name,rnd_team,user.pos)
+        val p = new UserInfo(user.uid,user.name,rnd_team,user.pos,new Gold(0),List())
         players = players :+ Tuple2(p,null)
         val tmp_g = ghosts.map(x => x._1)
         val tmp_t = treasures.map(x => x._1)
@@ -129,9 +129,8 @@ class GameManagerBackend () extends Actor {
       }
     case UpdatePosition(user) =>
       var player_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == user.uid) => i}).head
-      val p = new UserInfo(user.uid,user.name,user.team,user.pos)
+      val p = new UserInfo(user.uid,user.name,user.team,user.pos,user.gold,user.keys)
       players(player_index) = players(player_index).copy(_1 = p)
-      players(player_index)._2 ! UpdatePlayerPos(user.pos)
       sender ! BroadcastUpdatePosition(user)
       
     case UpdateGhostsPositions =>
@@ -202,15 +201,19 @@ class GameManagerBackend () extends Actor {
         }
         
       }
-    case SetTrap(user) => 
+    case SetTrapRequest(user) => 
       /* Il GMB ha ricevuto la richiesta del client di mettere una trappola,
        * per controllare che il client sia consistente con il suo attore, 
        * spediamo la richiesta all'attore player e se potrà farlo sarà lui a dire "NewTrap" */
-      players.filter(_._1.uid == user.uid).head._2 ! SetTrap
+      players.filter(_._1.uid == user.uid).head._2 ! SetTrap(players.filter(_._1.uid == user.uid).head._1.gold,players.filter(_._1.uid == user.uid).head._1.pos)
       
-    case NewTrap(pos) =>
+    case NewTrap(uid,gold,pos) =>
       /* L'attore Player ci ha detto di mettere una nuova trappola,
        * lui sa le cose, quindi la piazziamo senza fare domande */
+      var player_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == uid) => i}).head
+      val p = players(player_index)._1
+      p.gold setAmount(gold.getAmount)
+      players(player_index) = players(player_index).copy(_1 = p)
       var trap = new Trap(pos)
       traps = traps :+ trap
       gameManagerClient ! BroadcastNewTrap(trap.getTrapInfo)
@@ -249,7 +252,7 @@ class GameManagerBackend () extends Actor {
     
     for(i <- 0 to game_n_players-1) {
       val user = players(i)._1
-      val p = new UserInfo(user.uid,user.name,user.team,Point(position_players(i).x,position_players(i).y))
+      val p = new UserInfo(user.uid,user.name,user.team,Point(position_players(i).x,position_players(i).y),user.gold,user.keys)
       val player_actor = context.actorOf(Props(new Player(user.uid,user.name,user.team,polygon)), name = user.uid)
       players(i) = Tuple2(p,player_actor)
       player_actor ! UpdatePlayerPos(Point(position_players(i).x,position_players(i).y))

@@ -134,8 +134,8 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       clientsConnections.map {cc =>
         cc._2 forward BroadcastGhostsPositions(ghosts)
       }
-    case SetTrap(user) =>
-      gameManagerBackend ! SetTrap(user)
+    case SetTrapRequest(user) =>
+      gameManagerBackend ! SetTrapRequest(user)
     case BroadcastNewTrap(trap) =>
       clientsConnections.map {cc =>
         cc._2 forward BroadcastNewTrap(trap)

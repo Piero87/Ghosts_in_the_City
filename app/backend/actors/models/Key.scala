@@ -3,7 +3,7 @@ package backend.actors.models
 /**
  * Class to create a Key
  */
-class Key(uid: String) {
+sealed case class Key(uid: String) {
   
   var key_uid = uid
 

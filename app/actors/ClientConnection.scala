@@ -6,6 +6,7 @@ import akka.util.Timeout
 import akka.pattern.ask
 import scala.util.{Failure, Success}
 import play.api.libs.json._
+import backend.actors.models._
 
 import common._
 
@@ -34,7 +35,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
           val newGameResult: JsResult[NewGameJSON] = msg.validate[NewGameJSON](CommonMessages.newGameReads)
           newGameResult match {
             case s: JsSuccess[NewGameJSON] => 
-              var user_info = new UserInfo(uid,username,team,Point(0,0))
+              var user_info = new UserInfo(uid,username,team,Point(0,0),new Gold(0),List())
               val future = frontendManager ? NewGame(s.get.name.replaceAll(" ", "_") + "_" + System.currentTimeMillis(),s.get.n_players,user_info,self)
               future.onSuccess {
                 case GameHandler(game,ref) => 
@@ -65,7 +66,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
           val joinGameResult: JsResult[JoinGameJSON] = msg.validate[JoinGameJSON](CommonMessages.joinGameReads)
           joinGameResult match {
             case s: JsSuccess[JoinGameJSON] =>
-              var user_info = new UserInfo(uid,username,team,Point(0,0))
+              var user_info = new UserInfo(uid,username,team,Point(0,0),new Gold(0),List())
               val future = frontendManager ? JoinGame(s.get.game,user_info,self)
               future.onSuccess {
                 case GameHandler(game,ref) =>  
@@ -86,14 +87,14 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
           
          case "leave_game" =>
            game_id = ""
-           var userInfo = new UserInfo(uid,username,team, Point(0,0))
+           var userInfo = new UserInfo(uid,username,team, Point(0,0),new Gold(0),List())
            gameManagerClient ! LeaveGame(userInfo)
            
          case "update_player_position" =>
            val updatePositionResult: JsResult[UpdatePositionJSON] = msg.validate[UpdatePositionJSON](CommonMessages.updatePositionReads)
            updatePositionResult match {
             case s: JsSuccess[UpdatePositionJSON] =>
-              var userInfo = new UserInfo(uid,username,team, s.get.pos)
+              var userInfo = new UserInfo(uid,username,team, s.get.pos,new Gold(0),List())
               gameManagerClient ! UpdatePosition(userInfo)
             case e: JsError => logger.log("UPDATE PLAYER POSITION ERROR: " + e.toString() + " FROM " + sender.path)
            }
@@ -102,7 +103,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
            val resumeGameResult: JsResult[ResumeGameJSON] = msg.validate[ResumeGameJSON](CommonMessages.resumeGameReads)
            resumeGameResult match {
             case s: JsSuccess[ResumeGameJSON] =>
-              var user_info = new UserInfo(uid,username,team,Point(0,0))
+              var user_info = new UserInfo(uid,username,team,Point(0,0),new Gold(0), List())
               val future = frontendManager ? ResumeGame(s.get.game_id,user_info, self)
               future.onSuccess {
                 case GameHandler(game,ref) =>  
@@ -122,8 +123,8 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
           }
            
          case "set_trap" =>
-           var user_info = new UserInfo(uid,username,team,Point(0,0))
-           gameManagerClient ! SetTrap(user_info)
+           var user_info = new UserInfo(uid,username,team,Point(0,0),new Gold(0), List())
+           gameManagerClient ! SetTrapRequest(user_info)
          case "hit_player" =>
            logger.log("Hit Player!")
          case "open_treasure" =>
@@ -158,7 +159,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
   
   override def postStop() = {
     if (game_id != "") {
-      var userInfo = new UserInfo(uid,username,team, Point(0,0))
+      var userInfo = new UserInfo(uid,username,team, Point(0,0),new Gold(0),List())
       gameManagerClient ! PauseGame(userInfo)
     }
   }

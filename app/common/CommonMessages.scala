@@ -49,7 +49,7 @@ case class UpdatePosition(user: UserInfo)
 case class BroadcastUpdatePosition(user: UserInfo)
 case class Players(players: MutableList[UserInfo])
 case class UpdatePlayerPos(pos: Point)
-case class UserInfo(uid: String, name: String, team: Int, pos: Point)
+case class UserInfo(uid: String, name: String, team: Int, pos: Point, gold: Gold, keys: List[Key])
 
 // Treasure
 case class Open(keys: List[Key])
@@ -59,10 +59,10 @@ case class TreasureError(msg : String)
 case class TreasureInfo(uid: String, status: Int, pos: Point)
 
 // Trap
-case class SetTrap(user: UserInfo)
-case object SetTrap
+case class SetTrapRequest(user: UserInfo)
+case class SetTrap(gold: Gold, pos: Point)
 case class TrapInfo(uid: String, pos: Point, status: Int)
-case class NewTrap(pos: Point)
+case class NewTrap(uid: String, gold: Gold, pos: Point)
 case class BroadcastNewTrap(trap: TrapInfo)
 case class BroadcastTrapActivated(trap: TrapInfo)
 case class RemoveTrap(uid: String)
@@ -108,7 +108,13 @@ object CommonMessages {
 
   implicit val pointReads = Json.reads[Point]
   implicit val pointWrites = Json.writes[Point]
-    
+  
+  implicit val goldReads = Json.reads[Gold]
+  implicit val goldWrites = Json.writes[Gold]
+  
+  implicit val keyReads = Json.reads[Key]
+  implicit val keyWrites = Json.writes[Key]
+  
   implicit val playerInfoReads = Json.reads[UserInfo]
   implicit val playerInfoWrites = Json.writes[UserInfo]
   
