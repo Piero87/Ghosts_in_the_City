@@ -148,6 +148,10 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       clientsConnections.map {cc =>
         cc._2 forward BroadcastRemoveTrap(trap)
       }
+    case UpdateUserInfo(user) =>
+      clientsConnections.map {cc =>
+        if (cc._1.uid == user.uid) cc._2 forward UpdateUserInfo(user)
+      }
         
   }
 }

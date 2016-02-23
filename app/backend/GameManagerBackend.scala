@@ -217,6 +217,7 @@ class GameManagerBackend () extends Actor {
       var trap = new Trap(pos)
       traps = traps :+ trap
       gameManagerClient ! BroadcastNewTrap(trap.getTrapInfo)
+      gameManagerClient ! UpdateUserInfo(p)
       
     case RemoveTrap(uid) =>
       /* Una trappola è scattata 10 secondi fa e ora è tempo che venga rimossa */
