@@ -216,7 +216,9 @@ class GameManagerBackend () extends Actor {
       players(player_index) = players(player_index).copy(_1 = p)
       var trap = new Trap(pos)
       traps = traps :+ trap
+      logger.log ("Invio broadcast new trap....")
       gameManagerClient ! BroadcastNewTrap(trap.getTrapInfo)
+      logger.log ("Invio update user info with new gold: "+p.gold.getAmount)
       gameManagerClient ! UpdateUserInfo(p)
       
     case RemoveTrap(uid) =>

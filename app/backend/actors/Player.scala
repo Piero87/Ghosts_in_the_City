@@ -26,6 +26,7 @@ class Player(uid: String, name: String, team: Int, area : Polygon) extends Actor
       if (gold.getAmount >= 100) {
         //Puoi mettere la trappola
         gold.setAmount(gold.getAmount - 100)
+        logger.log ("Richiesta trappola accettata nuovo valore soldi: "+gold.getAmount)
         origin ! NewTrap(uid,gold, pos)
       }
   }
