@@ -264,6 +264,28 @@ define () ->
 						8
 					)
 				
+			for ghost, i in @ghosts
+				# To center the images in their position point
+				ghost_x = @ghosts[i].x - (@icon_size / 2)
+				ghost_y = @ghosts[i].y - (@icon_size / 2)
+				area_x =  @ghosts[i].x - (@ghost_radius * @ghosts[i].level)
+				area_y =  @ghosts[i].y - (@ghost_radius * @ghosts[i].level)
+				# Drawings
+				@ctx.drawImage(
+					@sensible_area
+					area_x
+					area_y
+					(@ghost_radius * 2 * @ghosts[i].level)
+					(@ghost_radius * 2 * @ghosts[i].level)
+				)
+				@ctx.drawImage(
+					@ghosts_images[i]
+					ghost_x
+					ghost_y
+					@icon_size
+					@icon_size
+				)
+				
 			for trap, i in @traps
 				# To center the images in their position point
 				trap_x = @traps[i].x - (@icon_size / 2)
@@ -287,28 +309,6 @@ define () ->
 					trap_img
 					trap_x
 					trap_y
-					@icon_size
-					@icon_size
-				)
-
-			for ghost, i in @ghosts
-				# To center the images in their position point
-				ghost_x = @ghosts[i].x - (@icon_size / 2)
-				ghost_y = @ghosts[i].y - (@icon_size / 2)
-				area_x =  @ghosts[i].x - (@ghost_radius * @ghosts[i].level)
-				area_y =  @ghosts[i].y - (@ghost_radius * @ghosts[i].level)
-				# Drawings
-				@ctx.drawImage(
-					@sensible_area
-					area_x
-					area_y
-					(@ghost_radius * 2 * @ghosts[i].level)
-					(@ghost_radius * 2 * @ghosts[i].level)
-				)
-				@ctx.drawImage(
-					@ghosts_images[i]
-					ghost_x
-					ghost_y
 					@icon_size
 					@icon_size
 				)
