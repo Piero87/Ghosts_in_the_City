@@ -141,7 +141,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 							@game_client_engine.setGhosts(json.game.ghosts)
 							@game_client_engine.setTreasures(json.game.treasures)
 							@game_client_engine.startGame()
-							@usergold(player.gold.quantity) for player in json.game.players when player.uid == @useruid()
+							@usergold(player.gold) for player in json.game.players when player.uid == @useruid()
 						when 2 # game paused
 							console.log('Hold on!')
 							@game_client_engine.pauseGame()
@@ -157,9 +157,8 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 						
 				else if json.event == "update_user_info"
 					if @gamestarted()
-						@usergold(usergold()-100)
+						@usergold(usergold()-json.user.gold)
 						@userkeys(0)
-						console.log(json)
 						
 				else if json.event == "update_ghosts_positions"
 					if @gamestarted()
