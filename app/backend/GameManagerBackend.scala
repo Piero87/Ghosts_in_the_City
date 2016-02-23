@@ -47,7 +47,7 @@ class GameManagerBackend () extends Actor {
       logger.log("GMBackend NewGame From: "+ref.toString())
       gameManagerClient = ref
       var rnd_team = selectTeam()
-      val p = new UserInfo(user.uid,user.name,rnd_team,user.pos,new Gold (0),List())
+      val p = new UserInfo(user.uid,user.name,rnd_team,user.pos,new Gold (500),List())
       players = players :+ Tuple2(p,null)
       val tmp_g = ghosts.map(x => x._1)
       val tmp_t = treasures.map(x => x._1)
@@ -66,7 +66,7 @@ class GameManagerBackend () extends Actor {
         //Scegliamo un Team Random Blu o Rosso
         var rnd_team = selectTeam()
         
-        val p = new UserInfo(user.uid,user.name,rnd_team,user.pos,new Gold(0),List())
+        val p = new UserInfo(user.uid,user.name,rnd_team,user.pos,new Gold (500),List())
         players = players :+ Tuple2(p,null)
         val tmp_g = ghosts.map(x => x._1)
         val tmp_t = treasures.map(x => x._1)
