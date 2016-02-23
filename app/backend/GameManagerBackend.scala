@@ -238,6 +238,8 @@ class GameManagerBackend () extends Actor {
     var polygon = new Polygon(List(Point(0,0),Point(0,height),Point(width,0),Point(width,height)))
     
     val n_treasure = 8
+    val n_ghost = n_treasure
+    val n_free_ghost = game_n_players + 1
     
     var spaces = UtilFunctions.createSpaces(n_treasure)
     var position_treasure = new Array[Point](n_treasure)
@@ -255,17 +257,17 @@ class GameManagerBackend () extends Actor {
       player_actor ! UpdatePlayerPos(Point(position_players(i).x,position_players(i).y))
     }
     
-    for(i <- 0 to game_n_players){
+    for(i <- 0 to n_treasure-1){
       position_treasure(i) = UtilFunctions.randomPositionInSpace(spaces(i))
       logger.log("Treasure[" + i + "] position: ("+ position_treasure(i).x +","+ position_treasure(i).y +")")
     }
     
-    for(j <- 0 to game_n_players){ //l'ultimo space è dei giocatori e non ha fantasmi
+    for(j <- 0 to n_ghost-1){ //l'ultimo space è dei giocatori e non ha fantasmi
       position_ghosts(j) = UtilFunctions.randomPositionAroundPoint(position_treasure(j))
       logger.log("Ghost[" + j + "] position: ("+ position_ghosts(j).x +","+ position_ghosts(j).y +")")
     }
     
-    for(j <- 0 to game_n_players){ //l'ultimo space è dei giocatori e non ha fantasmi
+    for(j <- 0 to n_free_ghost-1){ //l'ultimo space è dei giocatori e non ha fantasmi
       free_position_ghosts(j) = UtilFunctions.randomPositionInSpace(spaces(j))
       logger.log("Free Ghost[" + j + "] position: ("+ free_position_ghosts(j).x +","+ free_position_ghosts(j).y +")")
     }
