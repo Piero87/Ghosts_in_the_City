@@ -14,7 +14,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			@usergold = ko.observable()
 			@userkeys = ko.observable()
 			
-			@usergold(0)
+			@usergold(500)
 			@userkeys(0)
 			
 			# Game data
@@ -153,6 +153,12 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 				else if json.event == "update_player_position"
 					if @gamestarted()
 						@game_client_engine.busterMove(json.user.uid, json.user.pos.x, json.user.pos.y)
+						
+				else if json.event == "update_user_info"
+					if @gamestarted()
+						@usergold(usergold()-100)
+						@userkeys(0)
+						console.log(json)
 						
 				else if json.event == "update_ghosts_positions"
 					if @gamestarted()
