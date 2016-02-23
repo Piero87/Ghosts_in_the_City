@@ -233,9 +233,10 @@ class GameManagerBackend () extends Actor {
       traps = traps.filterNot {_.uid == uid }
   }
   
+  //Metodo per stampare il contenuto delle liste
   def printList(args: TraversableOnce[_]): Unit = {
-  args.foreach(println)
-}
+    args.foreach(println)
+  }
   
   def newGame () = {
       //...inizializza attori partita
