@@ -206,6 +206,7 @@ class GameManagerBackend () extends Actor {
        * per controllare che il client sia consistente con il suo attore, 
        * spediamo la richiesta all'attore player e se potrà farlo sarà lui a dire "NewTrap" */
       var player = players.filter(_._1.uid == user.uid).head
+      logger.log("Gold: "+player._1.gold)
       player._2 ! SetTrap(player._1.gold,player._1.pos)
       
     case NewTrap(uid,gold,pos) =>
