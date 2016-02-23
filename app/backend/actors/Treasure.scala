@@ -12,10 +12,10 @@ object Treasure {
   /**
    * Actor Props 
    */
-  def props(uid: String, position: Point, loot: Tuple2[Key,Gold], needKey: Tuple2[Boolean, Key]) = Props(new Treasure(uid,position,loot,needKey))
+  def props(uid: String, position: Point, loot: Tuple2[Key,Int], needKey: Tuple2[Boolean, Key]) = Props(new Treasure(uid,position,loot,needKey))
 }
 
-class Treasure(uid: String, position: Point, loot: Tuple2[Key,Gold], needKey: Tuple2[Boolean, Key]) extends Actor{
+class Treasure(uid: String, position: Point, loot: Tuple2[Key,Int], needKey: Tuple2[Boolean, Key]) extends Actor{
   
   val logger = new CustomLogger("Treasure")
   var treasure_loot = loot
@@ -36,7 +36,7 @@ class Treasure(uid: String, position: Point, loot: Tuple2[Key,Gold], needKey: Tu
             {
               logger.log("Opened")
               origin ! LootRetrieved(treasure_loot)
-              treasure_loot = Tuple2(null,null)
+              treasure_loot = Tuple2(null,0)
               treasure_need_key = treasure_need_key.copy(_1 = false)
               check = true
               break
@@ -60,7 +60,7 @@ class Treasure(uid: String, position: Point, loot: Tuple2[Key,Gold], needKey: Tu
       }
     case IncreaseGold(gold) =>
       logger.log("Increase gold")
-      treasure_loot = treasure_loot.copy(_2 = new Gold(treasure_loot._2.getAmount+gold.getAmount))
+      treasure_loot = treasure_loot.copy(_2 = treasure_loot._2+gold)
     
   }
   

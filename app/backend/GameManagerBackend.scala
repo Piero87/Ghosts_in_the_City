@@ -47,7 +47,7 @@ class GameManagerBackend () extends Actor {
       logger.log("GMBackend NewGame From: "+ref.toString())
       gameManagerClient = ref
       var rnd_team = selectTeam()
-      val p = new UserInfo(user.uid,user.name,rnd_team,user.pos,new Gold (500),List())
+      val p = new UserInfo(user.uid,user.name,rnd_team,user.pos,500,List())
       players = players :+ Tuple2(p,null)
       val tmp_g = ghosts.map(x => x._1)
       val tmp_t = treasures.map(x => x._1)
@@ -66,7 +66,7 @@ class GameManagerBackend () extends Actor {
         //Scegliamo un Team Random Blu o Rosso
         var rnd_team = selectTeam()
         
-        val p = new UserInfo(user.uid,user.name,rnd_team,user.pos,new Gold (500),List())
+        val p = new UserInfo(user.uid,user.name,rnd_team,user.pos,500,List())
         players = players :+ Tuple2(p,null)
         val tmp_g = ghosts.map(x => x._1)
         val tmp_t = treasures.map(x => x._1)
@@ -212,15 +212,13 @@ class GameManagerBackend () extends Actor {
       /* L'attore Player ci ha detto di mettere una nuova trappola,
        * lui sa le cose, quindi la piazziamo senza fare domande */
       var player_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == uid) => i}).head
-      val p = players(player_index)._1
-      p.gold setAmount(gold.getAmount)
-      players(player_index) = players(player_index).copy(_1 = p)
+      var u_tmp = players(player_index)._1
+      var user_info = new UserInfo(u_tmp.uid,u_tmp.name,u_tmp.team,u_tmp.pos,gold,u_tmp.keys)
+      players(player_index) = players(player_index).copy(_1 = user_info)
       var trap = new Trap(pos)
       traps = traps :+ trap
-      logger.log ("Invio broadcast new trap....")
       gameManagerClient ! BroadcastNewTrap(trap.getTrapInfo)
-      logger.log ("Invio update user info with new gold: "+p.gold.getAmount)
-      gameManagerClient ! UpdateUserInfo(p)
+      gameManagerClient ! UpdateUserInfo(user_info)
       
     case RemoveTrap(uid) =>
       /* Una trappola è scattata 10 secondi fa e ora è tempo che venga rimossa */
@@ -288,7 +286,7 @@ class GameManagerBackend () extends Actor {
       var treasure_id = randomString(8)
       
       val rnd = new Random()
-      var gold = new Gold(rnd.nextInt(150)+100)
+      var gold = rnd.nextInt(150)+100
       var pos_t = new Point (position_treasure(i).x,position_treasure(i).y)
       var treasure_info = new TreasureInfo(treasure_id,0,pos_t)
       
