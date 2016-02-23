@@ -129,8 +129,9 @@ class GameManagerBackend () extends Actor {
       }
     case UpdatePosition(user) =>
       var player_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == user.uid) => i}).head
-      val p = new UserInfo(user.uid,user.name,user.team,user.pos,user.gold,user.keys)
-      players(player_index) = players(player_index).copy(_1 = p)
+      var u_tmp = players(player_index)._1
+      var user_info = new UserInfo(u_tmp.uid,u_tmp.name,u_tmp.team,user.pos,u_tmp.gold,u_tmp.keys)
+      players(player_index) = players(player_index).copy(_1 = user_info)
       sender ! BroadcastUpdatePosition(user)
       
     case UpdateGhostsPositions =>
@@ -206,7 +207,6 @@ class GameManagerBackend () extends Actor {
        * per controllare che il client sia consistente con il suo attore, 
        * spediamo la richiesta all'attore player e se potrà farlo sarà lui a dire "NewTrap" */
       var player = players.filter(_._1.uid == user.uid).head
-      logger.log("Gold: "+player._1.gold)
       player._2 ! SetTrap(player._1.gold,player._1.pos)
       
     case NewTrap(uid,gold,pos) =>
@@ -231,6 +231,11 @@ class GameManagerBackend () extends Actor {
       ghosts(ghost_index) = ghosts(ghost_index).copy(_1 = g)
       ghosts(ghost_index)._2 ! GhostReleased
       traps = traps.filterNot {_.uid == uid }
+  }
+  
+  //Metodo per stampare il contenuto delle liste
+  def printList(args: TraversableOnce[_]): Unit = {
+    args.foreach(println)
   }
   
   def newGame () = {
