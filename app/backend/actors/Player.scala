@@ -17,8 +17,11 @@ object Player {
 
 class Player(uid: String, name: String, team: Int, area : Polygon) extends Actor{
   
+  val logger = new CustomLogger("PlayerActor")
+  
   def receive = {
     case SetTrap(gold, pos) =>
+      logger.log ("Richiesta trappola con soldi: "+gold.getAmount)
       var origin = sender
       if (gold.getAmount >= 100) {
         //Puoi mettere la trappola
