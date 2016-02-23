@@ -157,6 +157,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 						
 				else if json.event == "update_user_info"
 					if @gamestarted()
+						console.log(json)
 						@usergold(usergold()-json.user.gold)
 						@userkeys(0)
 						
@@ -172,19 +173,19 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					if @gamestarted()
 						@game_client_engine.newTrap(json.trap.uid, json.trap.pos.x, json.trap.pos.y)
 						console.log "Nuova trappola!"
-						console.log json.trap
+						# console.log json.trap
 				
 				else if json.event == "active_trap"
 					if @gamestarted()
 						@game_client_engine.activeTrap(json.trap.uid) if (json.trap.status == 1)
 						console.log "Trappola attivata!"
-						console.log json.trap
+						# console.log json.trap
 				
 				else if json.event == "remove_trap"
 					if @gamestarted()
 						@game_client_engine.removeTrap(json.trap.uid)
 						console.log "Trappola rimossa!"
-						console.log json.trap
+						# console.log json.trap
 							
 		# The user clicked connect
 		submitUsername: ->
