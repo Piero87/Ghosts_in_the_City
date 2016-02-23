@@ -14,7 +14,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			@usergold = ko.observable()
 			@userkeys = ko.observable()
 			
-			@usergold(100)
+			@usergold(0)
 			@userkeys(0)
 			
 			# Game data
@@ -97,6 +97,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					console.log('User Position Received!')
 					# Update all the markers on the map
 					#@map.updateMarkers(json.positions.features)
+					
 				else if json.event == "games_list"
 					#console.log('Games list received!')
 					@gameslist.removeAll()
@@ -106,6 +107,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 							@gameslist.push(game)
 					else
 						@gamesavailable(false)
+						
 				else if json.event == "game_ready"
 					console.log('Ready!')
 					if (@interval)
@@ -146,26 +148,32 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 							@game_client_engine = null
 							console.log 'Game Over!'
 							@gamename("")
-							localStorage.removeItem("gameid")			
+							localStorage.removeItem("gameid")
+										
 				else if json.event == "update_player_position"
 					if @gamestarted()
 						@game_client_engine.busterMove(json.user.uid, json.user.pos.x, json.user.pos.y)
+						
 				else if json.event == "update_ghosts_positions"
 					if @gamestarted()
 						@game_client_engine.ghostMove(ghost.uid, ghost.mood, ghost.pos.x, ghost.pos.y) for ghost in json.ghosts
+				
 				else if json.event == "update_treasures"
 					if @gamestarted()
 						@game_client_engine.updateTreasure(treasure.uid, treasure.status) for treasure in json.treasures
+				
 				else if json.event == "new_trap"
 					if @gamestarted()
 						@game_client_engine.newTrap(json.trap.uid, json.trap.pos.x, json.trap.pos.y)
 						console.log "Nuova trappola!"
 						console.log json.trap
+				
 				else if json.event == "active_trap"
 					if @gamestarted()
 						@game_client_engine.activeTrap(json.trap.uid) if (json.trap.status == 1)
 						console.log "Trappola attivata!"
 						console.log json.trap
+				
 				else if json.event == "remove_trap"
 					if @gamestarted()
 						@game_client_engine.removeTrap(json.trap.uid)
