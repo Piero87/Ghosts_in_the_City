@@ -14,7 +14,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			@usergold = ko.observable()
 			@userkeys = ko.observable()
 			
-			@usergold(500)
+			@usergold(0)
 			@userkeys(0)
 			
 			# Game data
@@ -140,7 +140,8 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 							@game_client_engine.setBusters(json.game.players)
 							@game_client_engine.setGhosts(json.game.ghosts)
 							@game_client_engine.setTreasures(json.game.treasures)
-							@game_client_engine.startGame()	
+							@game_client_engine.startGame()
+							@usergold(player.gold.quantity) for player in json.game.players when player.uid == @useruid()
 						when 2 # game paused
 							console.log('Hold on!')
 							@game_client_engine.pauseGame()
