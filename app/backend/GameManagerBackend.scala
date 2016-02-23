@@ -129,8 +129,9 @@ class GameManagerBackend () extends Actor {
       }
     case UpdatePosition(user) =>
       var player_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == user.uid) => i}).head
-      val p = new UserInfo(user.uid,user.name,user.team,user.pos,user.gold,user.keys)
-      players(player_index) = players(player_index).copy(_1 = p)
+      var u_tmp = players(player_index)._1
+      var user_info = new UserInfo(u_tmp.uid,u_tmp.name,u_tmp.team,user.pos,u_tmp.gold,u_tmp.keys)
+      players(player_index) = players(player_index).copy(_1 = user_info)
       sender ! BroadcastUpdatePosition(user)
       
     case UpdateGhostsPositions =>
@@ -205,9 +206,7 @@ class GameManagerBackend () extends Actor {
       /* Il GMB ha ricevuto la richiesta del client di mettere una trappola,
        * per controllare che il client sia consistente con il suo attore, 
        * spediamo la richiesta all'attore player e se potrà farlo sarà lui a dire "NewTrap" */
-      printList(players)
       var player = players.filter(_._1.uid == user.uid).head
-      logger.log("Gold: "+player._1.gold)
       player._2 ! SetTrap(player._1.gold,player._1.pos)
       
     case NewTrap(uid,gold,pos) =>
@@ -261,7 +260,6 @@ class GameManagerBackend () extends Actor {
     
     for(i <- 0 to game_n_players-1) {
       val user = players(i)._1
-      logger.log("Gold in for new game: "+user.gold)
       val p = new UserInfo(user.uid,user.name,user.team,Point(position_players(i).x,position_players(i).y),user.gold,user.keys)
       val player_actor = context.actorOf(Props(new Player(user.uid,user.name,user.team,polygon)), name = user.uid)
       players(i) = Tuple2(p,player_actor)
