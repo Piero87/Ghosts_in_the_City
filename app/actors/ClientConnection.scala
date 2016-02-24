@@ -128,7 +128,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
          case "hit_player" =>
            logger.log("Hit Player!")
          case "open_treasure" =>
-           logger.log("Open Treasure")
+           gameManagerClient ! OpenTreasure(uid)
            
       }
     case GameStatusBroadcast(game: Game) =>

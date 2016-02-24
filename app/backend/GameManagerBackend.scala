@@ -164,9 +164,8 @@ class GameManagerBackend () extends Actor {
       var g = new GhostInfo(ghosts(ghost_index)._1.uid,ghosts(ghost_index)._1.level,ghost_mood,ghost_point)
       ghosts(ghost_index) = ghosts(ghost_index).copy(_1 = g)
       
-    case PlayersPositions =>
-      val tmp_p = players.map(x => x._1)
-      sender ! Players(tmp_p)
+    case PlayersInfo =>
+      sender ! Players(players)
     case CheckPaused =>
       if (game_status == StatusGame.PAUSED) {
         var now = System.currentTimeMillis()
@@ -233,6 +232,12 @@ class GameManagerBackend () extends Actor {
       traps = traps.filterNot {_.uid == uid }
     case MessageCode(uid,code) =>
       gameManagerClient ! MessageCode(uid,code)
+    case OpenTreasure(uid) =>
+      var player_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == uid) => i}).head
+      var u_tmp = players(player_index)._1
+      treasures.map {t =>
+        //t._2 forward UpdateUserInfo(user)
+      }
   }
   
   //Metodo per stampare il contenuto delle liste
