@@ -74,10 +74,11 @@ case class Players(players: MutableList[Tuple2[UserInfo, ActorRef]])
 case class UpdatePlayerPos(pos: Point)
 case class UserInfo(uid: String, name: String, team: Int, pos: Point, gold: Int, keys: List[Key])
 case class UpdateUserInfo(user: UserInfo)
-case class OpenTreasure(uid: String)
+case class OpenTreasureRequest(uid: String)
+case class OpenTreasure(treasures: MutableList[Tuple2[TreasureInfo, ActorRef]], user: UserInfo)
 
 // Treasure
-case class Open(uid_p: String, pos_p: Point, keys: List[Key])
+case class Open(pos_p: Point, keys: List[Key])
 case class IncreaseGold(gold: Int)
 case class LootRetrieved(loot: Tuple2[Key,Int])
 case class TreasureError(msg : String)

@@ -232,12 +232,9 @@ class GameManagerBackend () extends Actor {
       traps = traps.filterNot {_.uid == uid }
     case MessageCode(uid,code) =>
       gameManagerClient ! MessageCode(uid,code)
-    case OpenTreasure(uid) =>
-      var player_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == uid) => i}).head
-      var u_tmp = players(player_index)._1
-      treasures.map {t =>
-        //t._2 forward UpdateUserInfo(user)
-      }
+    case OpenTreasureRequest(uid) =>
+      var player = players.filter(_._1.uid == uid).head
+      player._2 ! OpenTreasure(treasures,player._1)
   }
   
   //Metodo per stampare il contenuto delle liste

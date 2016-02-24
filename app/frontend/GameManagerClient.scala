@@ -156,8 +156,8 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       clientsConnections.map {cc =>
         if (cc._1.uid == uid) cc._2 forward MessageCode(uid,code)
       }
-    case OpenTreasure(uid) =>
-      gameManagerBackend ! OpenTreasure(uid)
+    case OpenTreasureRequest(uid) =>
+      gameManagerBackend ! OpenTreasureRequest(uid)
         
   }
 }

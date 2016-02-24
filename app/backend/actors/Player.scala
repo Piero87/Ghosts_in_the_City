@@ -29,5 +29,9 @@ class Player(uid: String, name: String, team: Int, area : Polygon) extends Actor
       } else {
         origin ! MessageCode(uid, MsgCodes.NO_TRAP)
       }
+    case OpenTreasure(treasures,user) =>
+      treasures.map {t =>
+        t._2 forward Open(user.pos,user.keys)
+      }
   }
 }
