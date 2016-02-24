@@ -32,6 +32,13 @@ object TrapStatus extends Enumeration {
    val ACTIVE = 1
 }
 
+object MsgCodes extends Enumeration {
+  type MsgCodes = Int
+   val NO_TRAP = -1
+}
+
+// Code messages
+case class Message(uid: String, code: Int)
 
 // Ghost messages
 case class GhostPositionUpdate(uid: String, pos: Point, mood: Int)
@@ -87,6 +94,7 @@ case object KillYourself
 case object KillMyself
 case object CheckPaused
 
+
 // Json
 case class NewGameJSON(event: String, name: String, n_players: Int)
 case class GameJSON(event: String, game: Game)
@@ -103,6 +111,7 @@ case class BroadcastNewTrapJSON(event: String, trap: TrapInfo)
 case class BroadcastTrapActivatedJSON(event:String, trap: TrapInfo)
 case class BroadcastRemoveTrapJSON(event:String, trap: TrapInfo)
 case class UpdateUserInfoJSON(event: String, user: UserInfo)
+case class MessageJSON(event: String, code: Int)
 
 import play.api.libs.json._
 
@@ -173,5 +182,8 @@ object CommonMessages {
   
   implicit val updateUserInfoJSONReads = Json.reads[UpdateUserInfoJSON]
   implicit val updateUserInfoJSONWrites = Json.writes[UpdateUserInfoJSON]
+  
+  implicit val messageJSONReads = Json.reads[MessageJSON]
+  implicit val messageJSONWrites = Json.writes[MessageJSON]
   
 }
