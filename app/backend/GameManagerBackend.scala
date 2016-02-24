@@ -232,12 +232,9 @@ class GameManagerBackend () extends Actor {
       traps = traps.filterNot {_.uid == uid }
     case MessageCode(uid,code) =>
       gameManagerClient ! MessageCode(uid,code)
-    case OpenTreasure(uid) =>
-      var player_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == uid) => i}).head
-      var u_tmp = players(player_index)._1
-      treasures.map {t =>
-        //t._2 forward UpdateUserInfo(user)
-      }
+    case OpenTreasureRequest(uid) =>
+      var player = players.filter(_._1.uid == uid).head
+      player._2 ! OpenTreasure(treasures,player._1)
   }
   
   //Metodo per stampare il contenuto delle liste
@@ -339,7 +336,7 @@ class GameManagerBackend () extends Actor {
       var ghost_id = randomString(8)
       var p_g = new Point (position_ghosts(i).x,position_ghosts(i).y)
       val g_level = rnd.nextInt(2)+1
-      val ghost = context.actorOf(Props(new Ghost(ghost_id,polygon,p_g,g_level,treasure,pos_t)), name = ghost_id)
+      val ghost = context.actorOf(Props(new Ghost(ghost_id,polygon,p_g,g_level,treasure,pos_t,treasure_id)), name = ghost_id)
       var ghost_info = new GhostInfo(ghost_id,g_level,GhostMood.CALM,p_g)
       ghosts = ghosts :+ Tuple2(ghost_info,ghost)
       
@@ -354,7 +351,7 @@ class GameManagerBackend () extends Actor {
       var free_ghost_id = randomString(8)
       var free_p_g = new Point (free_position_ghosts(i).x,free_position_ghosts(i).y)
       val n_treasure = rnd.nextInt(treasures.size)
-      val free_ghost = context.actorOf(Props(new Ghost(free_ghost_id,polygon,free_p_g,3,treasures(n_treasure)._2,treasures(n_treasure)._1.pos)), name = free_ghost_id)
+      val free_ghost = context.actorOf(Props(new Ghost(free_ghost_id,polygon,free_p_g,3,treasures(n_treasure)._2,treasures(n_treasure)._1.pos,treasures(n_treasure)._1.uid)), name = free_ghost_id)
       var free_ghost_info = new GhostInfo(free_ghost_id,3,GhostMood.CALM,free_p_g)
       ghosts = ghosts :+ Tuple2(free_ghost_info,free_ghost)
     }
