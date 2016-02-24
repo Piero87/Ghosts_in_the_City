@@ -186,7 +186,10 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 						@game_client_engine.removeTrap(json.trap.uid)
 						console.log "Trappola rimossa!"
 						# console.log json.trap
-							
+				
+				else if json.event == "message"
+					@showMessage(json.code)
+					
 		# The user clicked connect
 		submitUsername: ->
 			@useruid(@generateUID())
@@ -306,5 +309,11 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
   						@game_team_RED.push(player)
   					else if (player.team == 1)
   						@game_team_BLUE.push(player)
+  		
+  		showMessage: (msg_code) ->
+  			switch status
+				when -1 
+					# no enough money to set a trap!
+  			
 	return MainPageModel
 
