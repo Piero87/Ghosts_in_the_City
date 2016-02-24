@@ -210,7 +210,9 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
         val future = pl._2 ? IAttackYou(level)
           future.onSuccess { 
             case GoldStolen(gold) =>
-              GMbackend ! IncreaseGoldRequest(t_uid, gold)
+              if(gold > 0){
+                GMbackend ! IncreaseGoldRequest(t_uid, gold)
+              }
           }
           future onFailure {
             case e: Exception => logger.log("******GHOST ATTACK PLAYER ERROR ******")
@@ -267,30 +269,26 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
 					ghost_move = 0
 			}
 		}
-     if (Math.abs(distance_x) < 10 && Math.abs(distance_y) < 10) {
-        // Giocatore raggiunto! Gli rubo i soldi
-      }
-    
-     ghost_move match {
-      // In alto
-      case 0 => {
-          new_position = new Point(ghostpos.x, ghostpos.y - ghostmovement)
-      }
-      // A destra
-      case 1 => {
-          new_position = new Point(ghostpos.x + ghostmovement, ghostpos.y)
-      }
-      // In basso
-      case 2 => {
-          new_position = new Point(ghostpos.x, ghostpos.y + ghostmovement)
-      }
-      // A sinistra
-      case 3 => {
-          new_position = new Point(ghostpos.x - ghostmovement, ghostpos.y)
-      }
-      case -1 => {
-          
-      }
+    ghost_move match {
+     // In alto
+     case 0 => {
+         new_position = new Point(ghostpos.x, ghostpos.y - ghostmovement)
+     }
+     // A destra
+     case 1 => {
+         new_position = new Point(ghostpos.x + ghostmovement, ghostpos.y)
+     }
+     // In basso
+     case 2 => {
+         new_position = new Point(ghostpos.x, ghostpos.y + ghostmovement)
+     }
+     // A sinistra
+     case 3 => {
+         new_position = new Point(ghostpos.x - ghostmovement, ghostpos.y)
+     }
+     case -1 => {
+         
+     }
    }
    
      ghostpos = new_position
