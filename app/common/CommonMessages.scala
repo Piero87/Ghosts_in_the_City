@@ -34,7 +34,23 @@ object TrapStatus extends Enumeration {
 
 object MsgCodes extends Enumeration {
   type MsgCodes = Int
-   val NO_TRAP = -1
+  //Error 
+  val NO_TRAP = -1
+  val OUT_OF_AREA = -2
+  val T_NEEDS_KEY = -3
+  val NOT_ENOUGH_PLAYERS = -4
+  val T_EMPTY = -5
+  val NO_T_NEAR_YOU = -6
+  
+  // Normal
+  val PARANORMAL_ATTACK = 1
+  val HUMAN_ATTACK = 2
+  val KEY_FOUND = 3
+  val GOLD_FOUND = 4
+  val K_G_FOUND = 5
+  val VICTORY = 6
+  val LOST = 7
+   
 }
 
 // Code messages
