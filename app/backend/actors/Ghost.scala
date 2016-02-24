@@ -55,15 +55,17 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
         val future = GMbackend ? PlayersInfo
         future.onSuccess { 
           case Players(players) => 
-            //Logger.info ("Player positions received")
+            logger.log("Player positions received")
+            printList(players)
             var playerpos = new Point(0,0)
             var playerdist : Double = ghost_radius //Max range iniziale
             var found_someone = false
             
             val tmp_p = players.map(x => x._1)
+            printList(tmp_p)
             var p_uid = ""
             
-            if(players.size != 0){
+            if(tmp_p.size != 0){
               
               for(player <- tmp_p){
                 var currentplayerpos = player.pos
@@ -294,6 +296,10 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
      ghostpos = new_position
      GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
        
+  }
+  
+  def printList(args: TraversableOnce[_]): Unit = {
+    args.foreach(println)
   }
   
   
