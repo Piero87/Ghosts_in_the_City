@@ -257,7 +257,6 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			
 			callback = @gamesList.bind(this)
 			@interval = setInterval(callback, 1000)
-			
 		
 		changeGameStatus: (s) ->
 			status = s
@@ -311,9 +310,50 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
   						@game_team_BLUE.push(player)
   		
   		showMessage: (msg_code) ->
-  			switch status
-				when -1 
-					# no enough money to set a trap!
+  			c = msg_code
+  			switch c
+				when -1
+					# no enough money to set a trap
+					message = "You cannot set a trap, asshole!"
+				when -2
+					# out of area
+					message = "Come inside, quick, you'll catch a cold out there!"
+				when -3
+					# the treasure needs the key to be opened
+					message = "This treasure is locked and you don't have the right key."
+				when -4
+					# not enough player
+					message = "Some moron is got out from the game and has not come back in time..."
+				when -5
+					# treasure empty
+					message = "Oh oh, there's nothing here."
+				when -6
+					# no treasure nearby
+					message = "There are no treasure near you, moron."
+				when 1
+					# attacked from ghost
+					message = "Aaaaaaaah!"
+				when 2
+					# attacked from human
+					message = "Ouch!"
+				when 3
+					# key found
+					message = "You have found a key! Yay!"
+				when 4
+					# gold found
+					message = "You have found some gold! You are filthy rich now!"
+				when 5
+					# key and gold found
+					message = "Jackpot! You have found a key and some gold!"
+				when 6
+					# victory
+					message = "Your team won this game! Congratulations!"
+				when 7
+					# lost
+					message = "Your team has been defeated! Looooooosers!"
+			
+			console.log(message)
+					
   			
 	return MainPageModel
 
