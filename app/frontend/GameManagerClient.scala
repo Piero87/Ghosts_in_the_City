@@ -152,6 +152,10 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       clientsConnections.map {cc =>
         if (cc._1.uid == user.uid) cc._2 forward UpdateUserInfo(user)
       }
+    case MessageCode(uid,code) =>
+      clientsConnections.map {cc =>
+        if (cc._1.uid == uid) cc._2 forward MessageCode(uid,code)
+      }
         
   }
 }

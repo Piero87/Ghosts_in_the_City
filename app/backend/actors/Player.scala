@@ -26,6 +26,8 @@ class Player(uid: String, name: String, team: Int, area : Polygon) extends Actor
         //Puoi mettere la trappola
         var new_gold = gold - 100
         origin ! NewTrap(uid,new_gold, pos)
+      } else {
+        origin ! MessageCode(uid, MsgCodes.NO_TRAP)
       }
   }
 }

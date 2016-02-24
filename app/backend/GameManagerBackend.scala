@@ -231,6 +231,8 @@ class GameManagerBackend () extends Actor {
       ghosts(ghost_index) = ghosts(ghost_index).copy(_1 = g)
       ghosts(ghost_index)._2 ! GhostReleased
       traps = traps.filterNot {_.uid == uid }
+    case MessageCode(uid,code) =>
+      gameManagerClient ! MessageCode(uid,code)
   }
   
   //Metodo per stampare il contenuto delle liste
