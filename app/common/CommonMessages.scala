@@ -65,6 +65,7 @@ case object GhostPause
 case object GhostReleased
 case class BroadcastGhostsPositions(ghosts: MutableList[GhostInfo])
 case class GhostTrapped(pos: Point)
+case class IAttackYou(level: Int)
 
 // Player 
 case object PlayersInfo
@@ -76,6 +77,7 @@ case class UserInfo(uid: String, name: String, team: Int, pos: Point, gold: Int,
 case class UpdateUserInfo(user: UserInfo)
 case class OpenTreasureRequest(uid: String)
 case class OpenTreasure(treasures: MutableList[Tuple2[TreasureInfo, ActorRef]], user: UserInfo)
+case class GoldStolen(gold: Int)
 
 // Treasure
 case class Open(pos_p: Point, keys: List[Key])

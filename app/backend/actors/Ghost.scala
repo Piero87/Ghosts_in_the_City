@@ -9,6 +9,7 @@ import akka.util.Timeout
 import akka.pattern.ask
 import common._
 import scala.util.Random
+import scala.collection.mutable.MutableList
 import com.typesafe.config.ConfigFactory
 
 object Ghost{
@@ -51,24 +52,28 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
        mood = GhostMood.CALM
         // Ciclo di vita del fantasma: chiedo al GMBackend le posizioni dei player, calcolo la distanza da ciascuno di essi 
         // se rientra nel range di azione attacco altrimenti mi muovo random
-        val future = GMbackend ? PlayersPositions
+        val future = GMbackend ? PlayersInfo
         future.onSuccess { 
           case Players(players) => 
             //Logger.info ("Player positions received")
             var playerpos = new Point(0,0)
             var playerdist : Double = ghost_radius //Max range iniziale
-            
             var found_someone = false
             
+            val tmp_p = players.map(x => x._1)
+            var p_uid = ""
+            
             if(players.size != 0){
-              for(player <- players){
+              
+              for(player <- tmp_p){
                 var currentplayerpos = player.pos
                 var distance = ghostpos.distanceFrom(currentplayerpos)
                 if(distance < ghost_radius){
                   // Salvo solamente la posizone la cui distanza è minore
                   if(distance < playerdist){
                     playerdist = distance
-                    playerpos = currentplayerpos 
+                    playerpos = currentplayerpos
+                    p_uid = player.uid
                   }
                   // Sono incazzato!
                   mood = GhostMood.ANGRY
@@ -81,12 +86,12 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
               if(mood == GhostMood.CALM){
                 random_move(ghostpos)
               }else{
-                attackPlayer(playerpos)
+                attackPlayer(p_uid, playerpos, players)
               }
             }else{
               random_move(ghostpos)
             }
-          }
+        }
         future onFailure {
           case e: Exception => logger.log("******GHOST REQUEST PLAYER POSITION ERROR ******")
         }
@@ -180,7 +185,7 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
       } 
   }
   
-  def attackPlayer(player_pos: Point) = {
+  def attackPlayer(uid: String, player_pos: Point, players: MutableList[Tuple2[UserInfo, ActorRef]]) = {
     var ghost_move : Int = -1
     var new_position : Point = ghostpos
     var distance_x = player_pos.x - ghostpos.x
@@ -201,6 +206,14 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
 			}
       if (Math.abs(distance_x) < 10 && Math.abs(distance_y) < 10) {
         // Giocatore raggiunto! Gli rubo i soldi
+        var pl = players.filter(_._1.uid == uid).head
+        val future = pl._2 ? IAttackYou(level)
+          future.onSuccess { 
+            case GoldStolen(gold) =>
+          }
+          future onFailure {
+            case e: Exception => logger.log("******GHOST ATTACK PLAYER ERROR ******")
+        }
       }
 		}
     
