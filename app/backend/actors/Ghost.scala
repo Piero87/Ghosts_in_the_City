@@ -19,10 +19,10 @@ object Ghost{
    */
   case object UpdateGhostPosition
   
-  def props(uid: String, area: Polygon, position: Point, level: Int, treasure: ActorRef,position_treasure: Point) = Props(new Ghost(uid, area,position, level, treasure,position_treasure))
+  def props(uid: String, area: Polygon, position: Point, level: Int, treasure: ActorRef,position_treasure: Point, t_uid: String) = Props(new Ghost(uid, area,position, level, treasure,position_treasure, t_uid))
 }
 
-class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: ActorRef, position_treasure: Point) extends Actor {
+class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: ActorRef, position_treasure: Point, t_uid: String) extends Actor {
   
   import context._
   import Ghost._
@@ -210,6 +210,7 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
         val future = pl._2 ? IAttackYou(level)
           future.onSuccess { 
             case GoldStolen(gold) =>
+              GMbackend ! IncreaseGoldRequest(t_uid, gold)
           }
           future onFailure {
             case e: Exception => logger.log("******GHOST ATTACK PLAYER ERROR ******")

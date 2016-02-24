@@ -66,6 +66,7 @@ case object GhostReleased
 case class BroadcastGhostsPositions(ghosts: MutableList[GhostInfo])
 case class GhostTrapped(pos: Point)
 case class IAttackYou(level: Int)
+case class IncreaseGoldRequest(t_uid: String, gold: Int)
 
 // Player 
 case object PlayersInfo
