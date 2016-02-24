@@ -373,7 +373,7 @@ define () ->
 				trap_index = i
 			@traps.splice(trap_index, 1) 
 			
-		openTreasure: (uid, status) ->
+		changeTreasureStatus: (uid, status) ->
 			for treasure, i in @treasures when treasure.uid == uid
 				@treasures[i].status = status
 		
