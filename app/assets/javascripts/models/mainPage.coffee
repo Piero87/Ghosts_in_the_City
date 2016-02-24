@@ -21,7 +21,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			@gameready = ko.observable(false)
 			@gamestarted = ko.observable(false)
 			@gamepaused = ko.observable(false)
-			@gameended  = ko.observable(false)
+			@gameended= ko.observable(false)
 			@gameid = ko.observable()
 			@gamename = ko.observable()
 			@gamemaxplayers = ko.observable(2)
@@ -288,28 +288,28 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					@gameended(true)
 		
 		generateUID: ->
-  			id = ""
-  			id += Math.random().toString(36).substr(2) while id.length < 8
-  			id.substr 0, 8
-  		
-  		refreshPlayerList: (json) ->
-  			# Compute missing players
-  			@gamemaxplayers(json.game.n_players)
-  			playersmissing = json.game.n_players - json.game.players.length
-  			@gameplayersmissing(playersmissing)
-  			@game_team_RED.removeAll()
-  			@game_team_BLUE.removeAll()
-  			if json.game.players.length > 0
-  				i = 0
-  				for player in json.game.players
-  					i = i + 1
-  					player.index = i
-  					if (player.team == 0)
-  						@game_team_RED.push(player)
-  					else if (player.team == 1)
-  						@game_team_BLUE.push(player)
-  		
-  		showMessage: (msg_code) ->
+			id = ""
+			id += Math.random().toString(36).substr(2) while id.length < 8
+			id.substr 0, 8
+		
+		refreshPlayerList: (json) ->
+			# Compute missing players
+			@gamemaxplayers(json.game.n_players)
+			playersmissing = json.game.n_players - json.game.players.length
+			@gameplayersmissing(playersmissing)
+			@game_team_RED.removeAll()
+			@game_team_BLUE.removeAll()
+			if json.game.players.length > 0
+				i = 0
+				for player in json.game.players
+					i = i + 1
+					player.index = i
+					if (player.team == 0)
+						@game_team_RED.push(player)
+					else if (player.team == 1)
+						@game_team_BLUE.push(player)
+		
+		showMessage: (msg_code) ->
 			c = msg_code
 			switch c
 				when -1
@@ -354,6 +354,6 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			
 			console.log(message)
 					
-  			
+			
 	return MainPageModel
 
