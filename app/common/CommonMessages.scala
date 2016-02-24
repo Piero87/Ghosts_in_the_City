@@ -38,7 +38,7 @@ object MsgCodes extends Enumeration {
 }
 
 // Code messages
-case class Message(uid: String, code: Int)
+case class MessageCode(uid: String, code: Int)
 
 // Ghost messages
 case class GhostPositionUpdate(uid: String, pos: Point, mood: Int)
@@ -111,7 +111,7 @@ case class BroadcastNewTrapJSON(event: String, trap: TrapInfo)
 case class BroadcastTrapActivatedJSON(event:String, trap: TrapInfo)
 case class BroadcastRemoveTrapJSON(event:String, trap: TrapInfo)
 case class UpdateUserInfoJSON(event: String, user: UserInfo)
-case class MessageJSON(event: String, code: Int)
+case class MessageCodeJSON(event: String, code: Int)
 
 import play.api.libs.json._
 
@@ -183,7 +183,7 @@ object CommonMessages {
   implicit val updateUserInfoJSONReads = Json.reads[UpdateUserInfoJSON]
   implicit val updateUserInfoJSONWrites = Json.writes[UpdateUserInfoJSON]
   
-  implicit val messageJSONReads = Json.reads[MessageJSON]
-  implicit val messageJSONWrites = Json.writes[MessageJSON]
+  implicit val messageCodeJSONReads = Json.reads[MessageCodeJSON]
+  implicit val messageCodeJSONWrites = Json.writes[MessageCodeJSON]
   
 }
