@@ -310,8 +310,8 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
   						@game_team_BLUE.push(player)
   		
   		showMessage: (msg_code) ->
-  			c = msg_code
-  			switch c
+			c = msg_code
+			switch c
 				when -1
 					# no enough money to set a trap
 					message = "You cannot set a trap, asshole!"
