@@ -39,16 +39,16 @@ class Player(uid: String, name: String, team: Int, area : Polygon, GMbackend: Ac
       
       var origin = sender
       implicit val ec = context.dispatcher
-      val taskFutures: List[Future[Tuple3[Int,Key,Int]]] = treasures map { t =>
+      val taskFutures: List[Future[Tuple4[Int,Key,Int,String]]] = treasures map { t =>
           implicit val timeout = Timeout(5 seconds)
-          (t ? Open(user.pos,user.keys)).mapTo[Tuple3[Int,Key,Int]]
+          (t ? Open(user.pos,user.keys)).mapTo[Tuple4[Int,Key,Int,String]]
       }
       
       //The call to Future.sequence is necessary to transform the List of Future[(String, Int)] into a Future of List[(String, Int)].
       val searchFuture = Future sequence taskFutures
       
       searchFuture.onSuccess {
-        case results: List[Tuple3[Int,Key,Int]] =>
+        case results: List[Tuple4[Int,Key,Int,String]] =>
           //Fare qualcosa
           logger.log("risultato apertura tesori")
           origin ! TreasureResponse(user.uid, results)
