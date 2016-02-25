@@ -59,7 +59,6 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
             var playerpos = new Point(0,0)
             var playerdist : Double = ghost_radius //Max range iniziale
             var found_someone = false
-            logger.log("tmp_p")
             val tmp_p = players.map(x => x._1)
             var p_uid = ""
             
