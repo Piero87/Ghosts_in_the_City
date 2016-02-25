@@ -21,57 +21,55 @@ class Treasure(uid: String, position: Point, loot: Tuple2[Key,Int], needKey: Tup
   val logger = new CustomLogger("Treasure")
   var treasure_loot = loot
   var treasure_need_key = needKey
-  var icon_size = ConfigFactory.load().getDouble("icon_size")
+  var status = 0
   
   def receive = {  
  
     case Open(pos_p,keys) =>
       
-      var distance_check = pos_p.distanceFrom(position)
       var origin = sender
-      
-      if (distance_check <= icon_size/2)
-      {
-        logger.log("Try to open")
-        if (needKey._1 && (keys.size != 0)) {
-          //Controlliamo se tra le chiavi passate c'è quella giusta
-          var check = false
-          breakable {
-            for (key <- keys)
+      logger.log("Try to open")
+      if (treasure_need_key._1 && (keys.size != 0)) {
+        //Controlliamo se tra le chiavi passate c'è quella giusta
+        var check = false
+        breakable {
+          for (key <- keys)
+          {
+            if (key.getKeyUID == needKey._2.getKeyUID)
             {
-              if (key.getKeyUID == needKey._2.getKeyUID)
-              {
-                logger.log("Opened")
-                origin ! LootRetrieved(treasure_loot)
-                treasure_loot = Tuple2(null,0)
-                treasure_need_key = treasure_need_key.copy(_1 = false)
-                check = true
-                break
-              }
+              logger.log("Opened")
+              origin ! Tuple3(MsgCodes.T_SUCCESS_OPENED,treasure_loot._1,treasure_loot._2)
+              var k = treasure_loot._1
+              k.setExistKey(false)
+              treasure_loot = Tuple2(k,0)
+              treasure_need_key = treasure_need_key.copy(_1 = false)
+              check = true
+              status = 1
+              break
             }
           }
-          
-          if (!check)  {
-            logger.log("Not Open: Wrong key")
-            origin ! TreasureError("Non hai la chiave giusta per questo tesoro")
-          }
-          
-        } else if (needKey._1 && (keys.size == 0))  {
-          //Serve una chiave ma non è stata passata nessuna chiave
-          logger.log("Not Open: Need Key")
-          origin ! TreasureError("Ti serve una chiave per aprire il tesoro")
-        } else if (!needKey._1) {
-          //Non serve nessuna chiave tesoro aperto
-          logger.log("Opened: without key")
-          origin ! LootRetrieved(treasure_loot)
         }
-      } else {
-        //Non sono nelle vicinanze del giocatore
+        
+        if (!check)  {
+          logger.log("Not Open: Wrong key")
+          origin ! Tuple3(MsgCodes.T_WRONG_KEY,treasure_loot._1,treasure_loot._2)
+        }
+        
+      } else if (treasure_need_key._1 && (keys.size == 0))  {
+        //Serve una chiave ma non è stata passata nessuna chiave
+        logger.log("Not Open: Need Key")
+        origin ! Tuple3(MsgCodes.T_NEEDS_KEY,treasure_loot._1,treasure_loot._2)
+      } else if (!treasure_need_key._1) {
+        //Non serve nessuna chiave tesoro aperto
+        logger.log("Opened: without key")
+        status = 1
+        origin ! Tuple3(MsgCodes.T_SUCCESS_OPENED,treasure_loot._1,treasure_loot._2)
       }
       
     case IncreaseGold(gold) =>
       logger.log("Increase gold")
       treasure_loot = treasure_loot.copy(_2 = treasure_loot._2+gold)
+      status = 0
     
   }
   

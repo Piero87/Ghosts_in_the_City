@@ -32,6 +32,7 @@ class GameManagerBackend () extends Actor {
   var previous_game_status = -1
   
   var paused_players:MutableList[Tuple2[String, Long]] = MutableList()
+  var icon_size = ConfigFactory.load().getDouble("icon_size")
   
   val logger = new CustomLogger("GameManagerBackend")
   
@@ -234,7 +235,12 @@ class GameManagerBackend () extends Actor {
       gameManagerClient ! MessageCode(uid,code)
     case OpenTreasureRequest(uid) =>
       var player = players.filter(_._1.uid == uid).head
-      player._2 ! OpenTreasure(treasures,player._1)
+      var t_actorref_list = (treasures.filter(_._1.pos.distanceFrom(player._1.pos) <= icon_size/2)).map(x => x._2).toList
+      if (t_actorref_list.size != 0 ) {
+        player._2 ! OpenTreasure(t_actorref_list,player._1)
+      } else {
+        gameManagerClient ! MessageCode(uid, MsgCodes.NO_T_NEAR_YOU)
+      }
   }
   
   //Metodo per stampare il contenuto delle liste
