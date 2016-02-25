@@ -37,6 +37,7 @@ class Player(uid: String, name: String, team: Int, area : Polygon) extends Actor
       }
     case OpenTreasure(treasures,user) =>
       
+      var origin = sender
       implicit val ec = context.dispatcher
       val taskFutures: List[Future[Tuple3[Int,Key,Int]]] = treasures map { t =>
           implicit val timeout = Timeout(5 seconds)
@@ -50,6 +51,7 @@ class Player(uid: String, name: String, team: Int, area : Polygon) extends Actor
         case results: List[Tuple3[Int,Key,Int]] =>
           //Fare qualcosa
           logger.log("risultato apertura tesori")
+          origin ! TreasureResponse(results)
       }
   }
 }

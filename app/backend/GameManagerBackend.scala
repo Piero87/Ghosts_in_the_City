@@ -241,6 +241,8 @@ class GameManagerBackend () extends Actor {
       } else {
         gameManagerClient ! MessageCode(uid, MsgCodes.NO_T_NEAR_YOU)
       }
+    case TreasureResponse(results) =>
+      logger.log("fai qualcosa")
   }
   
   //Metodo per stampare il contenuto delle liste
