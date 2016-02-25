@@ -51,7 +51,31 @@ class Player(uid: String, name: String, team: Int, area : Polygon) extends Actor
         case results: List[Tuple3[Int,Key,Int]] =>
           //Fare qualcosa
           logger.log("risultato apertura tesori")
-          origin ! TreasureResponse(results)
+          origin ! TreasureResponse(user.uid, results)
       }
+   /* case IAttackYou(level) =>
+      var origin = sender
+      var gold_stolen = 0
+      
+      level match {
+        case 3 => {
+           gold_stolen = gold
+       }
+       // A destra
+       case 1 => {
+           new_position = new Point(ghostpos.x + ghostmovement, ghostpos.y)
+       }
+       // In basso
+       case 2 => {
+           new_position = new Point(ghostpos.x, ghostpos.y + ghostmovement)
+       }
+       // A sinistra
+       case 3 => {
+           new_position = new Point(ghostpos.x - ghostmovement, ghostpos.y)
+       }
+       case -1 => {
+          
+       } 
+      }*/
   }
 }
