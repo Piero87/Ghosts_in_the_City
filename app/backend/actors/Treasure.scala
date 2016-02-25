@@ -40,7 +40,8 @@ class Treasure(uid: String, position: Point, loot: Tuple2[Key,Int], needKey: Tup
             if (key.getKeyUID == needKey._2.getKeyUID)
             {
               logger.log("Opened")
-              origin ! Tuple4(MsgCodes.T_SUCCESS_OPENED,treasure_loot._1,treasure_loot._2,uid)
+              //Tupla5[codice_msg, key, gold, uid_tesoro, uid chiave usata da rimuovere se non usata stringa vuota]
+              origin ! Tuple5(MsgCodes.T_SUCCESS_OPENED,treasure_loot._1,treasure_loot._2,uid,key.getKeyUID)
               var k = treasure_loot._1
               k.setExistKey(false)
               treasure_loot = Tuple2(k,0)
@@ -54,18 +55,21 @@ class Treasure(uid: String, position: Point, loot: Tuple2[Key,Int], needKey: Tup
         
         if (!check)  {
           logger.log("Not Open: Wrong key")
-          origin ! Tuple4(MsgCodes.T_WRONG_KEY,treasure_loot._1,treasure_loot._2,uid)
+          origin ! Tuple5(MsgCodes.T_WRONG_KEY,treasure_loot._1,treasure_loot._2,uid,"")
         }
         
       } else if (treasure_need_key._1 && (keys.size == 0))  {
         //Serve una chiave ma non è stata passata nessuna chiave
         logger.log("Not Open: Need Key")
-        origin ! Tuple4(MsgCodes.T_NEEDS_KEY,treasure_loot._1,treasure_loot._2,uid)
+        origin ! Tuple5(MsgCodes.T_NEEDS_KEY,treasure_loot._1,treasure_loot._2,uid,"")
       } else if (!treasure_need_key._1) {
         //Non serve nessuna chiave tesoro aperto
         logger.log("Opened: without key")
+        origin ! Tuple5(MsgCodes.T_SUCCESS_OPENED,treasure_loot._1,treasure_loot._2,uid,"")
         status = 1
-        origin ! Tuple4(MsgCodes.T_SUCCESS_OPENED,treasure_loot._1,treasure_loot._2,uid)
+        var k = treasure_loot._1
+        k.setExistKey(false)
+        treasure_loot = Tuple2(k,0)
       }
       
     case IncreaseGold(gold) =>

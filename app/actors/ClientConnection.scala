@@ -164,7 +164,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
       val json = Json.toJson(g_json)(CommonMessages.messageCodeJSONWrites)
       upstream ! json
     case BroadcastUpdateTreasure(treasures) =>
-      var g_json = new UpdateTreasureJSON("update_treasure",treasures)
+      var g_json = new UpdateTreasureJSON("update_treasures",treasures)
       val json = Json.toJson(g_json)(CommonMessages.updateTreasureJSONWrites)
       upstream ! json
   }

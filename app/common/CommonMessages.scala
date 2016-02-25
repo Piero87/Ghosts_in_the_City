@@ -88,7 +88,7 @@ case class IncreaseGold(gold: Int)
 case class LootRetrieved(loot: Tuple2[Key,Int])
 case class TreasureError(msg : String)
 case class TreasureInfo(uid: String, status: Int, pos: Point)
-case class TreasureResponse(uid_p: String, results: List[Tuple4[Int,Key,Int,String]])
+case class TreasureResponse(uid_p: String, results: List[Tuple5[Int,Key,Int,String,String]])
 case class BroadcastUpdateTreasure(treasures: MutableList[TreasureInfo])
 case class UpdateTreasure(uid: String, status: Int)
 

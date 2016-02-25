@@ -249,21 +249,37 @@ class GameManagerBackend () extends Actor {
       var t_opened = results.filter(_._1 == MsgCodes.T_SUCCESS_OPENED)
       var t_wrong_key = results.filter(_._1 == MsgCodes.T_WRONG_KEY)
       var t_needs_key = results.filter(_._1 == MsgCodes.T_NEEDS_KEY)
+      
       if (t_opened.size != 0) {
         
+        var player_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == uid_p) => i}).head
+        var u_tmp = players(player_index)._1
         var check_empty = true
         var keys_tmp: MutableList[Key] = MutableList()
         var gold_tmp = 0
+        var user_keys = u_tmp.keys
+        
+        var gold_found_message = false
+        var key_found_message = false
         
         for (t <- t_opened) {
+          
+          //Se è diverso da stringa vuota vuol dire che ho usato una chiave per aprirlo e la rimuovo dal giocatore
+          if (t._5 != "")
+          {
+            user_keys = user_keys.filter(_.getKeyUID != t._5)
+          }
+          
           if (t._2.existKey) {
             check_empty = false
             keys_tmp = keys_tmp :+ t._2
+            key_found_message = true
           }
           
           if (t._3 != 0) {
             check_empty = false
             gold_tmp = gold_tmp + t._3
+            gold_found_message = true
           }
           
           //Controllo se il tesoro è stato aperto adesso, perchè devo cambiare il suo status in TreasureInfo
@@ -279,13 +295,21 @@ class GameManagerBackend () extends Actor {
         if (check_empty) {
           gameManagerClient ! MessageCode(uid_p, MsgCodes.T_EMPTY)
         } else {
-          var player_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == uid_p) => i}).head
-          var u_tmp = players(player_index)._1
-          var user_info = new UserInfo(u_tmp.uid,u_tmp.name,u_tmp.team,u_tmp.pos,u_tmp.gold+gold_tmp,List.concat(u_tmp.keys,keys_tmp))
+          var user_info = new UserInfo(u_tmp.uid,u_tmp.name,u_tmp.team,u_tmp.pos,u_tmp.gold+gold_tmp,List.concat(user_keys,keys_tmp))
           players(player_index) = players(player_index).copy(_1 = user_info)
           val tmp_t_info = treasures.map(x => x._1)
-          gameManagerClient ! UpdateUserInfo(user_info)
           gameManagerClient ! BroadcastUpdateTreasure(tmp_t_info)
+          if (gold_found_message && key_found_message)
+          {
+            gameManagerClient ! MessageCode(uid_p, MsgCodes.K_G_FOUND)
+          } else if (key_found_message) {
+            gameManagerClient ! MessageCode(uid_p, MsgCodes.KEY_FOUND)
+          } else if (gold_found_message) {
+            gameManagerClient ! MessageCode(uid_p, MsgCodes.GOLD_FOUND)
+          }
+          
+          gameManagerClient ! UpdateUserInfo(user_info)
+          
           
         }
       } else if (t_wrong_key.size != 0) {
@@ -326,6 +350,7 @@ class GameManagerBackend () extends Actor {
         
         var user_info = new UserInfo(u_tmp.uid,u_tmp.name,u_tmp.team,u_tmp.pos,u_tmp.gold-gold_stolen,u_tmp.keys)
         players(player_index) = players(player_index).copy(_1 = user_info)
+        gameManagerClient ! MessageCode(uid, MsgCodes.PARANORMAL_ATTACK)
         gameManagerClient ! UpdateUserInfo(user_info)
         //Mando al fantasmi il numero di soldi rubati
         origin ! gold_stolen
