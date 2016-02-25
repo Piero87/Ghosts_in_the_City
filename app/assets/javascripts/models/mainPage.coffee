@@ -315,42 +315,65 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 				when -1
 					# no enough money to set a trap
 					message = "You cannot set a trap, asshole!"
+					type = "error"
 				when -2
 					# out of area
 					message = "Come inside, quick, you'll catch a cold out there!"
+					type = "error"
 				when -3
 					# the treasure needs the key to be opened
 					message = "This treasure is locked and you don't have the right key."
+					type = "error"
 				when -4
 					# not enough player
 					message = "Some moron is got out from the game and has not come back in time..."
+					type = "error"
 				when -5
 					# treasure empty
 					message = "Oh oh, there's nothing here."
+					type = "error"
 				when -6
 					# no treasure nearby
 					message = "There are no treasure near you, moron."
+					type = "error"
 				when 1
 					# attacked from ghost
 					message = "Aaaaaaaah!"
+					type = "message"
 				when 2
 					# attacked from human
 					message = "Ouch!"
+					type = "message"
 				when 3
 					# key found
 					message = "You have found a key! Yay!"
+					type = "message"
 				when 4
 					# gold found
 					message = "You have found some gold! You are filthy rich now!"
+					type = "message"
 				when 5
 					# key and gold found
 					message = "Jackpot! You have found a key and some gold!"
+					type = "message"
 				when 6
 					# victory
 					message = "Your team won this game! Congratulations!"
+					type = "message"
 				when 7
 					# lost
 					message = "Your team has been defeated! Looooooosers!"
+					type = "message"
+			
+			alert = $('#message-alert')
+			alert.html(message)
+			if (type == "error")
+				color = "red"
+			else if (type == "message")
+				color = "blue"
+			
+			alert.css('background-color', color);
+			alert.fadeIn('fast').delay(1000).fadeOut('fast').delay(300)
 			
 			console.log(message)
 					
