@@ -277,7 +277,7 @@ class GameManagerBackend () extends Actor {
     for(i <- 0 to game_n_players-1) {
       val user = players(i)._1
       val p = new UserInfo(user.uid,user.name,user.team,Point(position_players(i).x,position_players(i).y),user.gold,user.keys)
-      val player_actor = context.actorOf(Props(new Player(user.uid,user.name,user.team,polygon)), name = user.uid)
+      val player_actor = context.actorOf(Props(new Player(user.uid,user.name,user.team,polygon,self)), name = user.uid)
       players(i) = Tuple2(p,player_actor)
       player_actor ! UpdatePlayerPos(Point(position_players(i).x,position_players(i).y))
     }
