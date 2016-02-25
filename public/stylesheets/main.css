@@ -18,6 +18,9 @@
 	margin: auto;
 }
 
+.round-corner {
+	border-radius: 5px;
+}
 
 .line-with-icon {
 	line-height: 50px;
@@ -45,6 +48,18 @@
 
 .text-red {
 	color: red !important;
+}
+
+.bg-red {
+	background-color: red !important;
+}
+
+.bg-blue {
+	background-color: blue !important;
+}
+
+.bg-green {
+	background-color: blue !important;
 }
 
 .btn {
