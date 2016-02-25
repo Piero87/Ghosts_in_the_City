@@ -278,6 +278,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					@gamestarted(true)
 					@gamepaused(false)
 					@gameended(false)
+					$("#ghostbuster-theme").get(0).pause()
 				when 2 # game paused
 					@gameready(false)
 					@gamestarted(false)
@@ -288,6 +289,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					@gamestarted(false)
 					@gamepaused(false)
 					@gameended(true)
+					$("#ghostbuster-theme").get(0).play()
 		
 		generateUID: ->
 			id = ""
@@ -326,7 +328,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					# the treasure needs the key to be opened
 					message = "This treasure is locked and you don't have the right key."
 					type = "error"
-					$("#treasure-locked").play()
+					$("#treasure-locked").get(0).play()
 				when -4
 					# not enough player
 					message = "Some moron is got out from the game and has not come back in time..."
@@ -343,7 +345,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					# attacked from ghost
 					message = "Aaaaaaaah!"
 					type = "message"
-					$("#ghost-attack").play()
+					$("#ghost-attack").get(0).play()
 				when 2
 					# attacked from human
 					message = "Ouch!"
@@ -352,18 +354,18 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					# key found
 					message = "You have found a key! Yay!"
 					type = "message"
-					$("#keys-found").play()
+					$("#keys-found").get(0).play()
 				when 4
 					# gold found
 					message = "You have found some gold! You are filthy rich now!"
 					type = "message"
-					$("#gold-found").play()
+					$("#gold-found").get(0).play()
 				when 5
 					# key and gold found
 					message = "Jackpot! You have found a key and some gold!"
 					type = "message"
-					$("#gold-found").play()
-					$("#keys-found").delay(600).play()
+					$("#gold-found").get(0).play()
+					$("#keys-found").delay(600).get(0).play()
 				when 6
 					# victory
 					message = "Your team won this game! Congratulations!"
