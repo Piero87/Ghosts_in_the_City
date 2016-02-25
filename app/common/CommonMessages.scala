@@ -88,7 +88,9 @@ case class IncreaseGold(gold: Int)
 case class LootRetrieved(loot: Tuple2[Key,Int])
 case class TreasureError(msg : String)
 case class TreasureInfo(uid: String, status: Int, pos: Point)
-case class TreasureResponse(uid_p: String, results: List[Tuple3[Int,Key,Int]])
+case class TreasureResponse(uid_p: String, results: List[Tuple4[Int,Key,Int,String]])
+case class BroadcastUpdateTreasure(treasures: MutableList[TreasureInfo])
+case class UpdateTreasure(uid: String, status: Int)
 
 // Trap
 case class SetTrapRequest(user: UserInfo)
@@ -136,6 +138,7 @@ case class BroadcastTrapActivatedJSON(event:String, trap: TrapInfo)
 case class BroadcastRemoveTrapJSON(event:String, trap: TrapInfo)
 case class UpdateUserInfoJSON(event: String, user: UserInfo)
 case class MessageCodeJSON(event: String, code: Int)
+case class UpdateTreasureJSON(event: String, treasures: MutableList[TreasureInfo])
 
 import play.api.libs.json._
 
@@ -209,5 +212,8 @@ object CommonMessages {
   
   implicit val messageCodeJSONReads = Json.reads[MessageCodeJSON]
   implicit val messageCodeJSONWrites = Json.writes[MessageCodeJSON]
+  
+  implicit val updateTreasureJSONReads = Json.reads[UpdateTreasureJSON]
+  implicit val updateTreasureJSONWrites = Json.writes[UpdateTreasureJSON]
   
 }
