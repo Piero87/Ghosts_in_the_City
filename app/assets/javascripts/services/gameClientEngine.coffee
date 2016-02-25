@@ -329,8 +329,8 @@ define () ->
 					68
 				]
 				# 65 = "a" => set a trap
-				# 83 = "s" => hit other player
-				# 68 = "d" => open treasure
+				# 83 = "s" => open treasure
+				# 68 = "d" => hit other player
 				
 				if keys.indexOf(evt.keyCode) == -1
 					return false
@@ -344,12 +344,12 @@ define () ->
 					# "s" key
 					when 83
 						@ws.send(JSON.stringify
-							event: "hit_player"
+							event: "open_treasure"
 						)
 					# "d" key
 					when 68
 						@ws.send(JSON.stringify
-							event: "open_treasure"
+							event: "hit_player"
 						)
 					when 37, 38, 39, 40
 						@movement(evt.keyCode, i)
