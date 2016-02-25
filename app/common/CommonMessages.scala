@@ -88,7 +88,7 @@ case class IncreaseGold(gold: Int)
 case class LootRetrieved(loot: Tuple2[Key,Int])
 case class TreasureError(msg : String)
 case class TreasureInfo(uid: String, status: Int, pos: Point)
-case class TreasureResponse(results: List[Tuple3[Int,Key,Int]])
+case class TreasureResponse(uid_p: String, results: List[Tuple3[Int,Key,Int]])
 
 // Trap
 case class SetTrapRequest(user: UserInfo)
