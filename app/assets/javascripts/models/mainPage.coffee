@@ -159,7 +159,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					if @gamestarted()
 						console.log(json)
 						@usergold(json.user.gold)
-						@userkeys(0)
+						@userkeys(json.user.keys.length)
 						
 				else if json.event == "update_ghosts_positions"
 					if @gamestarted()
