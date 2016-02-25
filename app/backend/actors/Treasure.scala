@@ -42,8 +42,7 @@ class Treasure(uid: String, position: Point, loot: Tuple2[Key,Int], needKey: Tup
               logger.log("Opened")
               //Tupla5[codice_msg, key, gold, uid_tesoro, uid chiave usata da rimuovere se non usata stringa vuota]
               origin ! Tuple5(MsgCodes.T_SUCCESS_OPENED,treasure_loot._1,treasure_loot._2,uid,key.getKeyUID)
-              var k = treasure_loot._1
-              k.setExistKey(false)
+              var k = new Key("")
               treasure_loot = Tuple2(k,0)
               treasure_need_key = treasure_need_key.copy(_1 = false)
               check = true
@@ -67,8 +66,7 @@ class Treasure(uid: String, position: Point, loot: Tuple2[Key,Int], needKey: Tup
         logger.log("Opened: without key")
         origin ! Tuple5(MsgCodes.T_SUCCESS_OPENED,treasure_loot._1,treasure_loot._2,uid,"")
         status = 1
-        var k = treasure_loot._1
-        k.setExistKey(false)
+        var k = new Key("")
         treasure_loot = Tuple2(k,0)
       }
       

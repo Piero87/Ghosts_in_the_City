@@ -270,7 +270,7 @@ class GameManagerBackend () extends Actor {
             user_keys = user_keys.filter(_.getKeyUID != t._5)
           }
           
-          if (t._2.existKey) {
+          if (t._2.getKeyUID != "") {
             check_empty = false
             keys_tmp = keys_tmp :+ t._2
             key_found_message = true
@@ -393,24 +393,26 @@ class GameManagerBackend () extends Actor {
     
     val rnd_key = new Random()
     
-    var n_keys = rnd_key.nextInt(game_n_players/2)
-    var keys_loot = MutableList[Key]()
-    var keys_needed = MutableList[Key]()
+    var n_treasures_tmp = n_treasures_and_ghosts
+    var n_keys_tmp = rnd_key.nextInt(n_treasures_and_ghosts/2)
+    var n_treasures_closed_tmp = n_keys_tmp
+    var index = 0
     
-    for (i <- 0 to n_keys) {
-      
-      if (rnd_key.nextInt(2) == 1) {
-        //Creare chiave
-        var key = new Key(randomString(8))
-        keys_loot = keys_loot :+ key
-        keys_needed = keys_needed :+ key
-      }
+    var keys_container = MutableList[Key]()
+    
+    for (i <- 0 to n_keys_tmp-1) {
+      var key = new Key(randomString(8))
+      keys_container = keys_container :+ key
     }
+    
+    var empty_key = new Key("")
+          
+    var spaces_shuffled = (util.Random.shuffle(spaces.toList)).toArray
     
     for(i <- 0 to n_treasures_and_ghosts-1){
       
       // Creazione tesori
-      position_treasure(i) = UtilFunctions.randomPositionInSpace(spaces(i))
+      position_treasure(i) = UtilFunctions.randomPositionInSpace(spaces_shuffled(i))
       logger.log("Treasure[" + i + "] position: ("+ position_treasure(i).x +","+ position_treasure(i).y +")")
       
       var treasure_id = randomString(8)
@@ -420,33 +422,39 @@ class GameManagerBackend () extends Actor {
       var pos_t = new Point (position_treasure(i).x,position_treasure(i).y)
       var treasure_info = new TreasureInfo(treasure_id,0,pos_t)
       
-      //Random se contiene una chiave
-      var rnd_loot_key = rnd.nextInt(2)
-      //Random se ha bisogno di una chiave
-      var rnd_need_key = rnd.nextInt(2)
       
-      var key = new Key("")
-      var need_key = new Key ("")
+      var treasure = context.actorOf(Props(new Treasure(treasure_id,pos_t,Tuple2(empty_key,gold),Tuple2(false,empty_key),self)), name = treasure_id)
       
-      if (rnd_loot_key == 1 && keys_loot.size != 0) {
-        key = keys_loot(0)
-        keys_loot = keys_loot.filterNot(_.getKeyUID == key.getKeyUID)
-      }
-      
-      var tmp_key_need = MutableList[Key]()
-      
-      for (i <- 0 to keys_needed.size-1) {
-        if (keys_needed(i).getKeyUID != key.getKeyUID) {
-          tmp_key_need = tmp_key_need :+ keys_needed(i)
+      if (n_keys_tmp != 0) {
+        
+        var tmp_key = keys_container(index)
+        treasure = context.actorOf(Props(new Treasure(treasure_id,pos_t,Tuple2(tmp_key,gold),Tuple2(false,empty_key),self)), name = treasure_id)
+        treasures = treasures :+ Tuple2(treasure_info,treasure)
+        n_keys_tmp = n_keys_tmp-1
+        
+        if (keys_container.size == index+1)
+        {
+          index = 0
+        } else {
+          index = index +1
         }
-      }
         
-      if (rnd_need_key == 1 && tmp_key_need.size != 0) {
-        need_key = tmp_key_need(0)
-        keys_needed = keys_needed.filterNot(_.getKeyUID == need_key.getKeyUID)
-      }
+      } else if (n_treasures_closed_tmp != 0)
+      {
+        var tmp_key = keys_container(index)
+        treasure = context.actorOf(Props(new Treasure(treasure_id,pos_t,Tuple2(empty_key,gold),Tuple2(true,tmp_key),self)), name = treasure_id)
+        treasures = treasures :+ Tuple2(treasure_info,treasure)
+        n_treasures_closed_tmp = n_treasures_closed_tmp-1
         
-      val treasure = context.actorOf(Props(new Treasure(treasure_id,pos_t,Tuple2(key,gold),Tuple2(rnd_need_key == 1,need_key),self)), name = treasure_id)
+        if (keys_container.size == index+1)
+        {
+          index = 0
+        } else {
+          index = index +1
+        }
+        
+      }
+      
       treasures = treasures :+ Tuple2(treasure_info,treasure)
       
       position_ghosts(i) = UtilFunctions.randomPositionAroundPoint(position_treasure(i))
