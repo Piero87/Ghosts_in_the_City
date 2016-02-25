@@ -169,7 +169,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					console.log("Tesoro aperto!")
 					console.log(json.treasures)
 					if @gamestarted()
-						@game_client_engine.updateTreasure(treasure.uid, treasure.status) for treasure in json.treasures
+						@game_client_engine.changeTreasureStatus(treasure.uid, treasure.status) for treasure in json.treasures
 				
 				else if json.event == "new_trap"
 					if @gamestarted()
