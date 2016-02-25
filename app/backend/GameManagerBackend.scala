@@ -231,8 +231,10 @@ class GameManagerBackend () extends Actor {
       ghosts(ghost_index) = ghosts(ghost_index).copy(_1 = g)
       ghosts(ghost_index)._2 ! GhostReleased
       traps = traps.filterNot {_.uid == uid }
+      
     case MessageCode(uid,code) =>
       gameManagerClient ! MessageCode(uid,code)
+      
     case OpenTreasureRequest(uid) =>
       var player = players.filter(_._1.uid == uid).head
       var t_actorref_list = (treasures.filter(_._1.pos.distanceFrom(player._1.pos) <= icon_size/2)).map(x => x._2).toList
@@ -241,7 +243,8 @@ class GameManagerBackend () extends Actor {
       } else {
         gameManagerClient ! MessageCode(uid, MsgCodes.NO_T_NEAR_YOU)
       }
-    case TreasureResponse(results) =>
+      
+    case TreasureResponse(uid_p,results) =>
       logger.log("fai qualcosa")
   }
   
