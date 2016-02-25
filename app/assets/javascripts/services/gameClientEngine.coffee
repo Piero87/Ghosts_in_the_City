@@ -385,8 +385,9 @@ define () ->
 			
 		changeTreasureStatus: (uid, status) ->
 			for treasure, i in @treasures when treasure.uid == uid
-				if (status == 1 && @treasures[i].status == 0) $("#treasure-opening").play()
 				@treasures[i].status = status
+				if (status == 1 && @treasures[i].status == 0) 
+					$("#treasure-opening").play()
 		
 		movement: (direction, i) ->
 			# Flag to put variables back if we hit an edge of the board.
