@@ -4,9 +4,6 @@
 }
 
 #message-alert {
-	width: 300px;
-	height: 100px;
-	
 	opacity: 0.7;
 	position: absolute;
 	float: left;
@@ -14,7 +11,6 @@
 	bottom: 0;
 	left: 0;
 	right: 0;
-	
 	margin: auto;
 }
 
@@ -44,6 +40,10 @@
 
 .text-black {
 	color: black !important;
+}
+
+.text-white {
+	color: white !important;
 }
 
 .text-red {
