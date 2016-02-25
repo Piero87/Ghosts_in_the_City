@@ -158,6 +158,10 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       }
     case OpenTreasureRequest(uid) =>
       gameManagerBackend ! OpenTreasureRequest(uid)
+    case BroadcastUpdateTreasure(treasures) =>
+      clientsConnections.map {cc =>
+        cc._2 forward BroadcastUpdateTreasure(treasures)
+      }
         
   }
 }

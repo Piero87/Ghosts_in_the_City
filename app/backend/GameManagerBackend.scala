@@ -245,7 +245,91 @@ class GameManagerBackend () extends Actor {
       }
       
     case TreasureResponse(uid_p,results) =>
+      //Controllo se abbiamo aperto uno o più tesori
+      var t_opened = results.filter(_._1 == MsgCodes.T_SUCCESS_OPENED)
+      var t_wrong_key = results.filter(_._1 == MsgCodes.T_WRONG_KEY)
+      var t_needs_key = results.filter(_._1 == MsgCodes.T_NEEDS_KEY)
+      if (t_opened.size != 0) {
+        
+        var check_empty = true
+        var keys_tmp: MutableList[Key] = MutableList()
+        var gold_tmp = 0
+        
+        for (t <- t_opened) {
+          if (t._2.existKey) {
+            check_empty = false
+            keys_tmp = keys_tmp :+ t._2
+          }
+          
+          if (t._3 != 0) {
+            check_empty = false
+            gold_tmp = gold_tmp + t._3
+          }
+          
+          //Controllo se il tesoro è stato aperto adesso, perchè devo cambiare il suo status in TreasureInfo
+          if (!check_empty)
+          {
+            var t_index = (treasures.zipWithIndex.collect{case (g , i) if(g._1.uid == t._4) => i}).head
+            var t_tmp = treasures(t_index)._1
+            var t_info = new TreasureInfo(t_tmp.uid,1,t_tmp.pos)
+            treasures(t_index) = treasures(t_index).copy(_1 = t_info)
+          }
+        }
+        
+        if (check_empty) {
+          gameManagerClient ! MessageCode(uid_p, MsgCodes.T_EMPTY)
+        } else {
+          var player_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == uid_p) => i}).head
+          var u_tmp = players(player_index)._1
+          var user_info = new UserInfo(u_tmp.uid,u_tmp.name,u_tmp.team,u_tmp.pos,u_tmp.gold+gold_tmp,List.concat(u_tmp.keys,keys_tmp))
+          players(player_index) = players(player_index).copy(_1 = user_info)
+          val tmp_t_info = treasures.map(x => x._1)
+          gameManagerClient ! UpdateUserInfo(user_info)
+          gameManagerClient ! BroadcastUpdateTreasure(tmp_t_info)
+          
+        }
+      } else if (t_wrong_key.size != 0) {
+        gameManagerClient ! MessageCode(uid_p, MsgCodes.T_WRONG_KEY)
+      } else if (t_needs_key.size != 0) {
+        gameManagerClient ! MessageCode(uid_p, MsgCodes.T_NEEDS_KEY)
+      }
+    case UpdateTreasure(uid,status) =>
+      var t_index = (treasures.zipWithIndex.collect{case (g , i) if(g._1.uid == uid) => i}).head
+      var t_tmp = treasures(t_index)._1
+      //Invio il Broadcast solo se è cambiato il suo status
+      if (t_tmp.status != status) {
+        var t_info = new TreasureInfo(t_tmp.uid,0,t_tmp.pos)
+        treasures(t_index) = treasures(t_index).copy(_1 = t_info)
+        val tmp_t_info = treasures.map(x => x._1)
+        gameManagerClient ! BroadcastUpdateTreasure(tmp_t_info)
+      }
+    case PlayerAttacked(uid, level) =>
+      
+      var origin = sender
       logger.log("fai qualcosa")
+      var player_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == uid) => i}).head
+      var u_tmp = players(player_index)._1
+      //Se il giocatore ha soldi
+      if (u_tmp.gold != 0) {
+        var gold_stolen = 0
+        level match {
+          case 1 => {
+            gold_stolen = u_tmp.gold/3
+          }
+          case 2 => {
+            gold_stolen = u_tmp.gold/2
+          }
+          case 3 => {
+            gold_stolen = u_tmp.gold
+          }
+        }
+        
+        var user_info = new UserInfo(u_tmp.uid,u_tmp.name,u_tmp.team,u_tmp.pos,u_tmp.gold-gold_stolen,u_tmp.keys)
+        players(player_index) = players(player_index).copy(_1 = user_info)
+        gameManagerClient ! UpdateUserInfo(user_info)
+        //Mando al fantasmi il numero di soldi rubati
+        origin ! gold_stolen
+      }
   }
   
   //Metodo per stampare il contenuto delle liste
@@ -337,7 +421,7 @@ class GameManagerBackend () extends Actor {
         keys_needed = keys_needed.filterNot(_.getKeyUID == need_key.getKeyUID)
       }
         
-      val treasure = context.actorOf(Props(new Treasure(treasure_id,pos_t,Tuple2(key,gold),Tuple2(rnd_need_key == 1,need_key))), name = treasure_id)
+      val treasure = context.actorOf(Props(new Treasure(treasure_id,pos_t,Tuple2(key,gold),Tuple2(rnd_need_key == 1,need_key),self)), name = treasure_id)
       treasures = treasures :+ Tuple2(treasure_info,treasure)
       
       position_ghosts(i) = UtilFunctions.randomPositionAroundPoint(position_treasure(i))

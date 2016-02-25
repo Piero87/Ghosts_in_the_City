@@ -9,7 +9,9 @@ define () ->
 			@ghost_radius = $("#conf_ghost_radius").val()
 			@treasure_radius = $("#conf_treasure_radius").val()
 			@trap_radius = $("#conf_trap_radius").val()
-
+			
+			@debug = false;
+			
 			@gameLoop = null
 
 			@ws = websocket
@@ -209,14 +211,16 @@ define () ->
 				treasure_y = @treasures[i].y - (@icon_size / 2)
 				area_x =  @treasures[i].x -  @treasure_radius
 				area_y =  @treasures[i].y -  @treasure_radius
-				# Drawings
-				@ctx.drawImage(
-					@sensible_area
-					area_x 
-					area_y 
-					(@treasure_radius * 2)
-					(@treasure_radius * 2)
-				)
+				
+				if (@debug)
+					# Drawings
+					@ctx.drawImage(
+						@sensible_area
+						area_x 
+						area_y 
+						(@treasure_radius * 2)
+						(@treasure_radius * 2)
+					)
 				
 				if (@treasures[i].status == 0)
 					treasure_img = @treasure_close
@@ -270,14 +274,17 @@ define () ->
 				ghost_y = @ghosts[i].y - (@icon_size / 2)
 				area_x =  @ghosts[i].x - (@ghost_radius * @ghosts[i].level)
 				area_y =  @ghosts[i].y - (@ghost_radius * @ghosts[i].level)
-				# Drawings
-				@ctx.drawImage(
-					@sensible_area
-					area_x
-					area_y
-					(@ghost_radius * 2 * @ghosts[i].level)
-					(@ghost_radius * 2 * @ghosts[i].level)
-				)
+				
+				if (@debug)
+					# Drawings
+					@ctx.drawImage(
+						@sensible_area
+						area_x
+						area_y
+						(@ghost_radius * 2 * @ghosts[i].level)
+						(@ghost_radius * 2 * @ghosts[i].level)
+					)
+				
 				@ctx.drawImage(
 					@ghosts_images[i]
 					ghost_x
@@ -292,14 +299,17 @@ define () ->
 				trap_y = @traps[i].y - (@icon_size / 2)
 				area_x =  @traps[i].x -  @trap_radius
 				area_y =  @traps[i].y -  @trap_radius
-				# Drawings
-				@ctx.drawImage(
-					@sensible_area
-					area_x
-					area_y
-					(@trap_radius * 2)
-					(@trap_radius * 2)
-				)
+				
+				if (@debug)
+					# Drawings
+					@ctx.drawImage(
+						@sensible_area
+						area_x
+						area_y
+						(@trap_radius * 2)
+						(@trap_radius * 2)
+					)
+				
 				if (@traps[i].status == 0)
 					trap_img = @trap_unactive
 				else if (@traps[i].status == 1)
@@ -329,8 +339,8 @@ define () ->
 					68
 				]
 				# 65 = "a" => set a trap
-				# 83 = "s" => hit other player
-				# 68 = "d" => open treasure
+				# 83 = "s" => open treasure
+				# 68 = "d" => hit other player
 				
 				if keys.indexOf(evt.keyCode) == -1
 					return false
@@ -344,12 +354,12 @@ define () ->
 					# "s" key
 					when 83
 						@ws.send(JSON.stringify
-							event: "hit_player"
+							event: "open_treasure"
 						)
 					# "d" key
 					when 68
 						@ws.send(JSON.stringify
-							event: "open_treasure"
+							event: "hit_player"
 						)
 					when 37, 38, 39, 40
 						@movement(evt.keyCode, i)

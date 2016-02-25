@@ -166,6 +166,8 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 						@game_client_engine.ghostMove(ghost.uid, ghost.mood, ghost.pos.x, ghost.pos.y) for ghost in json.ghosts
 				
 				else if json.event == "update_treasures"
+					console.log("Tesoro aperto!")
+					console.log(json.treasures)
 					if @gamestarted()
 						@game_client_engine.updateTreasure(treasure.uid, treasure.status) for treasure in json.treasures
 				
