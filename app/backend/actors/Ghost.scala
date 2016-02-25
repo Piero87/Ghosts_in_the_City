@@ -55,16 +55,14 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
         val future = GMbackend ? PlayersInfo
         future.onSuccess { 
           case Players(players) => 
-            //Logger.info ("Player positions received")
             var playerpos = new Point(0,0)
             var playerdist : Double = ghost_radius //Max range iniziale
             var found_someone = false
-            
+            logger.log("tmp_p")
             val tmp_p = players.map(x => x._1)
             var p_uid = ""
             
-            if(players.size != 0){
-              
+            if(tmp_p.size != 0){
               for(player <- tmp_p){
                 var currentplayerpos = player.pos
                 var distance = ghostpos.distanceFrom(currentplayerpos)
@@ -82,7 +80,6 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
               }
               
               if (found_someone == false) mood = GhostMood.CALM
-              
               if(mood == GhostMood.CALM){
                 random_move(ghostpos)
               }else{
@@ -117,19 +114,19 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
   
   def random_move(position: Point) : Unit = {
     
-//     val delta_time = 3
-//     val speed = 10.0
-//     
-//     var direction = Math.random() * 2.0 * Math.PI
-//     
-//     var vx = (speed * Math.cos(direction)).toInt
-//     var vy = (speed * Math.sin(direction)).toInt
-//     
-//     var lat = (vx * delta_time) + position.x
-//     var lng = (vy * delta_time) + position.y
-//     
-//     var new_position = new Point(lat, lng)
-//    
+/**     val delta_time = 3
+*     val speed = 10.0
+*     
+*     var direction = Math.random() * 2.0 * Math.PI
+*     
+*     var vx = (speed * Math.cos(direction)).toInt
+*     var vy = (speed * Math.sin(direction)).toInt
+*     
+*     var lat = (vx * delta_time) + position.x
+*     var lng = (vy * delta_time) + position.y
+*     
+*     var new_position = new Point(lat, lng)
+**/    
     val rnd = new Random()
     var rnd_pos = rnd.nextInt(4)
     var new_position : Point = position
@@ -164,7 +161,7 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
       }
     }
     
-//    if (area.contains(new_position)) {
+//    if (area.contains(new_position)) { Ray-casting
       if ((icon_size < new_position.x && new_position.x < width-icon_size) && (icon_size < new_position.y && new_position.y < height-icon_size)) {
         if (level !=3 && new_position.distanceFrom(position_treasure) >= treasure_radius) {
           if (rnd_pos<2) {
@@ -185,7 +182,7 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
       } 
   }
   
-  def attackPlayer(uid: String, player_pos: Point, players: MutableList[Tuple2[UserInfo, ActorRef]]) = {
+  def attackPlayer(p_uid: String, player_pos: Point, players: MutableList[Tuple2[UserInfo, ActorRef]]) = {
     var ghost_move : Int = -1
     var new_position : Point = ghostpos
     var distance_x = player_pos.x - ghostpos.x
@@ -205,11 +202,13 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
 				}
 			}
       if (Math.abs(distance_x) < 10 && Math.abs(distance_y) < 10) {
+        logger.log(" Giocatore raggiunto! Lo attacco")
         // Giocatore raggiunto! Gli rubo i soldi
-        var pl = players.filter(_._1.uid == uid).head
+        var pl = players.filter(_._1.uid == p_uid).head
         val future = pl._2 ? IAttackYou(level)
           future.onSuccess { 
             case GoldStolen(gold) =>
+              logger.log("Soldi rubati")
               if(gold > 0){
                 GMbackend ! IncreaseGoldRequest(t_uid, gold)
               }
@@ -220,35 +219,35 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
       }
 		}
     
-   ghost_move match {
-      // In alto
-      case 0 => {
-          new_position = new Point(ghostpos.x, ghostpos.y - ghostmovement)
-      }
-      // A destra
-      case 1 => {
-          new_position = new Point(ghostpos.x + ghostmovement, ghostpos.y)
-      }
-      // In basso
-      case 2 => {
-          new_position = new Point(ghostpos.x, ghostpos.y + ghostmovement)
-      }
-      // A sinistra
-      case 3 => {
-          new_position = new Point(ghostpos.x - ghostmovement, ghostpos.y)
-      }
-      case -1 => {
+    ghost_move match {
+       // In alto
+       case 0 => {
+           new_position = new Point(ghostpos.x, ghostpos.y - ghostmovement)
+       }
+       // A destra
+       case 1 => {
+           new_position = new Point(ghostpos.x + ghostmovement, ghostpos.y)
+       }
+       // In basso
+       case 2 => {
+           new_position = new Point(ghostpos.x, ghostpos.y + ghostmovement)
+       }
+       // A sinistra
+       case 3 => {
+           new_position = new Point(ghostpos.x - ghostmovement, ghostpos.y)
+       }
+       case -1 => {
           
-      }
-    }
-   
+       }
+     }
+    
 //  if(area.contains(new_position, area_Edge)){
     if ((icon_size < new_position.x && new_position.x < width-icon_size) && (icon_size < new_position.y && new_position.y < height-icon_size)) {  
        if(level ==3 || new_position.distanceFrom(position_treasure) < treasure_radius){
          ghostpos = new_position
          GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
        }
-     }
+    }
   }
   
   def returnToTreasure = {
@@ -294,6 +293,10 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
      ghostpos = new_position
      GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
        
+  }
+  
+  def printList(args: TraversableOnce[_]): Unit = {
+    args.foreach(println)
   }
   
   
