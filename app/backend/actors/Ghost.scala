@@ -49,7 +49,7 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
       GMbackend = sender
       update_pos_scheduler = system.scheduler.schedule(0 millis, 500 millis, self, UpdateGhostPosition)
     case UpdateGhostPosition => 
-      if(ghostpos.distanceFrom(position_treasure) < treasure_radius){
+      if(ghostpos.distanceFrom(position_treasure) < treasure_radius || level == 3){
        mood = GhostMood.CALM
         // Ciclo di vita del fantasma: chiedo al GMBackend le posizioni dei player, calcolo la distanza da ciascuno di essi 
         // se rientra nel range di azione attacco altrimenti mi muovo random
@@ -201,16 +201,6 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
 						ghost_move = 0
 				}
 			}
-      if (Math.abs(distance_x) < 10 && Math.abs(distance_y) < 10) {
-        logger.log(" Giocatore raggiunto! Lo attacco")
-        // Giocatore raggiunto! Gli rubo i soldi
-        var pl = players.filter(_._1.uid == p_uid).head
-        val future = pl._2 ? IAttackYou(level)
-        val result = Await.result(future, timeout.duration).asInstanceOf[Int]
-        if(result > 0){
-          treasure ! IncreaseGold(result)
-        }
-      }
 		}
     
     ghost_move match {
@@ -242,6 +232,17 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
          GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
        }
     }
+    
+    if (Math.abs(distance_x) < 10 && Math.abs(distance_y) < 10) {
+        logger.log(" Giocatore raggiunto! Lo attacco")
+        // Giocatore raggiunto! Gli rubo i soldi
+        var pl = players.filter(_._1.uid == p_uid).head
+        val future = pl._2 ? IAttackYou(level)
+        val result = Await.result(future, timeout.duration).asInstanceOf[Int]
+        if(result > 0){
+          treasure ! IncreaseGold(result)
+        }
+      }
   }
   
   def returnToTreasure = {
