@@ -10,7 +10,7 @@ define () ->
 			@treasure_radius = $("#conf_treasure_radius").val()
 			@trap_radius = $("#conf_trap_radius").val()
 			
-			@debug = false;
+			@debug = true;
 			
 			@gameLoop = null
 
