@@ -17,11 +17,11 @@ object Player {
   /**
    * Actor Props 
    */
-  def props(uid: String, name: String, team: Int, area : Polygon): Props = Props(new Player(uid, name, team, area))
+  def props(uid: String, name: String, team: Int, area : Polygon, GMbackend: ActorRef): Props = Props(new Player(uid, name, team, area, GMbackend))
   
 }
 
-class Player(uid: String, name: String, team: Int, area : Polygon) extends Actor{
+class Player(uid: String, name: String, team: Int, area : Polygon, GMbackend: ActorRef) extends Actor{
   
   val logger = new CustomLogger("PlayerActor")
   
@@ -53,29 +53,10 @@ class Player(uid: String, name: String, team: Int, area : Polygon) extends Actor
           logger.log("risultato apertura tesori")
           origin ! TreasureResponse(user.uid, results)
       }
-   /* case IAttackYou(level) =>
+    case IAttackYou(level) =>
       var origin = sender
       var gold_stolen = 0
       
-      level match {
-        case 3 => {
-           gold_stolen = gold
-       }
-       // A destra
-       case 1 => {
-           new_position = new Point(ghostpos.x + ghostmovement, ghostpos.y)
-       }
-       // In basso
-       case 2 => {
-           new_position = new Point(ghostpos.x, ghostpos.y + ghostmovement)
-       }
-       // A sinistra
-       case 3 => {
-           new_position = new Point(ghostpos.x - ghostmovement, ghostpos.y)
-       }
-       case -1 => {
-          
-       } 
-      }*/
+       
   }
 }
