@@ -54,8 +54,7 @@ class Player(uid: String, name: String, team: Int, area : Polygon, GMbackend: Ac
           origin ! TreasureResponse(user.uid, results)
       }
     case IAttackYou(level) =>
-      var origin = sender
-      var gold_stolen = 0
+      GMbackend forward PlayerAttacked(uid,level)
       
        
   }

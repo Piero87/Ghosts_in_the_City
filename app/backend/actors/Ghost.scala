@@ -4,6 +4,7 @@ import akka.actor._
 import scala.math._
 import scala.concurrent.duration.Duration
 import scala.concurrent.duration._
+import scala.concurrent.Await;
 import java.util.concurrent.TimeUnit
 import akka.util.Timeout
 import akka.pattern.ask
@@ -206,15 +207,9 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
         // Giocatore raggiunto! Gli rubo i soldi
         var pl = players.filter(_._1.uid == p_uid).head
         val future = pl._2 ? IAttackYou(level)
-          future.onSuccess { 
-            case GoldStolen(gold) =>
-              logger.log("Soldi rubati")
-              if(gold > 0){
-                GMbackend ! IncreaseGoldRequest(t_uid, gold)
-              }
-          }
-          future onFailure {
-            case e: Exception => logger.log("******GHOST ATTACK PLAYER ERROR ******")
+        val result = Await.result(future, timeout.duration).asInstanceOf[Int]
+        if(result > 0){
+          treasure ! IncreaseGold(result)
         }
       }
 		}
