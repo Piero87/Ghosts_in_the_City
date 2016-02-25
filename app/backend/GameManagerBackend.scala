@@ -422,13 +422,10 @@ class GameManagerBackend () extends Actor {
       var pos_t = new Point (position_treasure(i).x,position_treasure(i).y)
       var treasure_info = new TreasureInfo(treasure_id,0,pos_t)
       
-      
-      var treasure = context.actorOf(Props(new Treasure(treasure_id,pos_t,Tuple2(empty_key,gold),Tuple2(false,empty_key),self)), name = treasure_id)
-      
       if (n_keys_tmp != 0) {
         
         var tmp_key = keys_container(index)
-        treasure = context.actorOf(Props(new Treasure(treasure_id,pos_t,Tuple2(tmp_key,gold),Tuple2(false,empty_key),self)), name = treasure_id)
+        var treasure = context.actorOf(Props(new Treasure(treasure_id,pos_t,Tuple2(tmp_key,gold),Tuple2(false,empty_key),self)), name = treasure_id)
         treasures = treasures :+ Tuple2(treasure_info,treasure)
         n_keys_tmp = n_keys_tmp-1
         
@@ -442,7 +439,7 @@ class GameManagerBackend () extends Actor {
       } else if (n_treasures_closed_tmp != 0)
       {
         var tmp_key = keys_container(index)
-        treasure = context.actorOf(Props(new Treasure(treasure_id,pos_t,Tuple2(empty_key,gold),Tuple2(true,tmp_key),self)), name = treasure_id)
+        var treasure = context.actorOf(Props(new Treasure(treasure_id,pos_t,Tuple2(empty_key,gold),Tuple2(true,tmp_key),self)), name = treasure_id)
         treasures = treasures :+ Tuple2(treasure_info,treasure)
         n_treasures_closed_tmp = n_treasures_closed_tmp-1
         
@@ -453,9 +450,10 @@ class GameManagerBackend () extends Actor {
           index = index +1
         }
         
+      } else {
+        var treasure = context.actorOf(Props(new Treasure(treasure_id,pos_t,Tuple2(empty_key,gold),Tuple2(false,empty_key),self)), name = treasure_id)
+        treasures = treasures :+ Tuple2(treasure_info,treasure)
       }
-      
-      treasures = treasures :+ Tuple2(treasure_info,treasure)
       
       position_ghosts(i) = UtilFunctions.randomPositionAroundPoint(position_treasure(i))
       logger.log("Ghost[" + i + "] position: ("+ position_ghosts(i).x +","+ position_ghosts(i).y +")")
@@ -464,7 +462,7 @@ class GameManagerBackend () extends Actor {
       var ghost_id = randomString(8)
       var p_g = new Point (position_ghosts(i).x,position_ghosts(i).y)
       val g_level = rnd.nextInt(2)+1
-      val ghost = context.actorOf(Props(new Ghost(ghost_id,polygon,p_g,g_level,treasure,pos_t,treasure_id)), name = ghost_id)
+      val ghost = context.actorOf(Props(new Ghost(ghost_id,polygon,p_g,g_level,treasures.last._2,pos_t,treasure_id)), name = ghost_id)
       var ghost_info = new GhostInfo(ghost_id,g_level,GhostMood.CALM,p_g)
       ghosts = ghosts :+ Tuple2(ghost_info,ghost)
       
