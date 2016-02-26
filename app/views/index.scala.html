@@ -89,7 +89,7 @@
         		<div data-bind="visible: (username() != gamecreator())">
         			<h1 class="ghostbuster-font font-big">Game created by <span data-bind="text: gamecreator"></span> at <span data-bind="text: gametime"></span></h1>
         		</div>
-	        	<div data-bind="visible: ()username() == gamecreator())">
+	        	<div data-bind="visible: (username() == gamecreator())">
         			<h1 class="ghostbuster-font font-big">You created this game at <span data-bind="text: gametime"></span></h1>
         		</div>
 	        	<p class="ghostbuster-font">[game with <span data-bind="text: gamemaxplayers"></span> players]</p>
