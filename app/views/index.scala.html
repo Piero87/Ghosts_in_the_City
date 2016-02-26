@@ -16,6 +16,8 @@
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav navbar-right">
                 	<li data-bind="ifnot: disconnected"><a class="ghostbuster-font" href="javascript:void(0);">Hello <span data-bind="text: username"></span>!</a></li>
+                	<li data-bind="ifnot: disconnected, click: toggleMusic"><a class="ghostbuster-font" href="javascript:void(0);">Music: <span data-bind="text: music"></span></a></li>
+                	<li data-bind="ifnot: disconnected, click: toggleSounds"><a class="ghostbuster-font" href="javascript:void(0);">Sounds: <span data-bind="text: sounds"></span></a></li>
                     <li data-bind="ifnot: disconnected, click: disconnect"><a class="ghostbuster-font" href="javascript:void(0);">Disconnect</a></li>
                 </ul>
             </div>
@@ -32,7 +34,7 @@
 		<div align="center" style="margin-bottom:20px;" data-bind="ifnot: gamestarted">
 			<img src="/assets/images/Ghostbuster_banner.png" alt="" style="max-width: 100%; max-height: 128px;">
 		</div>
-		<audio id="ghostbusters-song" src="/assets/images/Ghostbusters_song.mp3" preload="auto" autoplay="autoplay" loop></audio>
+		<audio id="ghostbusters-song" src="/assets/images/Ghostbusters_song.mp3" loop></audio>
 		<audio id="ghostbusters-theme" src="/assets/images/Ghostbusters_theme.mp3" loop></audio>
 		<audio id="gold-found" src="/assets/images/gold_found.mp3"></audio>
 		<audio id="keys-found" src="/assets/images/keys_found.mp3"></audio>
