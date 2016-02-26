@@ -53,6 +53,7 @@ object MsgCodes extends Enumeration {
    
 }
 
+case object Finish
 // Code messages
 case class MessageCode(uid: String, code: Int)
 
