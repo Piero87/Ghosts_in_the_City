@@ -260,30 +260,30 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			if (@music() == "on")
 				@music("off")
 				document.getElementById("ghostbusters-song").volume = 0.0;
-	    	    document.getElementById("ghostbusters-theme").volume = 0.0;
+				document.getElementById("ghostbusters-theme").volume = 0.0;
 			else if (@music() == "off")
 				@music("on")
 				document.getElementById("ghostbusters-song").volume = 0.1;
-	    	    document.getElementById("ghostbusters-theme").volume = 0.2;
+				document.getElementById("ghostbusters-theme").volume = 0.2;
 		
 		# Toggle the sounds effects in game
 		toggleSounds: ->
 			if (@sounds() == "on")
 				@sounds("off")
 				document.getElementById("gold-found").volume = 0.0;
-	    	    document.getElementById("keys-found").volume = 0.0;
-	    	    document.getElementById("trap-activated").volume = 0.0;
-	    	    document.getElementById("treasure-locked").volume = 0.0;
-	    	    document.getElementById("treasure-opening").volume = 0.0;
-	    	    document.getElementById("ghost-attack").volume = 0.0;
+				document.getElementById("keys-found").volume = 0.0;
+				document.getElementById("trap-activated").volume = 0.0;
+				document.getElementById("treasure-locked").volume = 0.0;
+				document.getElementById("treasure-opening").volume = 0.0;
+				document.getElementById("ghost-attack").volume = 0.0;
 			else if (@sounds() == "off")
 				@sounds("on")
 				document.getElementById("gold-found").volume = 0.5;
-	    	    document.getElementById("keys-found").volume = 0.5;
-	    	    document.getElementById("trap-activated").volume = 0.5;
-	    	    document.getElementById("treasure-locked").volume = 0.5;
-	    	    document.getElementById("treasure-opening").volume = 0.5;
-	    	    document.getElementById("ghost-attack").volume = 0.5;
+				document.getElementById("keys-found").volume = 0.5;
+				document.getElementById("trap-activated").volume = 0.5;
+				document.getElementById("treasure-locked").volume = 0.5;
+				document.getElementById("treasure-opening").volume = 0.5;
+				document.getElementById("ghost-attack").volume = 0.5;
 		
 		# The user clicked connect
 		submitUsername: ->
