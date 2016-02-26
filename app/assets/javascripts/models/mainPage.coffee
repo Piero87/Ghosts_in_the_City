@@ -268,6 +268,8 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					@gamestarted(false)
 					@gamepaused(false)
 					@gameended(false)
+					$("#ghostbusters-song").get(0).play()
+					$("#ghostbusters-theme").get(0).pause()
 				when 0 # game ready - wait for other players
 					@gameready(true)
 					@gamestarted(false)
@@ -278,7 +280,8 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					@gamestarted(true)
 					@gamepaused(false)
 					@gameended(false)
-					$("#ghostbuster-theme").get(0).pause()
+					$("#ghostbusters-song").get(0).pause()
+					$("#ghostbusters-theme").get(0).play()
 				when 2 # game paused
 					@gameready(false)
 					@gamestarted(false)
@@ -289,7 +292,8 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					@gamestarted(false)
 					@gamepaused(false)
 					@gameended(true)
-					$("#ghostbuster-theme").get(0).play()
+					$("#ghostbusters-song").get(0).play()
+					$("#ghostbusters-theme").get(0).pause()
 		
 		generateUID: ->
 			id = ""
@@ -317,61 +321,61 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			c = msg_code
 			switch c
 				when -1
-					# no enough money to set a trap
+					# NO_TRAP - no enough money to set a trap
 					message = "You cannot set a trap, asshole!"
 					type = "error"
 				when -2
-					# out of area
+					# OUT_OF_AREA - out of area
 					message = "Come inside, quick, you'll catch a cold out there!"
 					type = "error"
 				when -3
-					# the treasure needs the key to be opened
+					# T_NEEDS_KEY - the treasure needs the key to be opened
 					message = "This treasure is locked and you don't have the right key."
 					type = "error"
 					$("#treasure-locked").get(0).play()
 				when -4
-					# not enough player
+					# NOT_ENOUGH_PLAYERS - not enough player
 					message = "Some moron is got out from the game and has not come back in time..."
 					type = "error"
 				when -5
-					# treasure empty
+					# T_EMPTY - treasure empty
 					message = "Oh oh, there's nothing here."
 					type = "error"
 				when -6
-					# no treasure nearby
+					# NO_T_NEAR_YOU - no treasure nearby
 					message = "There are no treasure near you, moron."
 					type = "error"
 				when 1
-					# attacked from ghost
+					# PARANORMAL_ATTACK - attacked from ghost
 					message = "Aaaaaaaah!"
 					type = "message"
 					$("#ghost-attack").get(0).play()
 				when 2
-					# attacked from human
+					# HUMAN_ATTACK - attacked from human
 					message = "Ouch!"
 					type = "message"
 				when 3
-					# key found
+					# KEY_FOUND - key found
 					message = "You have found a key! Yay!"
 					type = "message"
 					$("#keys-found").get(0).play()
 				when 4
-					# gold found
+					# GOLD_FOUND - gold found
 					message = "You have found some gold! You are filthy rich now!"
 					type = "message"
 					$("#gold-found").get(0).play()
 				when 5
-					# key and gold found
+					# K_G_FOUND - key and gold found
 					message = "Jackpot! You have found a key and some gold!"
 					type = "message"
 					$("#gold-found").get(0).play()
 					$("#keys-found").delay(600).get(0).play()
 				when 6
-					# victory
+					# VICTORY - victory
 					message = "Your team won this game! Congratulations!"
 					type = "message"
 				when 7
-					# lost
+					# LOST - lost
 					message = "Your team has been defeated! Looooooosers!"
 					type = "message"
 			
