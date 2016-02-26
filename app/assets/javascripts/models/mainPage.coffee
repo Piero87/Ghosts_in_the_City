@@ -268,6 +268,8 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					@gamestarted(false)
 					@gamepaused(false)
 					@gameended(false)
+					$("#ghostbusters-song").get(0).play()
+					$("#ghostbusters-theme").get(0).pause()
 				when 0 # game ready - wait for other players
 					@gameready(true)
 					@gamestarted(false)
@@ -278,7 +280,8 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					@gamestarted(true)
 					@gamepaused(false)
 					@gameended(false)
-					$("#ghostbuster-theme").get(0).pause()
+					$("#ghostbusters-song").get(0).pause()
+					$("#ghostbusters-theme").get(0).play()
 				when 2 # game paused
 					@gameready(false)
 					@gamestarted(false)
@@ -289,7 +292,8 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					@gamestarted(false)
 					@gamepaused(false)
 					@gameended(true)
-					$("#ghostbuster-theme").get(0).play()
+					$("#ghostbusters-song").get(0).play()
+					$("#ghostbusters-theme").get(0).pause()
 		
 		generateUID: ->
 			id = ""

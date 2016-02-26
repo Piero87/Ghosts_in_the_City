@@ -32,7 +32,8 @@
 		<div align="center" style="margin-bottom:20px;" data-bind="ifnot: gamestarted">
 			<img src="/assets/images/Ghostbuster_banner.png" alt="" style="max-width: 100%; max-height: 128px;">
 		</div>
-		<audio id="ghostbuster-theme" src="/assets/images/Ghostbusters.mp3" preload="auto" autoplay="autoplay"></audio>
+		<audio id="ghostbusters-song" src="/assets/images/Ghostbusters_song.mp3" preload="auto" autoplay="autoplay" loop></audio>
+		<audio id="ghostbusters-theme" src="/assets/images/Ghostbusters_theme.mp3" loop></audio>
 		<audio id="gold-found" src="/assets/images/gold_found.mp3"></audio>
 		<audio id="keys-found" src="/assets/images/keys_found.mp3"></audio>
 		<audio id="treasure-locked" src="/assets/images/treasure_locked.mp3"></audio>
@@ -218,12 +219,13 @@
     	</div>
     	<script type="text/javascript">
 	    	window.onload = function() {
-	    	    document.getElementById("ghostbuster-theme").volume = 0.1;
+	    	    document.getElementById("ghostbusters-song").volume = 0.1;
+	    	    document.getElementById("ghostbusters-theme").volume = 0.2;
 	    	    document.getElementById("gold-found").volume = 0.5;
 	    	    document.getElementById("keys-found").volume = 0.5;
 	    	    document.getElementById("treasure-locked").volume = 0.5;
 	    	    document.getElementById("treasure-opening").volume = 0.5;
-	    	    document.getElementById("ghost-attack").volume = 0.0;
+	    	    document.getElementById("ghost-attack").volume = 0.5;
 	    	}
     	</script>
 }
