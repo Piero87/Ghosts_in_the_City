@@ -52,6 +52,14 @@
 	color: red !important;
 }
 
+.text-green {
+	color: green !important;
+}
+
+.text-grey {
+	color: silver !important;
+}
+
 .bg-red {
 	background-color: red !important;
 }

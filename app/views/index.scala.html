@@ -38,6 +38,7 @@
 		<audio id="keys-found" src="/assets/images/keys_found.mp3"></audio>
 		<audio id="treasure-locked" src="/assets/images/treasure_locked.mp3"></audio>
 		<audio id="treasure-opening" src="/assets/images/treasure_opening.mp3"></audio>
+		<audio id="trap-activated" src="/assets/images/trap_activated.mp3"></audio>
 		<audio id="ghost-attack" src="/assets/images/ghost_attack.mp3"></audio>
 		
         <div data-bind="visible: disconnected" align="center">
@@ -213,8 +214,51 @@
 	        	<div class="ghostbuster-font font-medium">get ready!</div>
 	        </div>
 	        <div data-bind="visible: gameended" align="center">
-	        	<h1 class="ghostbuster-font font-huge">GAME OVER</h1>
-	        	<button class="btn ghostbuster-font" data-bind="click: playAgain">Play Again</button>
+	        	<h1 class="ghostbuster-font font-big">GAME "<span data-bind="text: gamename"></span>" IS oVER</h1>
+	        	<h2 id="game-result-won" class="text-green" style="display:none;"> - Your team won! - </h2>
+	        	<h2 id="game-result-lost" class="text-red" style="display:none;">Looooooser!</h2>
+	        	<h2 id="game-result-draw" class="text-grey" style="display:none;">Uhm...It ended in a draw...</h2>
+	        	<hr>
+	        	<h1 class="ghostbuster-font font-medium">Players:</h1>
+	        	<div class="row">
+	        		<div class="col-sm-6">
+	        			<div class="ghostbuster-font font-big" align="center" style="color: red !important;">Team RED</div>
+		        		<div data-bind="foreach: game_team_RED">
+						    <div class="row" style="margin-bottom: 10px;">
+						    	<span class="col-xs-6" align="right">
+						    		<img width="48px" height="48px" alt="PLAYER ' + $data.index + '" data-bind="attr:{src: '/assets/images/G' + $data.index + '.png'}"/>
+						    	</span>
+					    		<span class="col-xs-6 ghostbuster-font font-big line-with-icon" align="left"> 
+						    	  	<span>
+						    			<span data-bind="text: name"></span>
+						    			<span class="ghostbuster-font font-small" align="left" data-bind="visible: uid == $parent.useruid()"> (you)</span>
+						    			<span class="gold-owned" data-bind="text: gold"></span> $
+						    	  	</span>				    	  	
+						    	</span>
+							    
+						    </div>
+						</div>
+					</div>
+					<div class="col-sm-6">
+						<div class="ghostbuster-font font-big" align="center" style="color: blue !important;">Team BLUE</div>
+		        		<div data-bind="foreach: game_team_BLUE">
+						    <div class="row" style="margin-bottom: 10px;">
+						    	<span class="col-xs-6" align="right">
+						    		<img width="48px" height="48px" alt="PLAYER ' + $data.index + '" data-bind="attr:{src: '/assets/images/G' + $data.index + '.png'}"/>
+						    	</span>
+					    		<span class="col-xs-6 ghostbuster-font font-big line-with-icon" align="left"> 
+						    	  	<span>
+						    			<span data-bind="text: name"></span>
+						    			<span class="ghostbuster-font font-small" align="left" data-bind="visible: uid == $parent.useruid()"> (you)</span>
+						    			<span class="gold-owned" data-bind="text: gold"></span> $
+						    	  	</span>					    	  	
+						    	</span>
+							    	
+						    </div>
+						</div>
+					</div>
+				</div>
+				<button class="btn ghostbuster-font" data-bind="click: playAgain">Play Again</button>
 	        </div>
     	</div>
     	<script type="text/javascript">
@@ -223,6 +267,7 @@
 	    	    document.getElementById("ghostbusters-theme").volume = 0.2;
 	    	    document.getElementById("gold-found").volume = 0.5;
 	    	    document.getElementById("keys-found").volume = 0.5;
+	    	    document.getElementById("trap-activated").volume = 0.5;
 	    	    document.getElementById("treasure-locked").volume = 0.5;
 	    	    document.getElementById("treasure-opening").volume = 0.5;
 	    	    document.getElementById("ghost-attack").volume = 0.5;

@@ -179,6 +179,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 				
 				else if json.event == "active_trap"
 					if @gamestarted()
+						$("#trap-activated").get(0).play()
 						@game_client_engine.activeTrap(json.trap.uid) if (json.trap.status == 1)
 						console.log "Trappola attivata!"
 						# console.log json.trap
@@ -191,6 +192,32 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 				
 				else if json.event == "message"
 					@showMessage(json.code)
+					
+				else if json.event == "game_results"
+					# "team" [0,1,-1] : winning team
+					# "players" [list of user_info] : players of the game
+					player_team = -1
+					
+					@game_team_RED.removeAll()
+					@game_team_BLUE.removeAll()
+					if json.game.players.length > 0
+						i = 0
+						for player in json.game.players
+							i = i + 1
+							player.index = i
+							if (player.uid == @useruid())
+								player_team = player.team
+							if (player.team == 0)
+								@game_team_RED.push(player)
+							else if (player.team == 1)
+								@game_team_BLUE.push(player)
+								
+					if (json.team == -1)
+						$("#game-result-draw").show()
+					else if (json.team == player_team)
+						$("#game-result-won").show()
+					else 
+						$("#game-result-lost").show()
 					
 		# The user clicked connect
 		submitUsername: ->
@@ -268,6 +295,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					@gamestarted(false)
 					@gamepaused(false)
 					@gameended(false)
+					$("#ghostbusters-song").get(0).currentTime = 0
 					$("#ghostbusters-song").get(0).play()
 					$("#ghostbusters-theme").get(0).pause()
 				when 0 # game ready - wait for other players
@@ -281,6 +309,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					@gamepaused(false)
 					@gameended(false)
 					$("#ghostbusters-song").get(0).pause()
+					$("#ghostbusters-theme").get(0).currentTime = 0
 					$("#ghostbusters-theme").get(0).play()
 				when 2 # game paused
 					@gameready(false)
@@ -292,6 +321,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					@gamestarted(false)
 					@gamepaused(false)
 					@gameended(true)
+					$("#ghostbusters-song").get(0).currentTime = 0
 					$("#ghostbusters-song").get(0).play()
 					$("#ghostbusters-theme").get(0).pause()
 		
