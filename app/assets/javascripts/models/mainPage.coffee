@@ -24,6 +24,8 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			@gameended= ko.observable(false)
 			@gameid = ko.observable()
 			@gamename = ko.observable()
+			@gamecreator = ko.observable()
+			@gametime = ko.observable()
 			@gamemaxplayers = ko.observable(2)
 			@gameplayersmissing = ko.observable()
 			@game_team_RED = ko.observableArray()
@@ -104,6 +106,14 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					if json.list.length > 0
 						@gamesavailable(true)
 						for game in json.list
+							game_details = game.name.split "_"
+							gamecreator = game_details[0].split("-").join(" ")
+							date = new Date(game_details[1]);
+							hours = date.getHours
+							minutes = "0" + date.getMinutes
+							seconds = "0" + date.getSeconds
+							gametime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2)
+							game.name = "Game created by " + gamecreator + " at " + gametime
 							@gameslist.push(game)
 					else
 						@gamesavailable(false)
@@ -117,6 +127,13 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					@gameid(json.game.id)
 					localStorage.setItem("gameid", @gameid())
 					@gamename(json.game.name)
+					game_details = json.game.name.split "_"
+					@gamecreator(game_details[0].split("-").join(" "))
+					date = new Date(game_details[1]);
+					hours = date.getHours
+					minutes = "0" + date.getMinutes
+					seconds = "0" + date.getSeconds
+					@gametime(hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2))
 					@gamemaxplayers(json.game.n_players)
 					# Update status variables
 					@gameready(true)
