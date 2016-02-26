@@ -109,9 +109,9 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 							game_details = game.name.split "_"
 							gamecreator = game_details[0].split("-").join(" ")
 							date = new Date(game_details[1]);
-							hours = date.getHours
-							minutes = "0" + date.getMinutes
-							seconds = "0" + date.getSeconds
+							hours = date.getHours()
+							minutes = "0" + date.getMinutes()
+							seconds = "0" + date.getSeconds()
 							gametime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2)
 							game.name = "Game created by " + gamecreator + " at " + gametime
 							@gameslist.push(game)
@@ -130,9 +130,9 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					game_details = json.game.name.split "_"
 					@gamecreator(game_details[0].split("-").join(" "))
 					date = new Date(game_details[1]);
-					hours = date.getHours
-					minutes = "0" + date.getMinutes
-					seconds = "0" + date.getSeconds
+					hours = date.getHours()
+					minutes = "0" + date.getMinutes()
+					seconds = "0" + date.getSeconds()
 					@gametime(hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2))
 					@gamemaxplayers(json.game.n_players)
 					# Update status variables
@@ -150,6 +150,16 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 							console.log('Ready!')
 							@refreshPlayerList(json)
 						when 1 # game started
+							
+							@gamename(json.game.name)
+							game_details = json.game.name.split "_"
+							@gamecreator(game_details[0].split("-").join(" "))
+							date = new Date(game_details[1]);
+							hours = date.getHours()
+							minutes = "0" + date.getMinutes()
+							seconds = "0" + date.getSeconds()
+							@gametime(hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2))
+							
 							console.log(json)
 							console.log('Fight!')
 							@refreshPlayerList(json)
