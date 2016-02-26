@@ -200,9 +200,9 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					
 					@game_team_RED.removeAll()
 					@game_team_BLUE.removeAll()
-					if json.game.players.length > 0
+					if json.players.length > 0
 						i = 0
-						for player in json.game.players
+						for player in json.players
 							i = i + 1
 							player.index = i
 							if (player.uid == @useruid())
@@ -214,6 +214,8 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 								
 					if (json.team == -1)
 						$("#game-result-draw").show()
+					else if (json.team == -2)
+						$("#game-result-won").show()
 					else if (json.team == player_team)
 						$("#game-result-won").show()
 					else 
@@ -228,7 +230,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 		
 		# New Game 
 		newGame: ->
-			gamename = @gamename()
+			gamename = @username()
 			gamemaxplayers = @gamemaxplayers()
 			console.log("New Game")
 			@ws.send(JSON.stringify

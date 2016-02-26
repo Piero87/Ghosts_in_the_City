@@ -63,8 +63,7 @@
 	        			<form>
 	        				<fieldset>
 	        					<legend><span class="ghostbuster-font font-big">Create New Game</span></legend>
-	        					<span class="ghostbuster-font">Game Name:</span> <input type="text" data-bind="value: gamename"/> 
-	        					<span class="ghostbuster-font">Players:</span> <input type="number" min="2" max="8" step="2" data-bind="value: gamemaxplayers"> 
+	        					<span class="ghostbuster-font">Number of players:</span> <input type="number" min="2" max="8" step="2" data-bind="value: gamemaxplayers"> 
 	        					<button class="btn ghostbuster-font font-big" data-bind="click: newGame">Create New Game</button>
 	        				</fieldset>
 	        			</form>
@@ -214,10 +213,13 @@
 	        	<div class="ghostbuster-font font-medium">get ready!</div>
 	        </div>
 	        <div data-bind="visible: gameended" align="center">
-	        	<h1 class="ghostbuster-font font-big">GAME "<span data-bind="text: gamename"></span>" IS oVER</h1>
-	        	<h2 id="game-result-won" class="text-green" style="display:none;"> - Your team won! - </h2>
-	        	<h2 id="game-result-lost" class="text-red" style="display:none;">Looooooser!</h2>
-	        	<h2 id="game-result-draw" class="text-grey" style="display:none;">Uhm...It ended in a draw...</h2>
+	        	<h1 class="ghostbuster-font font-huge">GAME OVER</h1>
+	        	<h2 id="game-result-won" class="text-green font-big" style="display:none;"> - Your team won! - </h2>
+	        	<h2 id="game-result-lost" class="text-red font-big" style="display:none;">Looooooser!</h2>
+	        	<h2 id="game-result-draw" class="text-grey font-big" style="display:none;">Uhm...It ended in a draw...</h2>
+	        	<h2 id="game-result-draw" class="text-grey font-big" style="display:none;">
+	        		Some moron has left the game...
+	        	</h2>
 	        	<hr>
 	        	<h1 class="ghostbuster-font font-medium">Players:</h1>
 	        	<div class="row">
@@ -250,7 +252,7 @@
 						    	  	<span>
 						    			<span data-bind="text: name"></span>
 						    			<span class="ghostbuster-font font-small" align="left" data-bind="visible: uid == $parent.useruid()"> (you)</span>
-						    			<span class="gold-owned" data-bind="text: gold"></span> $
+						    			<span class="gold-owned"><span data-bind="text: gold"></span>$</span> 
 						    	  	</span>					    	  	
 						    	</span>
 							    	
