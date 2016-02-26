@@ -309,6 +309,37 @@ class GameManagerBackend () extends Actor {
           
           gameManagerClient ! UpdateUserInfo(user_info)
           
+          var remaining_closed_treasures = treasures.filter(_._1.status == 0)
+          
+          if (remaining_closed_treasures == 0) {
+            //La partita è finita, tutti i tesori sono stati aperti
+            var team_red_gold = ((players.filter(_._1.team == Team.RED)).map(x => x._1.gold)).sum
+            var team_blue_gold = ((players.filter(_._1.team == Team.BLUE)).map(x => x._1.gold)).sum
+            
+            var all_user_info = players.map(x => x._1).toList
+            
+            if (team_red_gold > team_blue_gold) {
+              //La squadra rossa ha vinto
+              gameManagerClient ! BroadcastVictoryResponse(Team.RED,all_user_info)
+            } else if (team_red_gold < team_blue_gold) {
+              //La squadra blu ha vinto
+              gameManagerClient ! BroadcastVictoryResponse(Team.BLUE,all_user_info)
+            } else {
+              //Pareggio
+              gameManagerClient ! BroadcastVictoryResponse(Team.UNKNOWN,all_user_info)
+            }
+            
+            game_status = StatusGame.FINISHED
+            val future = gameManagerClient ? KillYourself
+            future.onSuccess { 
+              case KillMyself => 
+                logger.log("GMClient will die")
+                self ! PoisonPill
+            }
+            future onFailure {
+              case e: Exception => logger.log("******GAME MANAGER BACKEND KILL ERROR ******")
+            }
+          }
           
         }
       } else if (t_needs_key.size != 0) {
@@ -369,8 +400,8 @@ class GameManagerBackend () extends Actor {
 
     var polygon = new Polygon(List(Point(0,0),Point(0,height),Point(width,0),Point(width,height)))
     
-    val n_treasures_and_ghosts = 8
-    val n_free_ghosts = game_n_players + 1
+    var n_treasures_and_ghosts = game_n_players*2
+    var n_free_ghosts = game_n_players + 1
     
     var spaces = UtilFunctions.createSpaces(n_treasures_and_ghosts)
     var position_treasure = new Array[Point](n_treasures_and_ghosts)

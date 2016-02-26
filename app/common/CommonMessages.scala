@@ -48,9 +48,7 @@ object MsgCodes extends Enumeration {
   val KEY_FOUND = 3
   val GOLD_FOUND = 4
   val K_G_FOUND = 5
-  val VICTORY = 6
-  val LOST = 7
-  val T_SUCCESS_OPENED = 8
+  val T_SUCCESS_OPENED = 6
    
 }
 
@@ -113,6 +111,8 @@ case class Game(id: String, name: String, n_players: Int, status: Int, players: 
 case class GamesList(list: List[Game])
 case object GamesList
 case object GameStatus
+case class BroadcastVictoryResponse(team: Int,players: List[UserInfo])
+
 
 // Actor
 case object KillYourself
@@ -138,7 +138,8 @@ case class BroadcastRemoveTrapJSON(event:String, trap: TrapInfo)
 case class UpdateUserInfoJSON(event: String, user: UserInfo)
 case class MessageCodeJSON(event: String, code: Int)
 case class UpdateTreasureJSON(event: String, treasures: MutableList[TreasureInfo])
-
+case class VictoryResponseJSON(event: String, team: Int, players: List[UserInfo])
+    
 import play.api.libs.json._
 
 object CommonMessages {
@@ -214,5 +215,8 @@ object CommonMessages {
   
   implicit val updateTreasureJSONReads = Json.reads[UpdateTreasureJSON]
   implicit val updateTreasureJSONWrites = Json.writes[UpdateTreasureJSON]
+  
+  implicit val victoryResponseJSONReads = Json.reads[VictoryResponseJSON]
+  implicit val victoryResponseJSONWrites = Json.writes[VictoryResponseJSON]
   
 }

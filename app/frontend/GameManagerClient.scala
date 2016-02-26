@@ -162,6 +162,10 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       clientsConnections.map {cc =>
         cc._2 forward BroadcastUpdateTreasure(treasures)
       }
+    case BroadcastVictoryResponse(team, players) =>
+      clientsConnections.map {cc =>
+        cc._2 forward BroadcastVictoryResponse(team, players)
+      }
         
   }
 }
