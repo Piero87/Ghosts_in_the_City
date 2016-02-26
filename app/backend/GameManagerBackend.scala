@@ -111,20 +111,11 @@ class GameManagerBackend () extends Actor {
      
       // Se non abbiamo più giocatori dobbiamo dire al GameManager Client  di uccidersi
       if (players.size == 0 || game_status == StatusGame.STARTED) {
-        game_status = StatusGame.FINISHED
         
         var all_user_info = players.map(x => x._1).toList
         gameManagerClient ! BroadcastVictoryResponse(Team.NO_ENOUGH_PLAYER,all_user_info)
         
-        val future = gameManagerClient ? KillYourself
-          future.onSuccess { 
-            case KillMyself => 
-              logger.log("GMClient will die")
-              self ! PoisonPill
-          }
-          future onFailure {
-            case e: Exception => logger.log("******GAME MANAGER BACKEND KILL ERROR ******")
-          }
+        self ! Finish
       } else {
         val tmp_g = ghosts.map(x => x._1)
         val tmp_t = treasures.map(x => x._1)
@@ -333,16 +324,8 @@ class GameManagerBackend () extends Actor {
               gameManagerClient ! BroadcastVictoryResponse(Team.UNKNOWN,all_user_info)
             }
             
-            game_status = StatusGame.FINISHED
-            val future = gameManagerClient ? KillYourself
-            future.onSuccess { 
-              case KillMyself => 
-                logger.log("GMClient will die")
-                self ! PoisonPill
-            }
-            future onFailure {
-              case e: Exception => logger.log("******GAME MANAGER BACKEND KILL ERROR ******")
-            }
+            context.system.scheduler.scheduleOnce(1000 millis, self, Finish)
+            
           }
           
         }
@@ -386,6 +369,17 @@ class GameManagerBackend () extends Actor {
         gameManagerClient ! UpdateUserInfo(user_info)
         //Mando al fantasmi il numero di soldi rubati
         origin ! gold_stolen
+      }
+    case Finish =>
+      game_status = StatusGame.FINISHED
+      val future = gameManagerClient ? KillYourself
+      future.onSuccess { 
+        case KillMyself => 
+          logger.log("GMClient will die")
+          self ! PoisonPill
+      }
+      future onFailure {
+        case e: Exception => logger.log("******GAME MANAGER BACKEND KILL ERROR ******")
       }
   }
   
