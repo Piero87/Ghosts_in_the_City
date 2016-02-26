@@ -108,7 +108,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 						for game in json.list
 							game_details = game.name.split "_"
 							gamecreator = game_details[0].split("-").join(" ")
-							date = new Date(game_details[1]);
+							date = new Date(parseInt( game_details[1], 10 ));
 							hours = date.getHours()
 							minutes = "0" + date.getMinutes()
 							seconds = "0" + date.getSeconds()
@@ -129,7 +129,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					@gamename(json.game.name)
 					game_details = json.game.name.split "_"
 					@gamecreator(game_details[0].split("-").join(" "))
-					date = new Date(game_details[1]);
+					date = new Date(parseInt( game_details[1], 10 ));
 					hours = date.getHours()
 					minutes = "0" + date.getMinutes()
 					seconds = "0" + date.getSeconds()
@@ -154,7 +154,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 							@gamename(json.game.name)
 							game_details = json.game.name.split "_"
 							@gamecreator(game_details[0].split("-").join(" "))
-							date = new Date(game_details[1]);
+							date = new Date(parseInt( game_details[1], 10 ));
 							console.log(date)
 							console.log(game_details[1])
 							hours = date.getHours()
