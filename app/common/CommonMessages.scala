@@ -41,7 +41,6 @@ object MsgCodes extends Enumeration {
   val NOT_ENOUGH_PLAYERS = -4
   val T_EMPTY = -5
   val NO_T_NEAR_YOU = -6
-  val T_WRONG_KEY = -7
   
   // Normal
   val PARANORMAL_ATTACK = 1

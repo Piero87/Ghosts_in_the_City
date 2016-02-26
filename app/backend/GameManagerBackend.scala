@@ -247,7 +247,6 @@ class GameManagerBackend () extends Actor {
     case TreasureResponse(uid_p,results) =>
       //Controllo se abbiamo aperto uno o più tesori
       var t_opened = results.filter(_._1 == MsgCodes.T_SUCCESS_OPENED)
-      var t_wrong_key = results.filter(_._1 == MsgCodes.T_WRONG_KEY)
       var t_needs_key = results.filter(_._1 == MsgCodes.T_NEEDS_KEY)
       
       if (t_opened.size != 0) {
@@ -312,8 +311,6 @@ class GameManagerBackend () extends Actor {
           
           
         }
-      } else if (t_wrong_key.size != 0) {
-        gameManagerClient ! MessageCode(uid_p, MsgCodes.T_WRONG_KEY)
       } else if (t_needs_key.size != 0) {
         gameManagerClient ! MessageCode(uid_p, MsgCodes.T_NEEDS_KEY)
       }

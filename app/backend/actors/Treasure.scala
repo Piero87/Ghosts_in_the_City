@@ -54,7 +54,7 @@ class Treasure(uid: String, position: Point, loot: Tuple2[Key,Int], needKey: Tup
         
         if (!check)  {
           logger.log("Not Open: Wrong key")
-          origin ! Tuple5(MsgCodes.T_WRONG_KEY,treasure_loot._1,treasure_loot._2,uid,"")
+          origin ! Tuple5(MsgCodes.T_NEEDS_KEY,treasure_loot._1,treasure_loot._2,uid,"")
         }
         
       } else if (treasure_need_key._1 && (keys.size == 0))  {
