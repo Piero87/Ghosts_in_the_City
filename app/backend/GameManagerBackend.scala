@@ -112,6 +112,10 @@ class GameManagerBackend () extends Actor {
       // Se non abbiamo più giocatori dobbiamo dire al GameManager Client  di uccidersi
       if (players.size == 0 || game_status == StatusGame.STARTED) {
         game_status = StatusGame.FINISHED
+        
+        var all_user_info = players.map(x => x._1).toList
+        gameManagerClient ! BroadcastVictoryResponse(Team.NO_ENOUGH_PLAYER,all_user_info)
+        
         val future = gameManagerClient ? KillYourself
           future.onSuccess { 
             case KillMyself => 
@@ -311,7 +315,7 @@ class GameManagerBackend () extends Actor {
           
           var remaining_closed_treasures = treasures.filter(_._1.status == 0)
           
-          if (remaining_closed_treasures == 0) {
+          if (remaining_closed_treasures.size == 0) {
             //La partita è finita, tutti i tesori sono stati aperti
             var team_red_gold = ((players.filter(_._1.team == Team.RED)).map(x => x._1.gold)).sum
             var team_blue_gold = ((players.filter(_._1.team == Team.BLUE)).map(x => x._1.gold)).sum
