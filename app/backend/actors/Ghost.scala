@@ -194,21 +194,25 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
     
     var pl = players.filter(_._1.uid == p_uid).head
     
-    if(Math.abs(distance_x) < ghost_radius && Math.abs(distance_y) < ghost_radius){
-      if (Math.abs(distance_x) > Math.abs(distance_y) && Math.abs(distance_x) > 10) {
-				if (distance_x > 0){
-					ghost_move = 1
-				} else {
-					ghost_move = 3
-				}
-			} else if (Math.abs(distance_x) < Math.abs(distance_y) && Math.abs(distance_y) > 10) {
-		    if (distance_y > 0){
-						ghost_move = 2
-				} else {
-						ghost_move = 0
-				}
-			}
-		}
+    var player_gold = smellPlayerGold(pl._1)
+    
+    if (player_gold > 0 && (distance_x > 15 || distance_y > 15)){
+      if(Math.abs(distance_x) < ghost_radius && Math.abs(distance_y) < ghost_radius){
+        if (Math.abs(distance_x) > Math.abs(distance_y) && Math.abs(distance_x) > 10) {
+  				if (distance_x > 0){
+  					ghost_move = 1
+  				} else {
+  					ghost_move = 3
+  				}
+  			} else if (Math.abs(distance_x) <= Math.abs(distance_y) && Math.abs(distance_y) > 10) {
+  		    if (distance_y > 0){
+  						ghost_move = 2
+  				} else {
+  						ghost_move = 0
+  				}
+  			}
+  		}
+    }
     
     ghost_move match {
        // In alto
@@ -228,7 +232,7 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
            new_position = new Point(ghostpos.x - ghostmovement, ghostpos.y)
        }
        case -1 => {
-          
+          // wait still
        }
      }
     
@@ -240,7 +244,7 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
        }
     }
     
-    if (Math.abs(distance_x) < 10 && Math.abs(distance_y) < 10 && smellPlayerGold(pl._1) > 0) {
+    if (Math.abs(distance_x) < 10 && Math.abs(distance_y) < 10 && player_gold > 0) {
         logger.log(" Giocatore raggiunto! Lo attacco")
         // Giocatore raggiunto! Gli rubo i soldi
         
