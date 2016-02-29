@@ -65,25 +65,29 @@
         
         <div data-bind="visible: connected" align="center">
         	<div data-bind="visible: (!gameready() && !gamestarted() && !gamepaused() && !gameended())" align="center" >
-	        	<div class="ghostbuster-font" align="justify">It's a gloomy day in the Big Apple, the ghosts have taken possession of the city and they robbed all the gold reserves. 
-	        	Your job is to challenge them, and recover all the stolen gold! 
+	        	<div class="ghostbuster-font" align="center">
+	        	It's a gloomy day in the Big Apple, the ghosts have taken possession of the city and they robbed all the gold reserves. 
+	        	<br>
+	        	Your job is to challenge them, and recover all the stolen gold!
+	        	<br>
 	        	You can trap them to make it easier but be careful, traps cost. 
 	        	<br>
-	        	Other Ghostbusters have joined the mission, do not let that these pusillanimous take the spotlight from you, 
-	        	incite your team to overwhelm all the ghosts, leaving them without a penny!</div>
+	        	other Ghostbusters have joined the mission, do not let that these pusillanimous take the spotlight from you.
+	        	<br> 
+	        	Lead your team to overwhelm all the ghosts, leaving them without a penny!</div>
 	        	<h2 class="ghostbuster-font">Can you be the hero the city needs?</h2>
 	        	<div class="bordered" style="max-width: 500px;">
 	        		<div class="container">
 	        			<form>
 	        				<fieldset>
 	        					<span class="ghostbuster-font">Number of players:</span> <input type="number" min="2" max="8" step="2" data-bind="value: gamemaxplayers"> 
-	        					<button class="btn ghostbuster-font font-big" data-bind="click: newGame">Create New Game</button>
+	        					<button class="btn ghostbuster-font font-big" data-bind="click: newGame">Start new Mission</button>
 	        				</fieldset>
 	        			</form>
 	        		</div>
 	        		<hr>
 	        		<div class="container" data-bind="visible: gamesavailable">
-	        			<p class="ghostbuster-font font-big">Available Games</p>
+	        			<p class="ghostbuster-font font-big">Available Missions</p>
 	        			<ul data-bind="foreach: gameslist">
 						    <li>
 						        <span class="ghostbuster-font" data-bind="text: name"></span> 
@@ -92,21 +96,21 @@
 						</ul>
 	        		</div>
 	        		<div class="container" data-bind="ifnot: gamesavailable">
-	        			<p class="ghostbuster-font font-big"><i>there are no games available</i></p>
+	        			<p class="ghostbuster-font font-big"><i>there are no missions available</i></p>
 	        		</div>
 	        	</div>
         	</div>
         	<div data-bind="visible: gameready" align="center">
         		<div data-bind="visible: (username() != gamecreator())">
-        			<h1 class="ghostbuster-font font-big">Game created by <span data-bind="text: gamecreator"></span> at <span data-bind="text: gametime"></span></h1>
+        			<h1 class="ghostbuster-font font-big">Mission created by <span data-bind="text: gamecreator"></span> at <span data-bind="text: gametime"></span></h1>
         		</div>
 	        	<div data-bind="visible: (username() == gamecreator())">
-        			<h1 class="ghostbuster-font font-big">You created this game at <span data-bind="text: gametime"></span></h1>
+        			<h1 class="ghostbuster-font font-big">You created this mission at <span data-bind="text: gametime"></span></h1>
         		</div>
-	        	<p class="ghostbuster-font">[game with <span data-bind="text: gamemaxplayers"></span> players]</p>
-	        	<p class="ghostbuster-font font-medium">waiting for <span data-bind="text: gameplayersmissing"></span> more player<span data-bind="visible: gameplayersmissing != 1">s</span>...</p>
+	        	<p class="ghostbuster-font">[mission with <span data-bind="text: gamemaxplayers"></span> ghostbusters]</p>
+	        	<p class="ghostbuster-font font-medium">waiting for <span data-bind="text: gameplayersmissing"></span> more ghostbuster<span data-bind="visible: gameplayersmissing != 1">s</span>...</p>
 	        	<hr>
-	        	<h1 class="ghostbuster-font font-medium">Players:</h1>
+	        	<h1 class="ghostbuster-font font-medium">Ghostbusters:</h1>
 	        	<div class="row">
 	        		<div class="col-sm-6">
 	        			<div class="ghostbuster-font font-big" align="center" style="color: red !important;">Team RED</div>
@@ -144,11 +148,11 @@
 					</div>
 				</div>
 				<hr>
-				<button class="btn ghostbuster-font" data-bind="click: leaveGame">Leave Game</button>
+				<button class="btn ghostbuster-font" data-bind="click: leaveGame">Leave Mission</button>
 	        </div>
 	        <div data-bind="visible: gamestarted" align="center">
 	        	<h1 class="ghostbuster-font font-big"> 
-	        		game created by <span data-bind="text: gamecreator"></span> at <span data-bind="text: gametime"></span>
+	        		mission created by <span data-bind="text: gamecreator"></span> at <span data-bind="text: gametime"></span>
 	        	</h1>
 	        	<div align="center">
 	        		<div id="message-alert" 
@@ -224,22 +228,22 @@
 						</div>
 					</div>
 					<hr>
-					<button class="btn ghostbuster-font" data-bind="click: leaveGame">Leave Game</button>
+					<button class="btn ghostbuster-font" data-bind="click: leaveGame">Leave Mission</button>
 				</div>
 				
 	        </div>
 	        <div data-bind="visible: gamepaused" align="center">
-	        	<h1 class="ghostbuster-font font-huge">GAME PAUSED</h1>
+	        	<h1 class="ghostbuster-font font-huge">mission paused</h1>
 	        	<div class="ghostbuster-font font-medium">get ready!</div>
 	        </div>
 	        <div data-bind="visible: gameended" align="center">
-	        	<h1 class="ghostbuster-font font-huge">GAME OVER</h1>
+	        	<h1 class="ghostbuster-font font-huge">mission over</h1>
 	        	<h2 id="game-result-won" class="text-green font-huge ghostbuster-font" style="display:none;"> - Your team won! - </h2>
 	        	<h2 id="game-result-lost" class="text-red font-huge ghostbuster-font" style="display:none;">Looooooser!</h2>
 	        	<h2 id="game-result-draw" class="text-grey font-huge ghostbuster-font" style="display:none;">Uhm...It ended in a draw...</h2>
-	        	<h2 id="game-result-draw" class="text-grey font-huge ghostbuster-font" style="display:none;"> Some moron has left the game...</h2>
+	        	<h2 id="game-result-draw" class="text-grey font-huge ghostbuster-font" style="display:none;"> Some moron has left the mission...</h2>
 	        	<hr>
-	        	<h1 class="ghostbuster-font font-medium">Players:</h1>
+	        	<h1 class="ghostbuster-font font-medium">Ghostbusters:</h1>
 	        	<div class="row">
 	        		<div class="col-sm-6">
 	        			<div class="ghostbuster-font font-big" align="center" style="color: red !important;">Team RED</div>
@@ -278,7 +282,7 @@
 						</div>
 					</div>
 				</div>
-				<button class="btn ghostbuster-font" data-bind="click: playAgain">Play Again</button>
+				<button class="btn ghostbuster-font" data-bind="click: playAgain">Go Back to Home Page</button>
 	        </div>
     	</div>
     	<script type="text/javascript">
