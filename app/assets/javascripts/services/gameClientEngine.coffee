@@ -10,7 +10,7 @@ define () ->
 			@treasure_radius = $("#conf_treasure_radius").val()
 			@trap_radius = $("#conf_trap_radius").val()
 			
-			@debug = true;
+			@debug = false;
 			
 			@gameLoop = null
 
@@ -60,6 +60,7 @@ define () ->
 			@trap_unactive.src = '/assets/images/Trap_unactive.png'
 			
 		initCanvas: ->
+			@resetCanvas()
 			canvas_container = document.getElementById("gameArenaContainer")
 			@canvas = document.createElement("canvas")
 			@canvas.width = @space_width

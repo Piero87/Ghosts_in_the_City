@@ -11,11 +11,13 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <span class="navbar-brand ghostbuster-font text-black"><img src="/assets/images/favicon.png" alt="" width="64">Gh<span class="text-red">O</span>sts in the City</span>
+                <span class="navbar-brand ghostbuster-font text-black"><img src="/assets/images/favicon.png" alt="" width="32">Gh<span class="text-red">O</span>sts in the City</span>
             </div>
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav navbar-right">
                 	<li data-bind="ifnot: disconnected"><a class="ghostbuster-font" href="javascript:void(0);">Hello <span data-bind="text: username"></span>!</a></li>
+                	<li data-bind="ifnot: disconnected, click: toggleMusic"><a class="ghostbuster-font" href="javascript:void(0);">Music: <span data-bind="text: music"></span></a></li>
+                	<li data-bind="ifnot: disconnected, click: toggleSounds"><a class="ghostbuster-font" href="javascript:void(0);">Sounds: <span data-bind="text: sounds"></span></a></li>
                     <li data-bind="ifnot: disconnected, click: disconnect"><a class="ghostbuster-font" href="javascript:void(0);">Disconnect</a></li>
                 </ul>
             </div>
@@ -32,7 +34,7 @@
 		<div align="center" style="margin-bottom:20px;" data-bind="ifnot: gamestarted">
 			<img src="/assets/images/Ghostbuster_banner.png" alt="" style="max-width: 100%; max-height: 128px;">
 		</div>
-		<audio id="ghostbusters-song" src="/assets/images/Ghostbusters_song.mp3" preload="auto" autoplay="autoplay" loop></audio>
+		<audio id="ghostbusters-song" src="/assets/images/Ghostbusters_song.mp3" loop></audio>
 		<audio id="ghostbusters-theme" src="/assets/images/Ghostbusters_theme.mp3" loop></audio>
 		<audio id="gold-found" src="/assets/images/gold_found.mp3"></audio>
 		<audio id="keys-found" src="/assets/images/keys_found.mp3"></audio>
@@ -62,7 +64,6 @@
 	        		<div class="container">
 	        			<form>
 	        				<fieldset>
-	        					<legend><span class="ghostbuster-font font-big">Create New Game</span></legend>
 	        					<span class="ghostbuster-font">Number of players:</span> <input type="number" min="2" max="8" step="2" data-bind="value: gamemaxplayers"> 
 	        					<button class="btn ghostbuster-font font-big" data-bind="click: newGame">Create New Game</button>
 	        				</fieldset>
@@ -84,7 +85,12 @@
 	        	</div>
         	</div>
         	<div data-bind="visible: gameready" align="center">
-	        	<h1 class="ghostbuster-font font-big">You have joined the game created by <span data-bind="text: gamecreator"></span> at <span data-bind="text: gametime"></span></h1>
+        		<div data-bind="visible: (username() != gamecreator())">
+        			<h1 class="ghostbuster-font font-big">Game created by <span data-bind="text: gamecreator"></span> at <span data-bind="text: gametime"></span></h1>
+        		</div>
+	        	<div data-bind="visible: (username() == gamecreator())">
+        			<h1 class="ghostbuster-font font-big">You created this game at <span data-bind="text: gametime"></span></h1>
+        		</div>
 	        	<p class="ghostbuster-font">[game with <span data-bind="text: gamemaxplayers"></span> players]</p>
 	        	<p class="ghostbuster-font font-medium">waiting for <span data-bind="text: gameplayersmissing"></span> more player<span data-bind="visible: gameplayersmissing != 1">s</span>...</p>
 	        	<hr>
