@@ -550,6 +550,5 @@ class GameManagerBackend () extends Actor {
   
   def removeTrapScheduler(uid:String) = {
      context.system.scheduler.scheduleOnce(10000 millis, self, RemoveTrap(uid))
-     
   }
 }
