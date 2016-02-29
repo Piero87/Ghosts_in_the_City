@@ -121,7 +121,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 							minutes = "0" + date.getMinutes()
 							seconds = "0" + date.getSeconds()
 							gametime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2)
-							game.name = "Game created by " + gamecreator + " at " + gametime
+							game.name = "Mission created by " + gamecreator + " at " + gametime
 							@gameslist.push(game)
 					else
 						@gamesavailable(false)
@@ -441,7 +441,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					$("#treasure-locked").get(0).play()
 				when -4
 					# NOT_ENOUGH_PLAYERS - not enough player
-					message = "Some moron is got out from the game and has not come back in time..."
+					message = "Some moron leaved the mission and has not come back in time..."
 					type = "error"
 				when -5
 					# T_EMPTY - treasure empty
