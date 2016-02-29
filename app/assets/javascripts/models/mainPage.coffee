@@ -184,6 +184,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 							console.log 'Game Over!'
 							@gamename("")
 							localStorage.removeItem("gameid")
+							@game_client_engine.endGame()
 										
 				else if json.event == "update_player_position"
 					if @gamestarted()

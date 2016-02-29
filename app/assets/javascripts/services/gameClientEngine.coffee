@@ -100,6 +100,9 @@ define () ->
 				window.removeEventListener 'keydown', @callback_key, true
 				@resetCanvas()
 		
+		endGame: ->
+			@resetCanvas()
+			
 		setBusters: (players) ->
 			@busters = []
 			@busters_images = []
