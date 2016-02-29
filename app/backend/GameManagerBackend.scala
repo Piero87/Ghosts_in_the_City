@@ -228,6 +228,7 @@ class GameManagerBackend () extends Actor {
       traps = traps.filterNot {_.uid == uid }
       
     case MessageCode(uid,code,option) =>
+      logger.log("New Message! code: " + code + " option: " + option + " to: " + uid)
       gameManagerClient ! MessageCode(uid,code,option)
       
     case OpenTreasureRequest(uid) =>
