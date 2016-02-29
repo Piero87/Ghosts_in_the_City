@@ -60,6 +60,7 @@ define () ->
 			@trap_unactive.src = '/assets/images/Trap_unactive.png'
 			
 		initCanvas: ->
+			@resetCanvas()
 			canvas_container = document.getElementById("gameArenaContainer")
 			@canvas = document.createElement("canvas")
 			@canvas.width = @space_width
