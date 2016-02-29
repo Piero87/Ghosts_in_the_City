@@ -29,7 +29,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
   
   def receive = {
     case msg: JsValue =>
-      logger.log(msg.toString() + " (" + username + ")")
+      //logger.log(msg.toString() + " (" + username + ")")
       ((__ \ "event").read[String]).reads(msg) map {
         case "new_game" =>
           val newGameResult: JsResult[NewGameJSON] = msg.validate[NewGameJSON](CommonMessages.newGameReads)
@@ -70,7 +70,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
               val future = frontendManager ? JoinGame(s.get.game,user_info,self)
               future.onSuccess {
                 case GameHandler(game,ref) =>  
-                  logger.log("GameManagerClient path: " + sender.path)
+                  // logger.log("GameManagerClient path: " + sender.path)
                   if (ref != null) gameManagerClient = ref
                   game_id = game.id
                   for( user <- game.players) {
@@ -107,7 +107,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
               val future = frontendManager ? ResumeGame(s.get.game_id,user_info, self)
               future.onSuccess {
                 case GameHandler(game,ref) =>  
-                  logger.log("GameManagerClient path: " + sender.path)
+                  //logger.log("GameManagerClient path: " + sender.path)
                   if (ref != null) gameManagerClient = ref
                   game_id = game.id
                   for( user <- game.players) {
@@ -126,7 +126,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
            var user_info = new UserInfo(uid,username,team,Point(0,0),0, List())
            gameManagerClient ! SetTrapRequest(user_info)
          case "hit_player" =>
-           logger.log("Hit Player!")
+           //logger.log("Hit Player!")
          case "open_treasure" =>
            gameManagerClient ! OpenTreasureRequest(uid)
            
