@@ -196,23 +196,21 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
     
     var player_gold = smellPlayerGold(pl._1)
     
-    //if (player_gold > 0 || (distance_x > icon_size/2 || distance_y > icon_size/2)){
-      if(Math.abs(distance_x) < ghost_radius && Math.abs(distance_y) < ghost_radius){
-        if (Math.abs(distance_x) > Math.abs(distance_y) && Math.abs(distance_x) > icon_size/2) {
-  				if (distance_x > 0){
-  					ghost_move = 1
-  				} else {
-  					ghost_move = 3
-  				}
-  			} else if (Math.abs(distance_x) < Math.abs(distance_y) && Math.abs(distance_y) > icon_size/2) {
-  		    if (distance_y > 0){
-  						ghost_move = 2
-  				} else {
-  						ghost_move = 0
-  				}
-  			}
-  		}
-    //}
+    if(Math.abs(distance_x) < ghost_radius && Math.abs(distance_y) < ghost_radius){
+      if (Math.abs(distance_x) > Math.abs(distance_y) && Math.abs(distance_x) > icon_size/4) {
+				if (distance_x > 0){
+					ghost_move = 1
+				} else {
+					ghost_move = 3
+				}
+			} else if (Math.abs(distance_x) < Math.abs(distance_y) && Math.abs(distance_y) > icon_size/4) {
+		    if (distance_y > 0){
+						ghost_move = 2
+				} else {
+						ghost_move = 0
+				}
+			}
+		}
     
     ghost_move match {
        // In alto
@@ -238,7 +236,7 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
     
 //  if(area.contains(new_position, area_Edge)){
     if ((icon_size < new_position.x && new_position.x < width-icon_size) && (icon_size < new_position.y && new_position.y < height-icon_size)) {  
-       if(level ==3 || new_position.distanceFrom(position_treasure) < treasure_radius){
+       if(level == 3 || new_position.distanceFrom(position_treasure) < treasure_radius){
          ghostpos = new_position
          GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
        }
@@ -261,13 +259,13 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
     var new_position : Point = ghostpos
     var distance_x = position_treasure.x - ghostpos.x
     var distance_y = position_treasure.y - ghostpos.y
-    if (Math.abs(distance_x) > Math.abs(distance_y) && Math.abs(distance_x) > 10) {
+    if (Math.abs(distance_x) > Math.abs(distance_y) && Math.abs(distance_x) > icon_size/4) {
 			if (distance_x > 0){
 				ghost_move = 1
 			} else {
 				ghost_move = 3
 			}
-		} else if (Math.abs(distance_x) < Math.abs(distance_y) && Math.abs(distance_y) > 10) {
+		} else if (Math.abs(distance_x) < Math.abs(distance_y) && Math.abs(distance_y) > icon_size/4) {
 		   if (distance_y > 0){
 					ghost_move = 2
 			} else {
