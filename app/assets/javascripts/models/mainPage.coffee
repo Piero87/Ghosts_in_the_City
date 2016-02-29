@@ -74,6 +74,8 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 				@connected(true)
 				$("#ghostbusters-song").get(0).play()
 				
+				@game_client_engine = new GameClientEngine(@useruid(), @ws)
+				
 				if localStorage.gameid
 					@gameid(localStorage.gameid)
 					@resumeGame()
@@ -142,7 +144,8 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					@gametime(hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2))
 					@gamemaxplayers(json.game.n_players)
 					
-					@game_client_engine = new GameClientEngine(@useruid(), @ws)
+					@game_client_engine = new GameClientEngine(@useruid(), @ws) if (@game_client_engine == null)
+					
 					$("#game-result-won").hide()
 					$("#game-result-lost").hide()
 					$("#game-result-draw").hide()
@@ -347,7 +350,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 		
 		playAgain: ->
 			@clearGameData()
-			window.location.reload(true)
+			#window.location.reload(true)
 		
 		clearGameData: ->
 			@changeGameStatus(-1)
