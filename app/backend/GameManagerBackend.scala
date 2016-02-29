@@ -227,8 +227,8 @@ class GameManagerBackend () extends Actor {
       ghosts(ghost_index)._2 ! GhostReleased
       traps = traps.filterNot {_.uid == uid }
       
-    case MessageCode(uid,code) =>
-      gameManagerClient ! MessageCode(uid,code)
+    case MessageCode(uid,code,option) =>
+      gameManagerClient ! MessageCode(uid,code,option)
       
     case OpenTreasureRequest(uid) =>
       var player = players.filter(_._1.uid == uid).head
@@ -236,7 +236,7 @@ class GameManagerBackend () extends Actor {
       if (t_actorref_list.size != 0 ) {
         player._2 ! OpenTreasure(t_actorref_list,player._1)
       } else {
-        gameManagerClient ! MessageCode(uid, MsgCodes.NO_T_NEAR_YOU)
+        gameManagerClient ! MessageCode(uid, MsgCodes.NO_T_NEAR_YOU,"0")
       }
       
     case TreasureResponse(uid_p,results) =>
@@ -287,7 +287,7 @@ class GameManagerBackend () extends Actor {
         }
         
         if (check_empty) {
-          gameManagerClient ! MessageCode(uid_p, MsgCodes.T_EMPTY)
+          gameManagerClient ! MessageCode(uid_p, MsgCodes.T_EMPTY,"0")
         } else {
           var user_info = new UserInfo(u_tmp.uid,u_tmp.name,u_tmp.team,u_tmp.pos,u_tmp.gold+gold_tmp,List.concat(user_keys,keys_tmp))
           players(player_index) = players(player_index).copy(_1 = user_info)
@@ -295,11 +295,11 @@ class GameManagerBackend () extends Actor {
           gameManagerClient ! BroadcastUpdateTreasure(tmp_t_info)
           if (gold_found_message && key_found_message)
           {
-            gameManagerClient ! MessageCode(uid_p, MsgCodes.K_G_FOUND)
+            gameManagerClient ! MessageCode(uid_p, MsgCodes.K_G_FOUND,gold_tmp.toString())
           } else if (key_found_message) {
-            gameManagerClient ! MessageCode(uid_p, MsgCodes.KEY_FOUND)
+            gameManagerClient ! MessageCode(uid_p, MsgCodes.KEY_FOUND,gold_tmp.toString())
           } else if (gold_found_message) {
-            gameManagerClient ! MessageCode(uid_p, MsgCodes.GOLD_FOUND)
+            gameManagerClient ! MessageCode(uid_p, MsgCodes.GOLD_FOUND,gold_tmp.toString())
           }
           
           gameManagerClient ! UpdateUserInfo(user_info)
@@ -330,7 +330,7 @@ class GameManagerBackend () extends Actor {
           
         }
       } else if (t_needs_key.size != 0) {
-        gameManagerClient ! MessageCode(uid_p, MsgCodes.T_NEEDS_KEY)
+        gameManagerClient ! MessageCode(uid_p, MsgCodes.T_NEEDS_KEY,"0")
       }
     case UpdateTreasure(uid,status) =>
       var t_index = (treasures.zipWithIndex.collect{case (g , i) if(g._1.uid == uid) => i}).head
@@ -365,7 +365,7 @@ class GameManagerBackend () extends Actor {
         
         var user_info = new UserInfo(u_tmp.uid,u_tmp.name,u_tmp.team,u_tmp.pos,u_tmp.gold-gold_stolen,u_tmp.keys)
         players(player_index) = players(player_index).copy(_1 = user_info)
-        gameManagerClient ! MessageCode(uid, MsgCodes.PARANORMAL_ATTACK)
+        gameManagerClient ! MessageCode(uid, MsgCodes.PARANORMAL_ATTACK,gold_stolen.toString())
         gameManagerClient ! UpdateUserInfo(user_info)
         //Mando al fantasmi il numero di soldi rubati
         origin ! gold_stolen
