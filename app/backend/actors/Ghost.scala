@@ -196,7 +196,7 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
     
     var player_gold = smellPlayerGold(pl._1)
     
-    if (player_gold > 0 || (distance_x > 32 || distance_y > 32)){
+    if (player_gold > 0 || (distance_x > icon_size || distance_y > icon_size)){
       if(Math.abs(distance_x) < ghost_radius && Math.abs(distance_y) < ghost_radius){
         if (Math.abs(distance_x) > Math.abs(distance_y) && Math.abs(distance_x) > 10) {
   				if (distance_x > 0){
