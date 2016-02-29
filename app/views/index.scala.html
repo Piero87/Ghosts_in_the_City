@@ -2,8 +2,8 @@
 
 @main {
 
-	<div class="page-loader" style="display: none;">
-        <div class="loader" style="display: none;">Loading...</div>
+	<div class="page-loader">
+        <div class="loader">Loading...</div>
     </div>
 	
     <div class="container">
@@ -283,6 +283,10 @@
 	    	    document.getElementById("treasure-locked").volume = 0.5;
 	    	    document.getElementById("treasure-opening").volume = 0.5;
 	    	    document.getElementById("ghost-attack").volume = 0.5;
+	    	    
+	    	    $(".page-loader div").fadeOut();
+	            $(".page-loader").delay(200).fadeOut("slow");
+	    	    
 	    	}
     	</script>
 }
