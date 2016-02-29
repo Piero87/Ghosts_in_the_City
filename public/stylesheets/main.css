@@ -15,29 +15,14 @@
 }
 
 .loader {
-	width: 50px;
-	height: 50px;
+	width: 155px;
+	height: 115px;
 	position: absolute;
+	background-image: url(/assets/images/loader.gif);
 	top: 50%;
 	left: 50%;
-	margin: -25px 0 0 -25px;
-	font-size: 10px;
-	text-indent: -12345px;
-	border-top: 1px solid rgba(0, 0, 0, 0.08);
-	border-right: 1px solid rgba(0, 0, 0, 0.08);
-	border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-	border-left: 1px solid rgba(0, 0, 0, 0.5);
-	
-	-webkit-border-radius: 50%;
-	-moz-border-radius: 50%;
-	border-radius: 50%;
-	
-	-webkit-animation: spinner 700ms infinite linear;
-	-moz-animation: spinner 700ms infinite linear;
-	-ms-animation: spinner 700ms infinite linear;
-	-o-animation: spinner 700ms infinite linear;
-	animation: spinner 700ms infinite linear;
-	
+	margin-top: -77px;
+	margin-left: -57px;
 	z-index: 100001;
 }
 
