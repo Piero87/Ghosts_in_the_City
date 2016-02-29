@@ -37,6 +37,8 @@ class GameManagerBackend () extends Actor {
   var ghost_level1_damage = ConfigFactory.load().getDouble("ghost_hunger_level1")
   var ghost_level2_damage = ConfigFactory.load().getDouble("ghost_hunger_level2")
   var ghost_level3_damage = ConfigFactory.load().getDouble("ghost_hunger_level3")
+  var min_treasure_gold = ConfigFactory.load().getInt("min_treasure_gold")
+  var max_treasure_gold = ConfigFactory.load().getInt("max_treasure_gold")
   
   val logger = new CustomLogger("GameManagerBackend")
   
@@ -411,6 +413,7 @@ class GameManagerBackend () extends Actor {
     var spaces = UtilFunctions.createSpaces(n_treasures_and_ghosts)
     var position_treasure = new Array[Point](n_treasures_and_ghosts)
     var position_ghosts = new Array[Point](n_treasures_and_ghosts)
+    var position_ghosts2 = new Array[Point](n_treasures_and_ghosts)
     var free_position_ghosts = new Array[Point](n_free_ghosts)
     
     var position_players = new Array[Point](game_n_players)
@@ -451,7 +454,7 @@ class GameManagerBackend () extends Actor {
       var treasure_id = randomString(8)
       
       val rnd = new Random()
-      var gold = rnd.nextInt(150)+100
+      var gold = rnd.nextInt(max_treasure_gold-min_treasure_gold)+min_treasure_gold
       var pos_t = new Point (position_treasure(i).x,position_treasure(i).y)
       var treasure_info = new TreasureInfo(treasure_id,0,pos_t)
       
@@ -491,13 +494,24 @@ class GameManagerBackend () extends Actor {
       position_ghosts(i) = UtilFunctions.randomPositionAroundPoint(position_treasure(i))
       logger.log("Ghost[" + i + "] position: ("+ position_ghosts(i).x +","+ position_ghosts(i).y +")")
       
-      // Creazione fantasmi a guardia dei tesori
+      // Creazione dei due fantasmi a guardia dei tesori
+      // Fantasma 1
       var ghost_id = randomString(8)
       var p_g = new Point (position_ghosts(i).x,position_ghosts(i).y)
       val g_level = rnd.nextInt(2)+1
       val ghost = context.actorOf(Props(new Ghost(ghost_id,polygon,p_g,g_level,treasures.last._2,pos_t,treasure_id)), name = ghost_id)
       var ghost_info = new GhostInfo(ghost_id,g_level,GhostMood.CALM,p_g)
       ghosts = ghosts :+ Tuple2(ghost_info,ghost)
+      
+      // Fantasma 2
+      position_ghosts2(i) = UtilFunctions.randomPositionAroundPoint(position_treasure(i))
+      
+      var ghost2_id = randomString(8)
+      var p_g2 = new Point (position_ghosts2(i).x,position_ghosts2(i).y)
+      val g2_level = rnd.nextInt(2)+1
+      val ghost2 = context.actorOf(Props(new Ghost(ghost2_id,polygon,p_g2,g2_level,treasures.last._2,pos_t,treasure_id)), name = ghost2_id)
+      var ghost2_info = new GhostInfo(ghost2_id,g2_level,GhostMood.CALM,p_g2)
+      ghosts = ghosts :+ Tuple2(ghost2_info,ghost2)
       
     }
     
