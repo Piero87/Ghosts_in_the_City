@@ -234,8 +234,8 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
        }
      }
     
-//  if(area.contains(new_position, area_Edge)){
-    if ((icon_size < new_position.x && new_position.x < width-icon_size) && (icon_size < new_position.y && new_position.y < height-icon_size)) {  
+    if (area.contains(new_position)){
+    //if ((icon_size < new_position.x && new_position.x < width-icon_size) && (icon_size < new_position.y && new_position.y < height-icon_size)) {  
        if(level == 3 || new_position.distanceFrom(position_treasure) < treasure_radius){
          ghostpos = new_position
          GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
