@@ -287,7 +287,7 @@ class GameManagerBackend () extends Actor {
         }
         
         if (check_empty) {
-          logger.log("New Message! code: " + MsgCodes.T_EMPTY + " option: 0 to: " + uid_p)
+          logger.log("New Message! code: " + MsgCodes.T_EMPTY + " option: 0 to: " + uid_p + " game_id:" + game_id)
           gameManagerClient ! MessageCode(uid_p, MsgCodes.T_EMPTY,"0")
         } else {
           var user_info = new UserInfo(u_tmp.uid,u_tmp.name,u_tmp.team,u_tmp.pos,u_tmp.gold+gold_tmp,List.concat(user_keys,keys_tmp))
@@ -296,13 +296,13 @@ class GameManagerBackend () extends Actor {
           gameManagerClient ! BroadcastUpdateTreasure(tmp_t_info)
           if (gold_found_message && key_found_message)
           {
-            logger.log("New Message! code: " + MsgCodes.K_G_FOUND + " option: " + gold_tmp.toString() + " to: " + uid_p)
+            logger.log("New Message! code: " + MsgCodes.K_G_FOUND + " option: " + gold_tmp.toString() + " to: " + uid_p + " game_id:" + game_id)
             gameManagerClient ! MessageCode(uid_p, MsgCodes.K_G_FOUND,gold_tmp.toString())
           } else if (key_found_message) {
-            logger.log("New Message! code: " + MsgCodes.KEY_FOUND + " option: " + gold_tmp.toString() + " to: " + uid_p)
+            logger.log("New Message! code: " + MsgCodes.KEY_FOUND + " option: " + gold_tmp.toString() + " to: " + uid_p + " game_id:" + game_id)
             gameManagerClient ! MessageCode(uid_p, MsgCodes.KEY_FOUND,gold_tmp.toString())
           } else if (gold_found_message) {
-            logger.log("New Message! code: " + MsgCodes.GOLD_FOUND + " option: " + gold_tmp.toString() + " to: " + uid_p)
+            logger.log("New Message! code: " + MsgCodes.GOLD_FOUND + " option: " + gold_tmp.toString() + " to: " + uid_p + " game_id:" + game_id)
             gameManagerClient ! MessageCode(uid_p, MsgCodes.GOLD_FOUND,gold_tmp.toString())
           }
           
