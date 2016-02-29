@@ -39,8 +39,14 @@
 	          zoom: 8
 	        });
 	      }
+	      
+	      var interval = setInterval(function () {
+	        if($('#gameArenaContainer').is(':visible')) {
+	        	initMap()
+	          clearInterval(interval);
+	        }
+	      }, 500)
 	    </script>
-	    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDkCp3Df53YEkhB23x-fjh-cfxzPEroyVs&callback=initMap"
-	    async defer></script>
+	    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDkCp3Df53YEkhB23x-fjh-cfxzPEroyVs"></script>
     </body>
 </html>
