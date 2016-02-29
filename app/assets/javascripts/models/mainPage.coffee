@@ -185,7 +185,6 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 							console.log('Hold on!')
 							@game_client_engine.pauseGame()
 						when 3 # game ended
-							@game_client_engine = null
 							console.log 'Game Over!'
 							@gamename("")
 							localStorage.removeItem("gameid")
