@@ -70,8 +70,7 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
               for(player <- tmp_p){
                 var currentplayerpos = player.pos
                 var distance = ghostpos.distanceFrom(currentplayerpos)
-                var gold_toSteal = smellPlayerGold(player)
-                if(distance < ghost_radius && gold_toSteal > 0){
+                if(distance < ghost_radius){
                   // Salvo solamente la posizone la cui distanza è minore
                   if(distance < playerdist){
                     playerdist = distance
@@ -192,6 +191,9 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
     var new_position : Point = ghostpos
     var distance_x = player_pos.x - ghostpos.x
     var distance_y = player_pos.y - ghostpos.y
+    
+    var pl = players.filter(_._1.uid == p_uid).head
+    
     if(Math.abs(distance_x) < ghost_radius && Math.abs(distance_y) < ghost_radius){
       if (Math.abs(distance_x) > Math.abs(distance_y) && Math.abs(distance_x) > 10) {
 				if (distance_x > 0){
@@ -238,10 +240,10 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
        }
     }
     
-    if (Math.abs(distance_x) < 10 && Math.abs(distance_y) < 10) {
+    if (Math.abs(distance_x) < 10 && Math.abs(distance_y) < 10 && smellPlayerGold(pl._1) > 0) {
         logger.log(" Giocatore raggiunto! Lo attacco")
         // Giocatore raggiunto! Gli rubo i soldi
-        var pl = players.filter(_._1.uid == p_uid).head
+        
         val future = pl._2 ? IAttackYou(level)
         val result = Await.result(future, timeout.duration).asInstanceOf[Int]
         if(result > 0){
