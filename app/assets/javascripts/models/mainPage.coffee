@@ -350,7 +350,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 		
 		playAgain: ->
 			@clearGameData()
-			#window.location.reload(true)
+			window.location.reload(true)
 		
 		clearGameData: ->
 			@changeGameStatus(-1)
