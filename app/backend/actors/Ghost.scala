@@ -41,6 +41,10 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
   val height = ConfigFactory.load().getDouble("space_height")
   val icon_size = ConfigFactory.load().getDouble("icon_size")
   
+  var ghost_level1_damage = ConfigFactory.load().getDouble("ghost_hunger_level1")
+  var ghost_level2_damage = ConfigFactory.load().getDouble("ghost_hunger_level2")
+  var ghost_level3_damage = ConfigFactory.load().getDouble("ghost_hunger_level3")
+  
   val logger = new CustomLogger("Ghost "+uid)
   var update_pos_scheduler : Cancellable = null
   
@@ -66,7 +70,8 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
               for(player <- tmp_p){
                 var currentplayerpos = player.pos
                 var distance = ghostpos.distanceFrom(currentplayerpos)
-                if(distance < ghost_radius){
+                var gold_toSteal = smellPlayerGold(player)
+                if(distance < ghost_radius && gold_toSteal > 0){
                   // Salvo solamente la posizone la cui distanza è minore
                   if(distance < playerdist){
                     playerdist = distance
@@ -292,6 +297,23 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
   
   def printList(args: TraversableOnce[_]): Unit = {
     args.foreach(println)
+  }
+  
+  def smellPlayerGold(player : UserInfo): Int = {
+    var gold_toSteal_double = 0.0
+    level match {
+      case 1 => {
+        gold_toSteal_double = player.gold * ghost_level1_damage
+      }
+      case 2 => {
+        gold_toSteal_double = player.gold * ghost_level2_damage
+      }
+      case 3 => {
+        gold_toSteal_double = player.gold * ghost_level3_damage
+      }
+    }
+    var gold_toSteal = gold_toSteal_double.toInt
+    gold_toSteal
   }
   
   

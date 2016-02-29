@@ -34,6 +34,10 @@ class GameManagerBackend () extends Actor {
   var paused_players:MutableList[Tuple2[String, Long]] = MutableList()
   var icon_size = ConfigFactory.load().getDouble("icon_size")
   
+  var ghost_level1_damage = ConfigFactory.load().getDouble("ghost_hunger_level1")
+  var ghost_level2_damage = ConfigFactory.load().getDouble("ghost_hunger_level2")
+  var ghost_level3_damage = ConfigFactory.load().getDouble("ghost_hunger_level3")
+  
   val logger = new CustomLogger("GameManagerBackend")
   
   implicit val timeout = Timeout(5 seconds)
@@ -353,19 +357,19 @@ class GameManagerBackend () extends Actor {
       var u_tmp = players(player_index)._1
       //Se il giocatore ha soldi
       if (u_tmp.gold != 0) {
-        var gold_stolen = 0
+        var gold_stolen_double = 0.0
         level match {
           case 1 => {
-            gold_stolen = u_tmp.gold/3
+            gold_stolen_double = u_tmp.gold * ghost_level1_damage
           }
           case 2 => {
-            gold_stolen = u_tmp.gold/2
+            gold_stolen_double = u_tmp.gold * ghost_level2_damage
           }
           case 3 => {
-            gold_stolen = u_tmp.gold
+            gold_stolen_double = u_tmp.gold * ghost_level3_damage
           }
         }
-        
+        var gold_stolen = gold_stolen_double.toInt
         var user_info = new UserInfo(u_tmp.uid,u_tmp.name,u_tmp.team,u_tmp.pos,u_tmp.gold-gold_stolen,u_tmp.keys)
         players(player_index) = players(player_index).copy(_1 = user_info)
         gameManagerClient ! MessageCode(uid, MsgCodes.PARANORMAL_ATTACK,gold_stolen.toString())
