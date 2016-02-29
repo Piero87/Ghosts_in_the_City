@@ -143,6 +143,9 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					@gamemaxplayers(json.game.n_players)
 					
 					@game_client_engine = new GameClientEngine(@useruid(), @ws)
+					$("#game-result-won").hide()
+					$("#game-result-lost").hide()
+					$("#game-result-draw").hide()
 					
 					# Update status variables
 					@gameready(true)
@@ -439,7 +442,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					type = "error"
 				when -5
 					# T_EMPTY - treasure empty
-					message = "Oh oh, there's nothing here."
+					message = "oh oh, there's nothing here."
 					type = "error"
 				when -6
 					# NO_T_NEAR_YOU - no treasure nearby
