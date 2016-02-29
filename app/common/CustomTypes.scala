@@ -4,8 +4,8 @@ import scala.collection.mutable
 
 sealed case class Point(x: Double, y: Double){
   
-  var pos_x = x
-  var pos_y = y
+  var pos_x = x // latidude
+  var pos_y = y // longitude
   
   def distanceFrom(p: Point): Double = {
     Math.sqrt(Math.pow((p.x - pos_x),2) + Math.pow((p.y - pos_y),2))

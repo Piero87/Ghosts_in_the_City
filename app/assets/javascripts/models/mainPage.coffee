@@ -10,9 +10,11 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			
 			@music = ko.observable()
 			@sounds = ko.observable()
+			@debug = ko.observable()
 			
 			@music("on")
 			@sounds("on")
+			@debug("off")
 						
 			# User data
 			@username = ko.observable()
@@ -293,6 +295,14 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 				document.getElementById("treasure-locked").volume = 0.5;
 				document.getElementById("treasure-opening").volume = 0.5;
 				document.getElementById("ghost-attack").volume = 0.5;
+		
+		toggleDebug: ->
+			if (@debug() == "on")
+				@debug("off")
+				@game_client_engine.toggleDebug(false)
+			else if (@debug() == "off")
+				@debug("on")
+				@game_client_engine.toggleDebug(true)
 		
 		# The user clicked connect
 		submitUsername: ->

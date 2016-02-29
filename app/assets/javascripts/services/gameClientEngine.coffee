@@ -447,4 +447,10 @@ define () ->
   			id += Math.random().toString(36).substr(2) while id.length < 8
   			id.substr 0, 8
 			
+		toggleDebug: (debug) ->
+			if (debug)
+				@debug = true
+			else
+				@debug = false
+			
 	return GameClientEngine
