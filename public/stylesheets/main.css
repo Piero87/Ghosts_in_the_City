@@ -18,7 +18,7 @@
 	width: 155px;
 	height: 115px;
 	position: absolute;
-	background-image: url(/assets/images/loader.gif)
+	background-image: url(/assets/images/loader.gif);
 	top: 50%;
 	left: 50%;
 	margin-top: -77px;
