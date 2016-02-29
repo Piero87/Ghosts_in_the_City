@@ -53,9 +53,9 @@ object MsgCodes extends Enumeration {
    
 }
 
+// Gamne Engine
+case class MessageCode(uid: String, code: Int, option: String)
 case object Finish
-// Code messages
-case class MessageCode(uid: String, code: Int)
 
 // Ghost messages
 case class GhostPositionUpdate(uid: String, pos: Point, mood: Int)
@@ -138,7 +138,7 @@ case class BroadcastNewTrapJSON(event: String, trap: TrapInfo)
 case class BroadcastTrapActivatedJSON(event:String, trap: TrapInfo)
 case class BroadcastRemoveTrapJSON(event:String, trap: TrapInfo)
 case class UpdateUserInfoJSON(event: String, user: UserInfo)
-case class MessageCodeJSON(event: String, code: Int)
+case class MessageCodeJSON(event: String, code: Int, option: String)
 case class UpdateTreasureJSON(event: String, treasures: MutableList[TreasureInfo])
 case class VictoryResponseJSON(event: String, team: Int, players: List[UserInfo])
     
