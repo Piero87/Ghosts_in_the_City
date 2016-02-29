@@ -31,22 +31,5 @@
     	<input type="hidden" id="conf_treasure_radius" value="@play.Play.application().configuration().getString("treasure_radius")">
     	<input type="hidden" id="conf_trap_radius" value="@play.Play.application().configuration().getString("trap_radius")">
         @content
-        <script>
-	      var map;
-	      function initMap() {
-	        map = new google.maps.Map(document.getElementById('gameArenaContainer'), {
-	          center: {lat: -34.397, lng: 150.644},
-	          zoom: 8
-	        });
-	      }
-	      
-	      var interval = setInterval(function () {
-	        if($('#gameArenaContainer').is(':visible')) {
-	        	initMap()
-	          clearInterval(interval);
-	        }
-	      }, 500)
-	    </script>
-	    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDkCp3Df53YEkhB23x-fjh-cfxzPEroyVs"></script>
     </body>
 </html>
