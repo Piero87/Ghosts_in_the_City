@@ -113,8 +113,8 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					if json.list.length > 0
 						@gamesavailable(true)
 						for game in json.list
-							game_details = game.name.split "_"
-							gamecreator = game_details[0].split("-").join(" ")
+							game_details = game.name.split "__"
+							gamecreator = game_details[0].split("_").join(" ")
 							date = new Date(parseInt( game_details[1], 10 ));
 							hours = date.getHours()
 							minutes = "0" + date.getMinutes()
@@ -134,8 +134,8 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					@gameid(json.game.id)
 					localStorage.setItem("gameid", @gameid())
 					@gamename(json.game.name)
-					game_details = json.game.name.split "_"
-					@gamecreator(game_details[0].split("-").join(" "))
+					game_details = json.game.name.split "__"
+					@gamecreator(game_details[0].split("_").join(" "))
 					date = new Date(parseInt( game_details[1], 10 ));
 					hours = date.getHours()
 					minutes = "0" + date.getMinutes()
@@ -159,8 +159,8 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 						when 1 # game started
 							
 							@gamename(json.game.name)
-							game_details = json.game.name.split "_"
-							@gamecreator(game_details[0].split("-").join(" "))
+							game_details = json.game.name.split "__"
+							@gamecreator(game_details[0].split("_").join(" "))
 							date = new Date(parseInt( game_details[1], 10 ));
 							hours = date.getHours()
 							minutes = "0" + date.getMinutes()
@@ -225,7 +225,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 						# console.log json.trap
 				
 				else if json.event == "message"
-					@showMessage(json.code)
+					@showMessage(json.code, json.option)
 					
 				else if json.event == "game_results"
 					# "team" [0,1,-1] : winning team
@@ -413,7 +413,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					else if (player.team == 1)
 						@game_team_BLUE.push(player)
 		
-		showMessage: (msg_code) ->
+		showMessage: (msg_code, option) ->
 			c = msg_code
 			switch c
 				when -1
@@ -443,7 +443,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					type = "error"
 				when 1
 					# PARANORMAL_ATTACK - attacked from ghost
-					message = "Aaaaaaaah!"
+					message = "Ghost Attack! You lost " + option + "$!"
 					type = "message"
 					$("#ghost-attack").get(0).play()
 				when 2
@@ -457,12 +457,12 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					$("#keys-found").get(0).play()
 				when 4
 					# GOLD_FOUND - gold found
-					message = "You have found some gold! You are filthy rich now!"
+					message = "You have found " + option + "$! You are filthy rich now!"
 					type = "message"
 					$("#gold-found").get(0).play()
 				when 5
 					# K_G_FOUND - key and gold found
-					message = "Jackpot! You have found a key and some gold!"
+					message = "Jackpot! " + option + "$ and a key!"
 					type = "message"
 					$("#gold-found").get(0).play()
 					$("#keys-found").delay(600).get(0).play()
