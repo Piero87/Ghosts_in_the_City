@@ -23,6 +23,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
   implicit val ec = context.dispatcher
   var game_id = ""
   var team = Team.UNKNOWN
+ 
   
   val logger = new CustomLogger("ClientConnection")
   logger.log("Ciao mondo! L'utente " + username + "si è appena collegato!")
