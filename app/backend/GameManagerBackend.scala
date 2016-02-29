@@ -33,7 +33,7 @@ class GameManagerBackend () extends Actor {
   
   var paused_players:MutableList[Tuple2[String, Long]] = MutableList()
   var icon_size = ConfigFactory.load().getDouble("icon_size")
-  
+  var initial_gold = ConfigFactory.load().getDouble("initial_gold").toInt
   var ghost_level1_damage = ConfigFactory.load().getDouble("ghost_hunger_level1")
   var ghost_level2_damage = ConfigFactory.load().getDouble("ghost_hunger_level2")
   var ghost_level3_damage = ConfigFactory.load().getDouble("ghost_hunger_level3")
@@ -52,7 +52,7 @@ class GameManagerBackend () extends Actor {
       logger.log("GMBackend NewGame From: "+ref.toString())
       gameManagerClient = ref
       var rnd_team = selectTeam()
-      val p = new UserInfo(user.uid,user.name,rnd_team,user.pos,500,List())
+      val p = new UserInfo(user.uid,user.name,rnd_team,user.pos,initial_gold,List())
       players = players :+ Tuple2(p,null)
       val tmp_g = ghosts.map(x => x._1)
       val tmp_t = treasures.map(x => x._1)
@@ -71,7 +71,7 @@ class GameManagerBackend () extends Actor {
         //Scegliamo un Team Random Blu o Rosso
         var rnd_team = selectTeam()
         
-        val p = new UserInfo(user.uid,user.name,rnd_team,user.pos,500,List())
+        val p = new UserInfo(user.uid,user.name,rnd_team,user.pos,initial_gold,List())
         players = players :+ Tuple2(p,null)
         val tmp_g = ghosts.map(x => x._1)
         val tmp_t = treasures.map(x => x._1)
