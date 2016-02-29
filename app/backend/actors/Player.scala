@@ -33,7 +33,7 @@ class Player(uid: String, name: String, team: Int, area : Polygon, GMbackend: Ac
         var new_gold = gold - 100
         origin ! NewTrap(uid,new_gold, pos)
       } else {
-        origin ! MessageCode(uid, MsgCodes.NO_TRAP)
+        origin ! MessageCode(uid, MsgCodes.NO_TRAP,"")
       }
     case OpenTreasure(treasures,user) =>
       
