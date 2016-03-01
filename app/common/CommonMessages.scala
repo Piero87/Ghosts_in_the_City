@@ -62,7 +62,7 @@ object MsgCodes extends Enumeration {
    
 }
 
-// Gamne Engine
+// Game Engine
 case class MessageCode(uid: String, code: Int, option: String)
 case object Finish
 
@@ -75,7 +75,7 @@ case object GhostPause
 case object GhostReleased
 case class BroadcastGhostsPositions(ghosts: MutableList[GhostInfo])
 case class GhostTrapped(pos: Point)
-case class IAttackYou(level: Int)
+case class IAttackYou(attacker_uid: String, attack_type: Int, gold_perc_stolen: Double)
 
 // Player 
 case object PlayersInfo
@@ -88,7 +88,9 @@ case class UpdateUserInfo(user: UserInfo)
 case class OpenTreasureRequest(uid: String)
 case class OpenTreasure(treasures: List[ActorRef], user: UserInfo)
 case class GoldStolen(gold: Int)
-case class PlayerAttacked(uid: String, level: Int)
+case class HitPlayer(player: UserInfo)
+case class AttackHim(player: ActorRef)
+case class PlayerAttacked(uid: String, attacker_uid: String, attack_type: Int, gold_perc_stolen: Double, keys_stolen: Int)
 
 // Treasure
 case class Open(pos_p: Point, keys: List[Key])

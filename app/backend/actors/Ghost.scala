@@ -41,9 +41,10 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
   val height = ConfigFactory.load().getDouble("space_height")
   val icon_size = ConfigFactory.load().getDouble("icon_size")
   
-  var ghost_level1_damage = ConfigFactory.load().getDouble("ghost_hunger_level1")
-  var ghost_level2_damage = ConfigFactory.load().getDouble("ghost_hunger_level2")
-  var ghost_level3_damage = ConfigFactory.load().getDouble("ghost_hunger_level3")
+  val ghost_hunger = Array(0.0,
+                           ConfigFactory.load().getDouble("ghost_hunger_level1"),
+                           ConfigFactory.load().getDouble("ghost_hunger_level2"),
+                           ConfigFactory.load().getDouble("ghost_hunger_level3"))
   
   val logger = new CustomLogger("Ghost "+uid)
   var update_pos_scheduler : Cancellable = null
@@ -172,7 +173,7 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
     if (Math.abs(distance_x) < icon_size/4 && Math.abs(distance_y) < icon_size/4 && gold_available > 0) {
         // Giocatore raggiunto! Gli rubo i soldi
         
-        val future = player_actor ? IAttackYou(level)
+        val future = player_actor ? IAttackYou(MsgCodes.PARANORMAL_ATTACK, ghost_hunger(level))
         val result = Await.result(future, timeout.duration).asInstanceOf[Int]
         if(result > 0){
           treasure ! IncreaseGold(result)
@@ -232,17 +233,8 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
   
   def smellPlayerGold(player : UserInfo): Int = {
     var gold_toSteal_double = 0.0
-    level match {
-      case 1 => {
-        gold_toSteal_double = player.gold * ghost_level1_damage
-      }
-      case 2 => {
-        gold_toSteal_double = player.gold * ghost_level2_damage
-      }
-      case 3 => {
-        gold_toSteal_double = player.gold * ghost_level3_damage
-      }
-    }
+    gold_toSteal_double = player.gold * ghost_hunger(level)
+    
     var gold_toSteal = gold_toSteal_double.toInt
     gold_toSteal
   }

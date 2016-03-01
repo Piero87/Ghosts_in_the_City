@@ -353,32 +353,37 @@ class GameManagerBackend () extends Actor {
         val tmp_t_info = treasures.map(x => x._1)
         gameManagerClient ! BroadcastUpdateTreasure(tmp_t_info)
       }
-    case PlayerAttacked(uid, level) =>
+    case HitPlayerRequest(user) => 
+      /* Il GMB ha ricevuto la richiesta del client di attaccare un altro giocatore,
+       * per controllare che il client sia consistente con il suo attore, 
+       * spediamo la richiesta all'attore player e se potrà farlo sarà lui a dire "PlayerAttacked" */
+      var other_players = players.filterNot(_._1.uid == user.uid)
+      var p_actorref_list = (other_players.filter(_._1.pos.distanceFrom(user.pos) <= icon_size/2)).map(x => x._2).toList
+      var player = players.filter(_._1.uid == user.uid).head
+      player._2 ! AttackHim(p_actorref_list.head)
+      
+    case PlayerAttacked(uid, attacker_uid, attack_type, gold_perc_stolen, keys_stolen) =>
       
       var origin = sender
       var player_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == uid) => i}).head
       var u_tmp = players(player_index)._1
       //Se il giocatore ha soldi
       if (u_tmp.gold != 0) {
-        var gold_stolen_double = 0.0
-        level match {
-          case 1 => {
-            gold_stolen_double = u_tmp.gold * ghost_level1_damage
-          }
-          case 2 => {
-            gold_stolen_double = u_tmp.gold * ghost_level2_damage
-          }
-          case 3 => {
-            gold_stolen_double = u_tmp.gold * ghost_level3_damage
-          }
-        }
+        var gold_stolen_double = u_tmp.gold * gold_perc_stolen
         var gold_stolen = gold_stolen_double.toInt
         var user_info = new UserInfo(u_tmp.uid,u_tmp.name,u_tmp.team,u_tmp.pos,u_tmp.gold-gold_stolen,u_tmp.keys)
         players(player_index) = players(player_index).copy(_1 = user_info)
-        gameManagerClient ! MessageCode(uid, MsgCodes.PARANORMAL_ATTACK,gold_stolen.toString())
+        if (attack_type == MsgCodes.PARANORMAL_ATTACK){
+          //Mando al fantasmi il numero di soldi rubati
+          origin ! gold_stolen
+        } else {
+          if (keys_stolen == 1){
+            
+          }
+        }
+        gameManagerClient ! MessageCode(uid, attack_type,gold_stolen.toString())
         gameManagerClient ! UpdateUserInfo(user_info)
-        //Mando al fantasmi il numero di soldi rubati
-        origin ! gold_stolen
+        
       }
     case Finish =>
       game_status = StatusGame.FINISHED
