@@ -354,13 +354,16 @@ class GameManagerBackend () extends Actor {
         gameManagerClient ! BroadcastUpdateTreasure(tmp_t_info)
       }
     case HitPlayerRequest(user) => 
+      logger.log("Hit player request from: " + user.name)
       /* Il GMB ha ricevuto la richiesta del client di attaccare un altro giocatore,
        * per controllare che il client sia consistente con il suo attore, 
        * spediamo la richiesta all'attore player e se potrà farlo sarà lui a dire "PlayerAttacked" */
       var other_players = players.filterNot(_._1.uid == user.uid)
       var p_actorref_list = (other_players.filter(_._1.pos.distanceFrom(user.pos) <= icon_size/2)).map(x => x._2).toList
       var player = players.filter(_._1.uid == user.uid).head
-      player._2 ! AttackHim(p_actorref_list.head)
+      if (p_actorref_list.size != 0 ) {
+        player._2 ! AttackHim(p_actorref_list.head)
+      }
       
     case PlayerAttacked(uid, attacker_uid, attack_type, gold_perc_stolen, keys_stolen) =>
       
@@ -385,13 +388,13 @@ class GameManagerBackend () extends Actor {
           var attacker_info = new UserInfo(att_tmp.uid,att_tmp.name,att_tmp.team,att_tmp.pos,att_tmp.gold+gold_stolen,List.concat(att_tmp.keys, u_tmp.keys))
           players(attacker_index) = players(attacker_index).copy(_1 = attacker_info)
           gameManagerClient ! UpdateUserInfo(attacker_info)
+          logger.log("Player " + u_tmp.name + " attacked from: " + att_tmp)
         }
-        var attacked_info = new UserInfo(u_tmp.uid,u_tmp.name,u_tmp.team,u_tmp.pos,gold_remain,u_tmp.keys)
+
+        var attacked_info = new UserInfo(u_tmp.uid,u_tmp.name,u_tmp.team,u_tmp.pos,gold_remain,u_tmp_keys)
         players(attacked_index) = players(attacked_index).copy(_1 = attacked_info)
-        
         gameManagerClient ! MessageCode(uid, attack_type,gold_stolen.toString())
         gameManagerClient ! UpdateUserInfo(attacked_info)
-        
       }
     case Finish =>
       game_status = StatusGame.FINISHED

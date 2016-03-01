@@ -55,9 +55,13 @@ class Player(uid: String, name: String, team: Int, area : Polygon, GMbackend: Ac
           origin ! TreasureResponse(user.uid, results)
       }
     case IAttackYou(attacker_uid, attack_type, gold_perc_stolen, key_stolen) =>
+      if(attack_type == MsgCodes.HUMAN_ATTACK){
+        logger.log("Ti ho attaccato")
+      }
       GMbackend forward PlayerAttacked(uid, attacker_uid, attack_type, gold_perc_stolen, key_stolen)
       
     case AttackHim(victim) =>
+      logger.log("Attack him")
       val rnd = new Random()
       var rnd_gold_perc_stolen = rnd.nextInt(91) + 10
       var keys_stolen = rnd.nextInt(2)
