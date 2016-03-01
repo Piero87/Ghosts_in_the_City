@@ -362,10 +362,7 @@ class GameManagerBackend () extends Actor {
       var other_players = players.filterNot(_._1.uid == uid)
       var p_actorref_list = (other_players.filter(_._1.pos.distanceFrom(player._1.pos) <= icon_size/2)).map(x => x._2).toList
       if (p_actorref_list.size != 0 ) {
-        logger.log("User found! I will kill him!")
         player._2 ! AttackHim(p_actorref_list.head)
-      } else {
-        logger.log("No one found...")
       }
       
     case PlayerAttacked(uid, attacker_uid, attack_type, gold_perc_stolen, keys_stolen) =>
@@ -376,9 +373,13 @@ class GameManagerBackend () extends Actor {
       var u_tmp_keys = u_tmp.keys
       //Se il giocatore ha soldi
       if (u_tmp.gold != 0) {
+        logger.log("Percentuale oro rubato: " + gold_perc_stolen)
         var gold_stolen_double = u_tmp.gold * gold_perc_stolen
+        logger.log("oro rubato (Double) : " + gold_stolen_double)
         var gold_stolen = gold_stolen_double.toInt
+        logger.log("oro rubato (Int) : " + gold_stolen)
         var gold_remain = u_tmp.gold - gold_stolen
+        logger.log("oro rimasto (Int) : " + gold_remain)
         if (attack_type == MsgCodes.PARANORMAL_ATTACK){
           //Mando al fantasmi il numero di soldi rubati
           origin ! gold_stolen
