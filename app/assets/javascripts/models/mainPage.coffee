@@ -470,6 +470,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					# HUMAN_ATTACK - attacked from human
 					message = "Ouch!"
 					type = "message"
+					$("#player-attack").get(0).play()
 				when 3
 					# KEY_FOUND - key found
 					message = "You have found a key! Yay!"
