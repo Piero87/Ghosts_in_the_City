@@ -353,16 +353,19 @@ class GameManagerBackend () extends Actor {
         val tmp_t_info = treasures.map(x => x._1)
         gameManagerClient ! BroadcastUpdateTreasure(tmp_t_info)
       }
-    case HitPlayerRequest(user) => 
-      logger.log("Hit player request from: " + user.name)
+    case HitPlayerRequest(uid) => 
       /* Il GMB ha ricevuto la richiesta del client di attaccare un altro giocatore,
        * per controllare che il client sia consistente con il suo attore, 
        * spediamo la richiesta all'attore player e se potrà farlo sarà lui a dire "PlayerAttacked" */
-      var other_players = players.filterNot(_._1.uid == user.uid)
-      var p_actorref_list = (other_players.filter(_._1.pos.distanceFrom(user.pos) <= icon_size/2)).map(x => x._2).toList
-      var player = players.filter(_._1.uid == user.uid).head
+      var player = players.filter(_._1.uid == uid).head
+      logger.log("Hit player request from: " + player._1.name)
+      var other_players = players.filterNot(_._1.uid == uid)
+      var p_actorref_list = (other_players.filter(_._1.pos.distanceFrom(player._1.pos) <= icon_size/2)).map(x => x._2).toList
       if (p_actorref_list.size != 0 ) {
+        logger.log("User found! I will kill him!")
         player._2 ! AttackHim(p_actorref_list.head)
+      } else {
+        logger.log("No one found...")
       }
       
     case PlayerAttacked(uid, attacker_uid, attack_type, gold_perc_stolen, keys_stolen) =>
