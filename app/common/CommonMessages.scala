@@ -27,6 +27,15 @@ object GhostMood extends Enumeration {
    val TRAPPED = 2
 }
 
+object Movement extends Enumeration {
+  type Movement = Int
+   val UP = 0
+   val RIGHT = 1
+   val DOWN = 2
+   val LEFT = 3
+   var STILL = -1
+}
+
 object TrapStatus extends Enumeration {
   type TrapStatus = Int
    val IDLE = 0
