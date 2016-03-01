@@ -88,7 +88,7 @@ case class UpdateUserInfo(user: UserInfo)
 case class OpenTreasureRequest(uid: String)
 case class OpenTreasure(treasures: List[ActorRef], user: UserInfo)
 case class GoldStolen(gold: Int)
-case class HitPlayerRequest(player: UserInfo)
+case class HitPlayerRequest(player_uid: String)
 case class AttackHim(player: ActorRef)
 case class PlayerAttacked(uid: String, attacker_uid: String, attack_type: Int, gold_perc_stolen: Double, keys_stolen: Int)
 
