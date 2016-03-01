@@ -128,7 +128,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
          case "hit_player" =>
            logger.log("Hit Player!")
            var user_info = new UserInfo(uid,username,team,Point(0,0),0, List())
-           gameManagerClient ! HitPlayer(user_info)
+           gameManagerClient ! HitPlayerRequest(user_info)
          case "open_treasure" =>
            gameManagerClient ! OpenTreasureRequest(uid)
            

@@ -136,6 +136,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       }
     case SetTrapRequest(user) =>
       gameManagerBackend ! SetTrapRequest(user)
+    
     case HitPlayerRequest(user) =>
       gameManagerBackend ! HitPlayerRequest(user)
     case BroadcastNewTrap(trap) =>
