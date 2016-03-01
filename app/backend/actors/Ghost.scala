@@ -60,21 +60,22 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
         val future = GMbackend ? PlayersInfo
         future.onSuccess { 
           case Players(players) => 
-            var playerpos = new Point(0,0)
-            var playerdist : Double = ghost_radius //Max range iniziale
+            var target_position = new Point(0,0)
+            var player_tastness_max : Double = 0.0
             var found_someone = false
             val tmp_p = players.map(x => x._1)
             var p_uid = ""
             
             if(tmp_p.size != 0){
               for(player <- tmp_p){
-                var currentplayerpos = player.pos
-                var distance = ghostpos.distanceFrom(currentplayerpos)
+                var distance = ghostpos.distanceFrom(player.pos)
                 if(distance < ghost_radius){
-                  // Salvo solamente la posizone la cui distanza è minore
-                  if(distance < playerdist){
-                    playerdist = distance
-                    playerpos = currentplayerpos
+                  // coefficiente di gustosità del giocatore
+                  // il "+ 1" è per evitare divisioni per zero nel caso il fantasma sia sopra al giocatore
+                  var player_tastness = player.gold / (distance + 1)
+                  if(player_tastness > player_tastness_max){
+                    player_tastness_max = player_tastness
+                    target_position = player.pos
                     p_uid = player.uid
                   }
                   // Sono incazzato!
@@ -87,7 +88,7 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
               if(mood == GhostMood.CALM){
                 random_move(ghostpos)
               }else{
-                attackPlayer(p_uid, playerpos, players)
+                attackPlayer(p_uid, target_position, players)
               }
             }else{
               random_move(ghostpos)
