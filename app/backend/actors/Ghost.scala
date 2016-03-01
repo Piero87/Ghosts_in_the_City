@@ -173,7 +173,7 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
     if (Math.abs(distance_x) < icon_size/4 && Math.abs(distance_y) < icon_size/4 && gold_available > 0) {
         // Giocatore raggiunto! Gli rubo i soldi
         
-        val future = player_actor ? IAttackYou(MsgCodes.PARANORMAL_ATTACK, ghost_hunger(level))
+        val future = player_actor ? IAttackYou(uid, MsgCodes.PARANORMAL_ATTACK, ghost_hunger(level), 0)
         val result = Await.result(future, timeout.duration).asInstanceOf[Int]
         if(result > 0){
           treasure ! IncreaseGold(result)
@@ -238,8 +238,5 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
     var gold_toSteal = gold_toSteal_double.toInt
     gold_toSteal
   }
-  
-  
-     
   
 }

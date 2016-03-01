@@ -75,7 +75,7 @@ case object GhostPause
 case object GhostReleased
 case class BroadcastGhostsPositions(ghosts: MutableList[GhostInfo])
 case class GhostTrapped(pos: Point)
-case class IAttackYou(attacker_uid: String, attack_type: Int, gold_perc_stolen: Double)
+case class IAttackYou(attacker_uid: String, attack_type: Int, gold_perc_stolen: Double, key_stolen: Int)
 
 // Player 
 case object PlayersInfo
@@ -89,6 +89,7 @@ case class OpenTreasureRequest(uid: String)
 case class OpenTreasure(treasures: List[ActorRef], user: UserInfo)
 case class GoldStolen(gold: Int)
 case class HitPlayer(player: UserInfo)
+case class HitPlayerRequest(player: UserInfo)
 case class AttackHim(player: ActorRef)
 case class PlayerAttacked(uid: String, attacker_uid: String, attack_type: Int, gold_perc_stolen: Double, keys_stolen: Int)
 

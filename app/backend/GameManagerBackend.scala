@@ -365,24 +365,32 @@ class GameManagerBackend () extends Actor {
     case PlayerAttacked(uid, attacker_uid, attack_type, gold_perc_stolen, keys_stolen) =>
       
       var origin = sender
-      var player_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == uid) => i}).head
-      var u_tmp = players(player_index)._1
+      var attacked_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == uid) => i}).head
+      var u_tmp = players(attacked_index)._1
+      var u_tmp_keys = u_tmp.keys
       //Se il giocatore ha soldi
       if (u_tmp.gold != 0) {
         var gold_stolen_double = u_tmp.gold * gold_perc_stolen
         var gold_stolen = gold_stolen_double.toInt
-        var user_info = new UserInfo(u_tmp.uid,u_tmp.name,u_tmp.team,u_tmp.pos,u_tmp.gold-gold_stolen,u_tmp.keys)
-        players(player_index) = players(player_index).copy(_1 = user_info)
+        var gold_remain = u_tmp.gold - gold_stolen
         if (attack_type == MsgCodes.PARANORMAL_ATTACK){
           //Mando al fantasmi il numero di soldi rubati
           origin ! gold_stolen
         } else {
+          var attacker_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == attacker_uid) => i}).head
+          var att_tmp = players(attacker_index)._1
           if (keys_stolen == 1){
-            
+            u_tmp_keys = List()
           }
+          var attacker_info = new UserInfo(att_tmp.uid,att_tmp.name,att_tmp.team,att_tmp.pos,att_tmp.gold+gold_stolen,List.concat(att_tmp.keys, u_tmp.keys))
+          players(attacker_index) = players(attacker_index).copy(_1 = attacker_info)
+          gameManagerClient ! UpdateUserInfo(attacker_info)
         }
+        var attacked_info = new UserInfo(u_tmp.uid,u_tmp.name,u_tmp.team,u_tmp.pos,gold_remain,u_tmp.keys)
+        players(attacked_index) = players(attacked_index).copy(_1 = attacked_info)
+        
         gameManagerClient ! MessageCode(uid, attack_type,gold_stolen.toString())
-        gameManagerClient ! UpdateUserInfo(user_info)
+        gameManagerClient ! UpdateUserInfo(attacked_info)
         
       }
     case Finish =>

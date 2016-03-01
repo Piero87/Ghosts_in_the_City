@@ -11,6 +11,7 @@ import scala.concurrent.Future
 import backend.actors.models._
 import akka.actor._
 import akka.util.Timeout
+import scala.util.Random
 
 object Player {
 
@@ -53,15 +54,14 @@ class Player(uid: String, name: String, team: Int, area : Polygon, GMbackend: Ac
           logger.log("risultato apertura tesori")
           origin ! TreasureResponse(user.uid, results)
       }
-    case IAttackYou(attacker_uid, attack_type, gold_perc_stolen) =>
-      GMbackend forward PlayerAttacked(uid, attacker_uid, attack_type, gold_perc_stolen, 0)
+    case IAttackYou(attacker_uid, attack_type, gold_perc_stolen, key_stolen) =>
+      GMbackend forward PlayerAttacked(uid, attacker_uid, attack_type, gold_perc_stolen, key_stolen)
       
     case AttackHim(victim) =>
       val rnd = new Random()
       var rnd_gold_perc_stolen = rnd.nextInt(91) + 10
       var keys_stolen = rnd.nextInt(2)
-      victim ! GMbackend forward PlayerAttacked(uid, MsgCodes.HUMAN_ATTACK, rnd_gold_perc_stolen, keys_stolen)
-      
+      victim ! IAttackYou(uid, MsgCodes.HUMAN_ATTACK, rnd_gold_perc_stolen, keys_stolen)
        
   }
 }
