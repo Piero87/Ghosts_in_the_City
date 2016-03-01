@@ -25,7 +25,7 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
   var team = Team.UNKNOWN
   
   val logger = new CustomLogger("ClientConnection")
-  logger.log("Ciao mondo! L'utente " + username + "si è appena collegato!")
+  logger.log("Ciao mondo! L'utente " + username + " si è appena collegato!")
   
   def receive = {
     case msg: JsValue =>
