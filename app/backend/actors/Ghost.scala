@@ -83,11 +83,11 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
               }
             }
             
-            if (found_someone == false){
+            if (found_someone && smellPlayerGold(target_info) > 0){
+              attackPlayer(target_info, target_actor)
+            } else {
               mood = GhostMood.CALM
               random_move(ghostpos)
-            } else {
-              attackPlayer(target_info, target_actor)
             }
         }
         future onFailure {
