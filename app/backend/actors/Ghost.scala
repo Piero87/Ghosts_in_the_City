@@ -214,19 +214,21 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
   def computeNextPosition(next_move: Int) : Point = {
     next_move match {
        case Movement.UP => {
-           new Point(ghostpos.x, ghostpos.y - ghostmovement)
+         new Point(ghostpos.x, ghostpos.y - ghostmovement)
        }
        case Movement.RIGHT => {
-           new Point(ghostpos.x + ghostmovement, ghostpos.y)
+         new Point(ghostpos.x + ghostmovement, ghostpos.y)
        }
        case Movement.DOWN => {
-           new Point(ghostpos.x, ghostpos.y + ghostmovement)
+         new Point(ghostpos.x, ghostpos.y + ghostmovement)
        }
        case Movement.LEFT => {
-           new Point(ghostpos.x - ghostmovement, ghostpos.y)
+         new Point(ghostpos.x - ghostmovement, ghostpos.y)
+       }
+       case Movement.STILL => {
+         new Point(ghostpos.x, ghostpos.y)
        }
     }
-    new Point(ghostpos.x, ghostpos.y)
   }
   
   def smellPlayerGold(player : UserInfo): Int = {

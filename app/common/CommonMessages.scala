@@ -33,7 +33,7 @@ object Movement extends Enumeration {
    val RIGHT = 1
    val DOWN = 2
    val LEFT = 3
-   var STILL = -1
+   val STILL = -1
 }
 
 object TrapStatus extends Enumeration {
