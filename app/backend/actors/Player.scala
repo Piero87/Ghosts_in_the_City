@@ -63,7 +63,7 @@ class Player(uid: String, name: String, team: Int, area : Polygon, GMbackend: Ac
     case AttackHim(victim) =>
       logger.log("Attack him")
       val rnd = new Random()
-      var rnd_gold_perc_stolen = rnd.nextInt(91) + 10
+      var rnd_gold_perc_stolen : Double = ( rnd.nextInt(91) + 10 ) / 100
       var keys_stolen = rnd.nextInt(2)
       victim ! IAttackYou(uid, MsgCodes.HUMAN_ATTACK, rnd_gold_perc_stolen, keys_stolen)
        
