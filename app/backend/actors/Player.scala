@@ -64,7 +64,7 @@ class Player(uid: String, name: String, team: Int, area : Polygon, GMbackend: Ac
       logger.log("Attack him")
       val rnd = new Random()
       var rnd_gold_perc_stolen = rnd.nextDouble
-      var keys_stolen = rnd.nextInt(2)
+      var keys_stolen = math.round(rnd.nextFloat)
       victim ! IAttackYou(uid, MsgCodes.HUMAN_ATTACK, rnd_gold_perc_stolen, keys_stolen)
        
   }
