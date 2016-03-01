@@ -362,7 +362,10 @@ class GameManagerBackend () extends Actor {
       var p_actorref_list = (other_players.filter(_._1.pos.distanceFrom(user.pos) <= icon_size/2)).map(x => x._2).toList
       var player = players.filter(_._1.uid == user.uid).head
       if (p_actorref_list.size != 0 ) {
+        logger.log("User found! I will kill him!")
         player._2 ! AttackHim(p_actorref_list.head)
+      } else {
+        logger.log("No one found...")
       }
       
     case PlayerAttacked(uid, attacker_uid, attack_type, gold_perc_stolen, keys_stolen) =>
