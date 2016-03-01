@@ -61,26 +61,26 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
         future.onSuccess { 
           case Players(players) => 
             
-            var player_tastness_max : Double = 0.0
             var found_someone = false
+            var target_tastness : Double = 0.0
             var target_info : UserInfo = null
             var target_actor : ActorRef = null
             
             players.foreach { p =>
               val (info, actor) = p
               var distance = ghostpos.distanceFrom(info.pos)
-                if(distance < ghost_radius){
-                  // coefficiente di gustosità del giocatore
-                  // il "+ 1" è per evitare divisioni per zero nel caso il fantasma sia sopra al giocatore
-                  var player_tastness = info.gold / (distance + 1)
-                  if(player_tastness >= player_tastness_max){
-                    player_tastness_max = player_tastness
-                    mood = GhostMood.ANGRY
-                    found_someone = true
-                    target_info = info
-                    target_actor = actor
-                  }
+              if (distance < ghost_radius){
+                // coefficiente di gustosità del giocatore
+                // il "+ 1" è per evitare divisioni per zero nel caso il fantasma sia sopra al giocatore
+                var player_tastness = info.gold / (distance + 1)
+                if (player_tastness > target_tastness){
+                  target_tastness = player_tastness
+                  target_info = info
+                  target_actor = actor
+                  mood = GhostMood.ANGRY
+                  found_someone = true
                 }
+              }
             }
             
             if (found_someone == false){
@@ -166,12 +166,10 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
     }
     
     var gold_available = smellPlayerGold(player_info)
-    
     var distance_x = player_info.pos.x - ghostpos.x
     var distance_y = player_info.pos.y - ghostpos.y
     
-    if (Math.abs(distance_x) < icon_size/2 && Math.abs(distance_y) < icon_size/2 && gold_available > 0) {
-        logger.log(" Giocatore raggiunto! Lo attacco")
+    if (Math.abs(distance_x) < icon_size/4 && Math.abs(distance_y) < icon_size/4 && gold_available > 0) {
         // Giocatore raggiunto! Gli rubo i soldi
         
         val future = player_actor ? IAttackYou(level)
