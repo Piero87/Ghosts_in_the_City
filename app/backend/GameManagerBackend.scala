@@ -370,32 +370,30 @@ class GameManagerBackend () extends Actor {
       var origin = sender
       var attacked_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == uid) => i}).head
       var u_tmp = players(attacked_index)._1
-      var u_tmp_keys = u_tmp.keys
+      var attacked_keys = u_tmp.keys
       //Se il giocatore ha soldi
       if (u_tmp.gold != 0) {
-        logger.log("Percentuale oro rubato: " + gold_perc_stolen)
         var gold_stolen_double = u_tmp.gold * gold_perc_stolen
-        logger.log("oro rubato (Double) : " + gold_stolen_double)
         var gold_stolen = gold_stolen_double.toInt
-        logger.log("oro rubato (Int) : " + gold_stolen)
         var gold_remain = u_tmp.gold - gold_stolen
-        logger.log("oro rimasto (Int) : " + gold_remain)
         if (attack_type == MsgCodes.PARANORMAL_ATTACK){
           //Mando al fantasmi il numero di soldi rubati
           origin ! gold_stolen
         } else {
           var attacker_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == attacker_uid) => i}).head
           var att_tmp = players(attacker_index)._1
+          var attacker_keys = att_tmp.keys
           if (keys_stolen == 1){
-            u_tmp_keys = List()
+            attacked_keys = List()
+            attacker_keys = List.concat(att_tmp.keys, u_tmp.keys)
           }
-          var attacker_info = new UserInfo(att_tmp.uid,att_tmp.name,att_tmp.team,att_tmp.pos,att_tmp.gold+gold_stolen,List.concat(att_tmp.keys, u_tmp.keys))
+          var attacker_info = new UserInfo(att_tmp.uid,att_tmp.name,att_tmp.team,att_tmp.pos,att_tmp.gold+gold_stolen,attacker_keys)
           players(attacker_index) = players(attacker_index).copy(_1 = attacker_info)
           gameManagerClient ! UpdateUserInfo(attacker_info)
           logger.log("Player " + u_tmp.name + " attacked from: " + att_tmp)
         }
 
-        var attacked_info = new UserInfo(u_tmp.uid,u_tmp.name,u_tmp.team,u_tmp.pos,gold_remain,u_tmp_keys)
+        var attacked_info = new UserInfo(u_tmp.uid,u_tmp.name,u_tmp.team,u_tmp.pos,gold_remain,attacked_keys)
         players(attacked_index) = players(attacked_index).copy(_1 = attacked_info)
         gameManagerClient ! MessageCode(uid, attack_type,gold_stolen.toString())
         gameManagerClient ! UpdateUserInfo(attacked_info)
