@@ -126,7 +126,9 @@ class ClientConnection(username: String, uid: String, upstream: ActorRef,fronten
            var user_info = new UserInfo(uid,username,team,Point(0,0),0, List())
            gameManagerClient ! SetTrapRequest(user_info)
          case "hit_player" =>
-           //logger.log("Hit Player!")
+           logger.log("Hit Player!")
+           var user_info = new UserInfo(uid,username,team,Point(0,0),0, List())
+           gameManagerClient ! HitPlayer(user_info)
          case "open_treasure" =>
            gameManagerClient ! OpenTreasureRequest(uid)
            
