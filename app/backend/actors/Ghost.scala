@@ -195,20 +195,21 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
   def chooseNextMovement(target: Point) : Int = {
     var distance_x = target.x - ghostpos.x
     var distance_y = target.y - ghostpos.y
+    var next_move = Movement.STILL
     if (Math.abs(distance_x) > Math.abs(distance_y) && Math.abs(distance_x) > icon_size/4) {
 			if (distance_x > 0){
-				Movement.RIGHT
+				next_move = Movement.RIGHT
 			} else {
-				Movement.LEFT
+				next_move = Movement.LEFT
 			}
 		} else if (Math.abs(distance_x) < Math.abs(distance_y) && Math.abs(distance_y) > icon_size/4) {
 	     if (distance_y > 0){
-         Movement.DOWN
+         next_move = Movement.DOWN
        } else {
-         Movement.UP
+         next_move = Movement.UP
        }
 		}
-    Movement.STILL
+    next_move
   }
   
   def computeNextPosition(next_move: Int) : Point = {
