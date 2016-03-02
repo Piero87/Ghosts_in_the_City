@@ -57,7 +57,6 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
       update_pos_scheduler = system.scheduler.schedule(0 millis, 500 millis, self, UpdateGhostPosition)
     case UpdateGhostPosition => 
       if(ghostpos.distanceFrom(position_treasure) < treasure_radius || level == 3){
-       mood = GhostMood.CALM
         // Ciclo di vita del fantasma: chiedo al GMBackend le posizioni dei player, calcolo la distanza da ciascuno di essi 
         // se rientra nel range di azione attacco altrimenti mi muovo random
         val future = GMbackend ? PlayersInfo
@@ -70,6 +69,7 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
               var target_actor : ActorRef = player._2
               attackPlayer(target_info, target_actor)
             } else {
+              mood = GhostMood.CALM
               var found_someone = false
               var target_tastness : Double = 0.0
               var future_loot = 0.0
