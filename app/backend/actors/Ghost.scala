@@ -31,6 +31,8 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
   implicit val timeout = Timeout(5 seconds)
   
   var ghostpos: Point = position
+  var attack = false
+  var attack_uid = ""
   var mood = GhostMood.CALM
   var GMbackend: ActorRef = _
   val ghost_radius = level * ConfigFactory.load().getDouble("ghost_radius")
@@ -62,34 +64,42 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
         future.onSuccess { 
           case Players(players) => 
             
-            var found_someone = false
-            var target_tastness : Double = 0.0
-            var target_info : UserInfo = null
-            var target_actor : ActorRef = null
-            
-            players.foreach { p =>
-              val (info, actor) = p
-              var distance = ghostpos.distanceFrom(info.pos)
-              if (distance < ghost_radius){
-                // coefficiente di gustosità del giocatore
-                // il "+ 1" è per evitare divisioni per zero nel caso il fantasma sia sopra al giocatore
-                var player_tastness = info.gold / (distance + 1)
-                if (player_tastness > target_tastness){
-                  target_tastness = player_tastness
-                  target_info = info
-                  target_actor = actor
-                  mood = GhostMood.ANGRY
-                  found_someone = true
+            if (attack) {
+              var player = players.filter(_._1.uid == attack_uid).head
+              var target_info : UserInfo = player._1
+              var target_actor : ActorRef = player._2
+              attackPlayer(target_info, target_actor)
+            } else {
+              var found_someone = false
+              var target_tastness : Double = 0.0
+              var future_loot = 0.0
+              
+              players.foreach { p =>
+                val (info, actor) = p
+                var distance = ghostpos.distanceFrom(info.pos)
+                if (distance < ghost_radius){
+                  // coefficiente di gustosità del giocatore
+                  // il "+ 1" è per evitare divisioni per zero nel caso il fantasma sia sopra al giocatore
+                  var player_tastness = info.gold / (distance + 1)
+                  if (player_tastness > target_tastness){
+                    target_tastness = player_tastness
+                    attack_uid = info.uid
+                    future_loot = smellPlayerGold(info)
+                    mood = GhostMood.ANGRY
+                    found_someone = true
+                  }
                 }
+              }
+              
+              if (found_someone && future_loot > 0){
+                attack = true
+              } else {
+                attack = false
+                mood = GhostMood.CALM
+                random_move(ghostpos)
               }
             }
             
-            if (found_someone && smellPlayerGold(target_info) > 0){
-              attackPlayer(target_info, target_actor)
-            } else {
-              mood = GhostMood.CALM
-              random_move(ghostpos)
-            }
         }
         future onFailure {
           case e: Exception => logger.log("******GHOST REQUEST PLAYER POSITION ERROR ******")
