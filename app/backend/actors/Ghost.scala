@@ -20,10 +20,10 @@ object Ghost{
    */
   case object UpdateGhostPosition
   
-  def props(uid: String, area: Rectangle, position: Point, level: Int, treasure: ActorRef,position_treasure: Point, t_uid: String) = Props(new Ghost(uid, area,position, level, treasure,position_treasure, t_uid))
+  def props(uid: String, arena: Rectangle, position: Point, level: Int, treasure: ActorRef,position_treasure: Point, t_uid: String) = Props(new Ghost(uid, arena,position, level, treasure,position_treasure, t_uid))
 }
 
-class Ghost(uid: String, area : Rectangle, position: Point, level: Int, treasure: ActorRef, position_treasure: Point, t_uid: String) extends Actor {
+class Ghost(uid: String, arena : Rectangle, position: Point, level: Int, treasure: ActorRef, position_treasure: Point, t_uid: String) extends Actor {
   
   import context._
   import Ghost._
@@ -134,8 +134,7 @@ class Ghost(uid: String, area : Rectangle, position: Point, level: Int, treasure
     var rnd_move = rnd.nextInt(4)
     var new_position : Point = computeNextPosition(rnd_move)
 
-    //if (area.contains(new_position)) {
-      if ((icon_size < new_position.latitude && new_position.latitude < width-icon_size) && (icon_size < new_position.longitude && new_position.longitude < height-icon_size)) {
+    if (arena.contains(new_position)) {
         if (level !=3 && new_position.distanceFrom(position_treasure) >= treasure_radius) {
           if (rnd_move<2) {
             rnd_move = 2-rnd_move
@@ -180,8 +179,7 @@ class Ghost(uid: String, area : Rectangle, position: Point, level: Int, treasure
       var ghost_move : Int = chooseNextMovement(player_info.pos)
       var new_position : Point = computeNextPosition(ghost_move)
       
-      //if (area.contains(new_position)){
-      if ((icon_size < new_position.latitude && new_position.latitude < width-icon_size) && (icon_size < new_position.longitude && new_position.longitude < height-icon_size)) {  
+      if (arena.contains(new_position)){
          if(level == 3 || new_position.distanceFrom(position_treasure) < treasure_radius){
            ghostpos = new_position
            GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
