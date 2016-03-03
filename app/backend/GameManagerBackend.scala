@@ -178,7 +178,7 @@ class GameManagerBackend () extends Actor {
               /* Invio le info di terminazione partita a causa di un utente 
                * che è uscito a causa di un disservizio e non è tornato
                */
-              players = players.filterNot(elm => elm._1.uid == player)
+              players = players.filterNot(elm => elm._1.uid == player._1)
               var all_player_info = players.map(x => x._1).toList
               gameManagerClient ! BroadcastVictoryResponse(Team.NO_ENOUGH_PLAYER,all_player_info)
         
