@@ -292,7 +292,9 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 		
 		# The player clicked connect
 		submitPlayerName: ->
-			@playername(@playername().replace(/ /g,''))
+			name = @playername()
+			name = name.replace /\s/g,''
+			@playername(name)
 			@playeruid(@generateUID())
 			localStorage.setItem("uid", @playeruid())
 			localStorage.setItem("playername", @playername())
