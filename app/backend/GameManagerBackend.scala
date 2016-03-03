@@ -436,10 +436,10 @@ class GameManagerBackend () extends Actor {
     
     for(i <- 0 to game_n_players-1) {
       val user = players(i)._1
-      val p = new UserInfo(user.uid,user.name,user.team,Point(position_players(i).x,position_players(i).y),user.gold,user.keys)
+      val p = new UserInfo(user.uid,user.name,user.team,Point(position_players(i).latitude,position_players(i).longitude),user.gold,user.keys)
       val player_actor = context.actorOf(Props(new Player(user.uid,user.name,user.team,polygon,self)), name = user.uid)
       players(i) = Tuple2(p,player_actor)
-      player_actor ! UpdatePlayerPos(Point(position_players(i).x,position_players(i).y))
+      player_actor ! UpdatePlayerPos(Point(position_players(i).latitude,position_players(i).longitude))
     }
     
     val rnd_key = new Random()
@@ -464,13 +464,13 @@ class GameManagerBackend () extends Actor {
       
       // Creazione tesori
       var treasure_position : Point = UtilFunctions.randomPositionInSpace(spaces_shuffled(i))
-      logger.log("Treasure[" + i + "] position: ("+ treasure_position.x +","+ treasure_position.y +")")
+      logger.log("Treasure[" + i + "] position: ("+ treasure_position.latitude +","+ treasure_position.longitude +")")
       
       var treasure_id = randomString(8)
       
       val rnd = new Random()
       var gold = rnd.nextInt(max_treasure_gold-min_treasure_gold)+min_treasure_gold
-      var pos_t = new Point (treasure_position.x,treasure_position.y)
+      var pos_t = new Point (treasure_position.latitude,treasure_position.longitude)
       var treasure_info = new TreasureInfo(treasure_id,0,pos_t)
       
       if (n_keys_tmp != 0) {
@@ -508,12 +508,12 @@ class GameManagerBackend () extends Actor {
       
       for(i <- 1 to ghosts_per_treasure){
         var ghost_postion : Point = UtilFunctions.randomPositionAroundPoint(treasure_position)
-        logger.log("Ghost[" + i + "] position: ("+ ghost_postion.x +","+ ghost_postion.y +")")
+        logger.log("Ghost[" + i + "] position: ("+ ghost_postion.latitude +","+ ghost_postion.longitude +")")
         
         // Creazione dei due fantasmi a guardia dei tesori
         // Fantasma 1
         var ghost_id = randomString(8)
-        var p_g = new Point (ghost_postion.x,ghost_postion.y)
+        var p_g = new Point (ghost_postion.latitude,ghost_postion.longitude)
         val g_level = rnd.nextInt(2)+1
         val ghost = context.actorOf(Props(new Ghost(ghost_id,polygon,p_g,g_level,treasures.last._2,pos_t,treasure_id)), name = ghost_id)
         var ghost_info = new GhostInfo(ghost_id,g_level,GhostMood.CALM,p_g)
@@ -524,12 +524,12 @@ class GameManagerBackend () extends Actor {
     
     for(i <- 0 to n_free_ghosts-1){ //l'ultimo space è dei giocatori e non ha fantasmi
       var free_ghost_postion = UtilFunctions.randomPositionInSpace(spaces(i))
-      logger.log("Free Ghost[" + i + "] position: ("+ free_ghost_postion.x +","+ free_ghost_postion.y +")")
+      logger.log("Free Ghost[" + i + "] position: ("+ free_ghost_postion.latitude +","+ free_ghost_postion.longitude +")")
       
       // Fantasmi liberi di girare per tutta l'area
       val rnd = new Random()
       var free_ghost_id = randomString(8)
-      var free_p_g = new Point (free_ghost_postion.x, free_ghost_postion.y)
+      var free_p_g = new Point (free_ghost_postion.latitude, free_ghost_postion.longitude)
       val n_treasure = rnd.nextInt(treasures.size)
       val free_ghost = context.actorOf(Props(new Ghost(free_ghost_id,polygon,free_p_g,3,treasures(n_treasure)._2,treasures(n_treasure)._1.pos,treasures(n_treasure)._1.uid)), name = free_ghost_id)
       var free_ghost_info = new GhostInfo(free_ghost_id,3,GhostMood.CALM,free_p_g)

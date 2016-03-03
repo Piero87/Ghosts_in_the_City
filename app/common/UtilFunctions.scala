@@ -54,8 +54,8 @@ object UtilFunctions {
     val rnd = new Random()
     var lat_rnd = rnd.nextInt(tmp_dist) - rnd.nextInt(tmp_dist)
     var lng_rnd = rnd.nextInt(tmp_dist) - rnd.nextInt(tmp_dist)
-    var lat = point.x + lat_rnd
-    var lng = point.y + lng_rnd
+    var lat = point.latitude + lat_rnd
+    var lng = point.longitude + lng_rnd
     
     val min_lat = icon_size
     val max_lat = space_width - icon_size

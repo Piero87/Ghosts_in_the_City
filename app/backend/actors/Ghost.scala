@@ -124,8 +124,8 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
 *     var vx = (speed * Math.cos(direction)).toInt
 *     var vy = (speed * Math.sin(direction)).toInt
 *     
-*     var lat = (vx * delta_time) + position.x
-*     var lng = (vy * delta_time) + position.y
+*     var lat = (vx * delta_time) + position.latitude
+*     var lng = (vy * delta_time) + position.longitude
 *     
 *     var new_position = new Point(lat, lng)
 **/    
@@ -134,7 +134,7 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
     var new_position : Point = computeNextPosition(rnd_move)
 
     //if (area.contains(new_position)) {
-      if ((icon_size < new_position.x && new_position.x < width-icon_size) && (icon_size < new_position.y && new_position.y < height-icon_size)) {
+      if ((icon_size < new_position.latitude && new_position.latitude < width-icon_size) && (icon_size < new_position.longitude && new_position.longitude < height-icon_size)) {
         if (level !=3 && new_position.distanceFrom(position_treasure) >= treasure_radius) {
           if (rnd_move<2) {
             rnd_move = 2-rnd_move
@@ -157,8 +157,8 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
   def attackPlayer(player_info: UserInfo, player_actor : ActorRef) = {
     
     var gold_available = smellPlayerGold(player_info)
-    var distance_x = player_info.pos.x - ghostpos.x
-    var distance_y = player_info.pos.y - ghostpos.y
+    var distance_x = player_info.pos.latitude - ghostpos.latitude
+    var distance_y = player_info.pos.longitude - ghostpos.longitude
     
     if (Math.abs(distance_x) < icon_size/2 && Math.abs(distance_y) < icon_size/2 && gold_available > 0) {
         // Giocatore raggiunto! Gli rubo i soldi
@@ -175,7 +175,7 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
       var new_position : Point = computeNextPosition(ghost_move)
       
       //if (area.contains(new_position)){
-      if ((icon_size < new_position.x && new_position.x < width-icon_size) && (icon_size < new_position.y && new_position.y < height-icon_size)) {  
+      if ((icon_size < new_position.latitude && new_position.latitude < width-icon_size) && (icon_size < new_position.longitude && new_position.longitude < height-icon_size)) {  
          if(level == 3 || new_position.distanceFrom(position_treasure) < treasure_radius){
            ghostpos = new_position
            GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
@@ -195,8 +195,8 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
   }
   
   def chooseNextMovement(target: Point) : Int = {
-    var distance_x = target.x - ghostpos.x
-    var distance_y = target.y - ghostpos.y
+    var distance_x = target.latitude - ghostpos.latitude
+    var distance_y = target.longitude - ghostpos.longitude
     var next_move = Movement.STILL
     if (Math.abs(distance_x) > Math.abs(distance_y) && Math.abs(distance_x) > icon_size/4) {
 			if (distance_x > 0){
@@ -217,19 +217,19 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
   def computeNextPosition(next_move: Int) : Point = {
     next_move match {
        case Movement.UP => {
-         new Point(ghostpos.x, ghostpos.y - ghostmovement)
+         new Point(ghostpos.latitude, ghostpos.longitude - ghostmovement)
        }
        case Movement.RIGHT => {
-         new Point(ghostpos.x + ghostmovement, ghostpos.y)
+         new Point(ghostpos.latitude + ghostmovement, ghostpos.longitude)
        }
        case Movement.DOWN => {
-         new Point(ghostpos.x, ghostpos.y + ghostmovement)
+         new Point(ghostpos.latitude, ghostpos.longitude + ghostmovement)
        }
        case Movement.LEFT => {
-         new Point(ghostpos.x - ghostmovement, ghostpos.y)
+         new Point(ghostpos.latitude - ghostmovement, ghostpos.longitude)
        }
        case Movement.STILL => {
-         new Point(ghostpos.x, ghostpos.y)
+         new Point(ghostpos.latitude, ghostpos.longitude)
        }
     }
   }

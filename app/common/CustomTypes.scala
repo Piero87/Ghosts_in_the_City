@@ -2,13 +2,13 @@ package common
 
 import scala.collection.mutable
 
-sealed case class Point(x: Double, y: Double){
+sealed case class Point(latitude: Double, longitude: Double){
   
-  var pos_x = x // latidude
-  var pos_y = y // longitude
+  var pos_latitude = latitude // x
+  var pos_longitude = longitude // y
   
   def distanceFrom(p: Point): Double = {
-    Math.sqrt(Math.pow((p.x - pos_x),2) + Math.pow((p.y - pos_y),2))
+    Math.sqrt(Math.pow((p.latitude - pos_latitude),2) + Math.pow((p.longitude - pos_longitude),2))
   }
 }
 
@@ -43,13 +43,13 @@ case class Edge(_1: Point, _2: Point) {
   // Ray-casting algorithm
   // It checks if a point is contained in the Polygon
   def raySegI(p: Point): Boolean = {
-    if (_1.y > _2.y) return Edge(_2, _1).raySegI(p)
-    if (p.y == _1.y || p.y == _2.y) return raySegI(new Point(p.x, p.y + epsilon))
-    if (p.y > _2.y || p.y < _1.y || p.x > max(_1.x, _2.x))
+    if (_1.longitude > _2.longitude) return Edge(_2, _1).raySegI(p)
+    if (p.longitude == _1.longitude || p.longitude == _2.longitude) return raySegI(new Point(p.latitude, p.longitude + epsilon))
+    if (p.longitude > _2.longitude || p.longitude < _1.longitude || p.latitude > max(_1.latitude, _2.latitude))
       return false
-    if (p.x < min(_1.x, _2.x)) return true
-    val blue = if (abs(_1.x - p.x) > MinValue) (p.y - _1.y) / (p.x - _1.x) else MaxValue
-    val red = if (abs(_1.x - _2.x) > MinValue) (_2.y - _1.y) / (_2.x - _1.x) else MaxValue
+    if (p.latitude < min(_1.latitude, _2.latitude)) return true
+    val blue = if (abs(_1.latitude - p.latitude) > MinValue) (p.longitude - _1.longitude) / (p.latitude - _1.latitude) else MaxValue
+    val red = if (abs(_1.latitude - _2.latitude) > MinValue) (_2.longitude - _1.longitude) / (_2.latitude - _1.latitude) else MaxValue
     blue >= red
   }
  
