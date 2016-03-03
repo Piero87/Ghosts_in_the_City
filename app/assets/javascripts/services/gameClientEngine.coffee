@@ -107,54 +107,54 @@ define () ->
 			@busters = []
 			@busters_images = []
 			@addBuster(
-				buster.uid, buster.name, buster.team, buster.pos.x, buster.pos.y
+				buster.uid, buster.name, buster.team, buster.pos.latitude, buster.pos.longitude
 			) for buster in players
 		
-		addBuster: (uid, name, team, x, y) ->
+		addBuster: (uid, name, team, latitude, longitude) ->
 			buster = {}
 			buster.uid = uid
 			buster.name = name
 			buster.team = team
-			buster.x = x
-			# current buster position X
-			buster.y = y
-			# current buster position Y
-			buster.old_x = x
-			# old buster position X
-			buster.old_y = y
-			# old buster position Y
+			buster.latitude = latitude
+			# current buster latitude position
+			buster.longitude = longitude
+			# current buster longitude position
+			buster.old_latitude = latitude
+			# old buster latitude position
+			buster.old_longitude = longitude
+			# old buster longitude position
 			@busters.push buster
 			buster_img = new Image
 			# buster
 			buster_img.src = '/assets/images/G' + @busters.length + '.png'
 			@busters_images.push buster_img
 		
-		busterMove: (uid, x, y) ->
+		busterMove: (uid, latitude, longitude) ->
 			for buster, i in @busters when buster.uid == uid
-				@busters[i].old_x = buster.x
-				@busters[i].old_y = buster.y
-				@busters[i].x = x
-				@busters[i].y = y
+				@busters[i].old_latitude = buster.latitude
+				@busters[i].old_longitude = buster.longitude
+				@busters[i].latitude = latitude
+				@busters[i].longitude = longitude
 		
 		setGhosts: (ghosts) ->
 			@ghosts = []
 			@ghosts_images = []
 			@addGhost(
-				ghost.uid, ghost.level, ghost.mood, ghost.pos.x, ghost.pos.y
+				ghost.uid, ghost.level, ghost.mood, ghost.pos.latitude, ghost.pos.longitude
 			) for ghost in ghosts
 			
-		addGhost: (uid, level, mood, x, y) ->
+		addGhost: (uid, level, mood, latitude, longitude) ->
 			ghost = {}
 			ghost.uid = uid
 			ghost.level = level
 			ghost.mood = mood
-			ghost.x = x
+			ghost.latitude = latitude
 			# current ghost position X
-			ghost.y = y
+			ghost.longitude = longitude
 			# current ghost position Y
-			ghost.old_x = x
+			ghost.old_latitude = latitude
 			# old ghost position X
-			ghost.old_y = y
+			ghost.old_longitude = longitude
 			# old ghost position Y
 			@ghosts.push ghost
 			ghost_img = new Image
@@ -162,46 +162,46 @@ define () ->
 			ghost_img.src = '/assets/images/Ghost_L' + level + '_right.png'
 			@ghosts_images.push ghost_img
 		
-		ghostMove: (uid, mood, x, y) ->
+		ghostMove: (uid, mood, latitude, longitude) ->
 			for ghost, i in @ghosts when ghost.uid == uid
 				@ghosts[i].mood = mood
 				if @ghosts[i].mood == 0
-					if ghost.x > x
+					if ghost.latitude > x
 						@ghosts_images[i].src = '/assets/images/Ghost_L' + @ghosts[i].level + '_left.png'
 					else
 						@ghosts_images[i].src = '/assets/images/Ghost_L' + @ghosts[i].level + '_right.png'
 				else if @ghosts[i].mood == 1 # Oh oh, someone is angry...
-					if ghost.x > x
+					if ghost.latitude > x
 						@ghosts_images[i].src = '/assets/images/Ghost_L' + @ghosts[i].level + '_Angry_left.png'
 					else
 						@ghosts_images[i].src = '/assets/images/Ghost_L' + @ghosts[i].level + '_Angry_right.png'
 				else if @ghosts[i].mood == 2 # Poor trapped ghost
 					console.log "Fantasma in trappola"
 					console.log @ghosts[i]
-					if ghost.x > x
+					if ghost.latitude > x
 						@ghosts_images[i].src = '/assets/images/Ghost_L' + @ghosts[i].level + '_Scared_left.png'
 					else
 						@ghosts_images[i].src = '/assets/images/Ghost_L' + @ghosts[i].level + '_Scared_right.png'
-				@ghosts[i].old_x = ghost.x
-				@ghosts[i].old_y = ghost.y
-				@ghosts[i].x = x
-				@ghosts[i].y = y
+				@ghosts[i].old_latitude = ghost.latitude
+				@ghosts[i].old_longitude = ghost.longitude
+				@ghosts[i].latitude = latitude
+				@ghosts[i].longitude = longitude
 		
 		setTreasures: (treasures) ->
 			@treasures = []
 			
 			@addTreasure(
-				treasure.uid, treasure.status, treasure.pos.x, treasure.pos.y
+				treasure.uid, treasure.status, treasure.pos.latitude, treasure.pos.longitude
 			) for treasure in treasures
 		
-		addTreasure: (uid, status, x, y) ->
+		addTreasure: (uid, status, latitude, longitude) ->
 			treasure = {}
 			treasure.uid = uid
 			treasure.name = name
 			treasure.status = status
-			treasure.x = x
+			treasure.latitude = latitude
 			# current buster position X
-			treasure.y = y
+			treasure.longitude = longitude
 			# current buster position Y
 			@treasures.push treasure
 		
@@ -211,17 +211,17 @@ define () ->
 			
 			for treasure, i in @treasures
 				# To center the images in their position point
-				treasure_x = @treasures[i].x - (@icon_size / 2)
-				treasure_y = @treasures[i].y - (@icon_size / 2)
-				area_x =  @treasures[i].x -  @treasure_radius
-				area_y =  @treasures[i].y -  @treasure_radius
+				treasure_latitude = @treasures[i].latitude - (@icon_size / 2)
+				treasure_longitude = @treasures[i].longitude - (@icon_size / 2)
+				area_latitude =  @treasures[i].latitude -  @treasure_radius
+				area_longitude =  @treasures[i].longitude -  @treasure_radius
 				
 				if (@debug)
 					# Drawings
 					@ctx.drawImage(
 						@sensible_area
-						area_x 
-						area_y 
+						area_latitude 
+						area_longitude 
 						(@treasure_radius * 2)
 						(@treasure_radius * 2)
 					)
@@ -233,21 +233,21 @@ define () ->
 				
 				@ctx.drawImage(
 					treasure_img
-					treasure_x
-					treasure_y
+					treasure_latitude
+					treasure_longitude
 					@icon_size
 					@icon_size
 				) 
 				
 			for buster, i in @busters
 				# To center the image in its position point
-				buster_x = @busters[i].x - (@icon_size / 2)
-				buster_y = @busters[i].y - (@icon_size / 2)
+				buster_latitude = @busters[i].latitude - (@icon_size / 2)
+				buster_longitude = @busters[i].longitude - (@icon_size / 2)
 				# Drawings
 				@ctx.drawImage(
 					@busters_images[i]
-					buster_x
-					buster_y
+					buster_latitude
+					buster_longitude
 					@icon_size
 					@icon_size
 				)
@@ -266,50 +266,50 @@ define () ->
 				
 				@ctx.drawImage(
 						team_img
-						(buster_x + (@icon_size - 8))
-						(buster_y + (@icon_size - 8))
+						(buster_latitude + (@icon_size - 8))
+						(buster_longitude + (@icon_size - 8))
 						8
 						8
 					)
 				
 			for ghost, i in @ghosts
 				# To center the images in their position point
-				ghost_x = @ghosts[i].x - (@icon_size / 2)
-				ghost_y = @ghosts[i].y - (@icon_size / 2)
-				area_x =  @ghosts[i].x - (@ghost_radius * @ghosts[i].level)
-				area_y =  @ghosts[i].y - (@ghost_radius * @ghosts[i].level)
+				ghost_latitude = @ghosts[i].latitude - (@icon_size / 2)
+				ghost_longitude = @ghosts[i].longitude - (@icon_size / 2)
+				area_latitude =  @ghosts[i].latitude - (@ghost_radius * @ghosts[i].level)
+				area_longitude =  @ghosts[i].longitude - (@ghost_radius * @ghosts[i].level)
 				
 				if (@debug)
 					# Drawings
 					@ctx.drawImage(
 						@sensible_area
-						area_x
-						area_y
+						area_latitude
+						area_longitude
 						(@ghost_radius * 2 * @ghosts[i].level)
 						(@ghost_radius * 2 * @ghosts[i].level)
 					)
 				
 				@ctx.drawImage(
 					@ghosts_images[i]
-					ghost_x
-					ghost_y
+					ghost_latitude
+					ghost_longitude
 					@icon_size
 					@icon_size
 				)
 				
 			for trap, i in @traps
 				# To center the images in their position point
-				trap_x = @traps[i].x - (@icon_size / 2)
-				trap_y = @traps[i].y - (@icon_size / 2)
-				area_x =  @traps[i].x -  @trap_radius
-				area_y =  @traps[i].y -  @trap_radius
+				trap_latitude = @traps[i].latitude - (@icon_size / 2)
+				trap_longitude = @traps[i].longitude - (@icon_size / 2)
+				area_latitude =  @traps[i].latitude -  @trap_radius
+				area_longitude =  @traps[i].longitude -  @trap_radius
 				
 				if (@debug)
 					# Drawings
 					@ctx.drawImage(
 						@sensible_area
-						area_x
-						area_y
+						area_latitude
+						area_longitude
 						(@trap_radius * 2)
 						(@trap_radius * 2)
 					)
@@ -321,8 +321,8 @@ define () ->
 
 				@ctx.drawImage(
 					trap_img
-					trap_x
-					trap_y
+					trap_latitude
+					trap_longitude
 					@icon_size
 					@icon_size
 				)
@@ -368,13 +368,13 @@ define () ->
 					when 37, 38, 39, 40
 						@movement(evt.keyCode, i)
 		
-		newTrap: (uid, x, y) ->
+		newTrap: (uid, latitude, longitude) ->
 			trap = {}
 			trap.uid = uid
 			trap.status = 0 # unactive
-			trap.x = x
+			trap.latitude = latitude
 			# current buster position X
-			trap.y = y
+			trap.longitude = longitude
 			@traps.push trap
 		
 		activeTrap: (trap_uid) ->
@@ -397,49 +397,49 @@ define () ->
 			# Flag to put variables back if we hit an edge of the board.
 			flag = 0
 			# Get where the buster was before key process.
-			@busters[i].old_x = @busters[i].x
-			@busters[i].old_y = @busters[i].y
+			@busters[i].old_latitude = @busters[i].latitude
+			@busters[i].old_longitude = @busters[i].longitude
 			switch direction
 				# Left arrow.
 				when 37
-					@busters[i].x = @busters[i].x - @move
-					if @busters[i].x < (@icon_size / 2)
+					@busters[i].latitude = @busters[i].latitude - @move
+					if @busters[i].latitude < (@icon_size / 2)
 						# If at edge, reset buster position and set flag.
-						@busters[i].x = (@icon_size / 2)
+						@busters[i].latitude = (@icon_size / 2)
 						flag = 1
 				# Right arrow.
 				when 39
-					@busters[i].x = @busters[i].x + @move
-					if @busters[i].x > @space_width - (@icon_size / 2)
+					@busters[i].latitude = @busters[i].latitude + @move
+					if @busters[i].latitude > @space_width - (@icon_size / 2)
 						# If at edge, reset buster position and set flag.
-						@busters[i].x = @space_width - @move
+						@busters[i].latitude = @space_width - @move
 						flag = 1
 				# Down arrow
 				when 40
-					@busters[i].y = @busters[i].y + @move
-					if @busters[i].y > @space_height - (@icon_size / 2)
+					@busters[i].longitude = @busters[i].longitude + @move
+					if @busters[i].longitude > @space_height - (@icon_size / 2)
 						# If at edge, reset buster position and set flag.
-						@busters[i].y = @space_height - @move
+						@busters[i].longitude = @space_height - @move
 						flag = 1
 				# Up arrow 
 				when 38
-					@busters[i].y = @busters[i].y - @move
-					if @busters[i].y < (@icon_size / 2)
+					@busters[i].longitude = @busters[i].longitude - @move
+					if @busters[i].longitude < (@icon_size / 2)
 						# If at edge, reset buster position and set flag.
-						@busters[i].y = (@icon_size / 2)
+						@busters[i].longitude = (@icon_size / 2)
 						flag = 1
 			
 			# If flag is set, the buster did not move.
 			# Put everything backBuster the way it was.
 			if flag
-				@busters[i].x = @busters[i].old_x
-				@busters[i].y = @busters[i].old_y
+				@busters[i].latitude = @busters[i].old_latitude
+				@busters[i].longitude = @busters[i].old_longitude
 			
 			@ws.send(JSON.stringify
 				event: "update_player_position"
 				pos:
-					x: @busters[i].x
-					y: @busters[i].y
+					latitude: @busters[i].latitude
+					longitude: @busters[i].longitude
 			)
 		
 		generateUID: ->
