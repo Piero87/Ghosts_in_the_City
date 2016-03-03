@@ -62,6 +62,14 @@ object MsgCodes extends Enumeration {
    
 }
 
+object PlayerType extends Enumeration {
+  type PlayerType = String
+  
+  val WEARABLE = "wearable"
+  val WEB = "web"
+  val UNKNOWN = ""
+}
+
 // Game Engine
 case class MessageCode(uid: String, code: Int, option: String)
 case object Finish
@@ -83,7 +91,7 @@ case class UpdatePosition(player: PlayerInfo)
 case class BroadcastUpdatePosition(player: PlayerInfo)
 case class Players(players: MutableList[Tuple2[PlayerInfo, ActorRef]])
 case class UpdatePlayerPos(pos: Point)
-case class PlayerInfo(uid: String, name: String, team: Int, pos: Point, gold: Int, keys: List[Key])
+case class PlayerInfo(uid: String, name: String, p_type: String, team: Int, pos: Point, gold: Int, keys: List[Key])
 case class UpdatePlayerInfo(player: PlayerInfo)
 case class OpenTreasureRequest(uid: String)
 case class OpenTreasure(treasures: List[ActorRef], player: PlayerInfo)
@@ -103,7 +111,7 @@ case class BroadcastUpdateTreasure(treasures: MutableList[TreasureInfo])
 case class UpdateTreasure(uid: String, status: Int)
 
 // Trap
-case class SetTrapRequest(player: PlayerInfo)
+case class SetTrapRequest(uid: String)
 case class SetTrap(gold: Int, pos: Point)
 case class TrapInfo(uid: String, pos: Point, status: Int)
 case class NewTrap(uid: String, gold: Int, pos: Point)
@@ -117,8 +125,8 @@ case class GameStatusBroadcast(game: Game)
 case class JoinGame(game: Game, player: PlayerInfo, ref: ActorRef = null)
 case class ResumeGame(game_id: String, player: PlayerInfo, ref: ActorRef)
 case class GameHandler(game: Game, ref: ActorRef = null)
-case class LeaveGame(player: PlayerInfo)
-case class PauseGame(player: PlayerInfo)
+case class LeaveGame(uid: String)
+case class PauseGame(uid: String)
 case class NewGame(name: String, n_players: Int, player: PlayerInfo, ref: ActorRef = null)
 case class Game(id: String, name: String, n_players: Int, status: Int, players: MutableList[PlayerInfo], ghosts: MutableList[GhostInfo], treasures: MutableList[TreasureInfo])
 case class GamesList(list: List[Game])
@@ -134,13 +142,13 @@ case object CheckPaused
 
 
 // Json
-case class NewGameJSON(event: String, name: String, n_players: Int)
+case class NewGameJSON(event: String, name: String, pos: Point, n_players: Int)
 case class GameJSON(event: String, game: Game)
 case class GamesListResponseJSON(event: String, list: List[Game])
 case class GamesListRequestJSON(event: String)
-case class JoinGameJSON(event: String, game: Game)
+case class JoinGameJSON(event: String, game: Game, pos: Point)
 case class LeaveGameJSON(event: String)
-case class ResumeGameJSON(event:String, game_id: String)
+case class ResumeGameJSON(event:String, game_id: String, pos: Point)
 case class UpdatePositionJSON(event: String, pos: Point)
 case class BroadcastUpdatePositionJSON(event: String, player: PlayerInfo)
 case class BroadcastGhostsPositionsJSON(event: String, ghosts: MutableList[GhostInfo])

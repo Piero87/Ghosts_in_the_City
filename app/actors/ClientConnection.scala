@@ -23,6 +23,7 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
   implicit val ec = context.dispatcher
   var game_id = ""
   var team = Team.UNKNOWN
+  var player_type = PlayerType.UNKNOWN
   
   val logger = new CustomLogger("ClientConnection")
   logger.log("Ciao mondo! L'utente " + name + " si è appena collegato!")
@@ -34,8 +35,16 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
         case "new_game" =>
           val newGameResult: JsResult[NewGameJSON] = msg.validate[NewGameJSON](CommonMessages.newGameReads)
           newGameResult match {
-            case s: JsSuccess[NewGameJSON] => 
-              var player_info = new PlayerInfo(uid,name,team,Point(0,0),0,List())
+            case s: JsSuccess[NewGameJSON] =>
+              var p_pos = s.get.pos
+              if(p_pos.latitude != 0.0 && p_pos.longitude != 0.0){
+                // Verifico che la posizione che mi è stata inviata sia diversa da 0.0,0.0(quella difeaul del web) per determinare se il client
+                // è un wearable o no. Se è wearable lo scrivo in player info e gli inserisco la posizione che mi è stata inviata dal client
+                player_type = PlayerType.WEARABLE
+              }else{
+                player_type = PlayerType.WEB
+              }
+              var player_info = new PlayerInfo(uid,name,player_type,team,p_pos,0,List())
               val future = frontendManager ? NewGame(s.get.name.replaceAll(" ", "_") + "__" + System.currentTimeMillis(),s.get.n_players,player_info,self)
               future.onSuccess {
                 case GameHandler(game,ref) => 
@@ -66,7 +75,20 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
           val joinGameResult: JsResult[JoinGameJSON] = msg.validate[JoinGameJSON](CommonMessages.joinGameReads)
           joinGameResult match {
             case s: JsSuccess[JoinGameJSON] =>
-              var player_info = new PlayerInfo(uid,name,team,Point(0,0),0,List())
+              var p_pos = s.get.pos
+              if(p_pos.latitude != 0.0 && p_pos.longitude != 0.0){
+                // Verifico che la posizione che mi è stata inviata sia diversa da 0.0,0.0(quella difeaul del web) per determinare se il client
+                // è un wearable o no. Se è wearable lo scrivo in player info e gli inserisco la posizione che mi è stata inviata dal client
+                player_type = PlayerType.WEARABLE
+              }else{
+                player_type = PlayerType.WEB
+              }
+              var player_info = new PlayerInfo(uid,name,player_type,team,p_pos,0,List())
+              if(p_pos.latitude != 0.0 && p_pos.longitude != 0.0){
+                // Verifico che la posizione che mi è stata inviata sia diversa da 0.0,0.0(quella difeaul del web) per determinare se il client
+                // è un wearable o no. Se è wearable lo scrivo in player info e gli inserisco la posizione che mi è stata inviata dal client
+                player_info = new PlayerInfo(uid,name,PlayerType.WEARABLE,team,p_pos,0,List())
+              }
               val future = frontendManager ? JoinGame(s.get.game,player_info,self)
               future.onSuccess {
                 case GameHandler(game,ref) =>  
@@ -87,14 +109,13 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
           
          case "leave_game" =>
            game_id = ""
-           var PlayerInfo = new PlayerInfo(uid,name,team, Point(0,0),0,List())
-           gameManagerClient ! LeaveGame(PlayerInfo)
+           gameManagerClient ! LeaveGame(uid)
            
          case "update_player_position" =>
            val updatePositionResult: JsResult[UpdatePositionJSON] = msg.validate[UpdatePositionJSON](CommonMessages.updatePositionReads)
            updatePositionResult match {
             case s: JsSuccess[UpdatePositionJSON] =>
-              var PlayerInfo = new PlayerInfo(uid,name,team, s.get.pos,0,List())
+              var PlayerInfo = new PlayerInfo(uid,name,player_type, team, s.get.pos,0,List())
               gameManagerClient ! UpdatePosition(PlayerInfo)
             case e: JsError => logger.log("UPDATE PLAYER POSITION ERROR: " + e.toString() + " FROM " + sender.path)
            }
@@ -103,7 +124,8 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
            val resumeGameResult: JsResult[ResumeGameJSON] = msg.validate[ResumeGameJSON](CommonMessages.resumeGameReads)
            resumeGameResult match {
             case s: JsSuccess[ResumeGameJSON] =>
-              var player_info = new PlayerInfo(uid,name,team,Point(0,0),0, List())
+              var p_pos = s.get.pos
+              var player_info = new PlayerInfo(uid,name,player_type,team,p_pos,0, List())
               val future = frontendManager ? ResumeGame(s.get.game_id,player_info, self)
               future.onSuccess {
                 case GameHandler(game,ref) =>  
@@ -123,8 +145,7 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
           }
            
          case "set_trap" =>
-           var player_info = new PlayerInfo(uid,name,team,Point(0,0),0, List())
-           gameManagerClient ! SetTrapRequest(player_info)
+           gameManagerClient ! SetTrapRequest(uid)
          case "hit_player" =>
            logger.log("Hit Player!")
            gameManagerClient ! HitPlayerRequest(uid)
@@ -176,8 +197,7 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
   
   override def postStop() = {
     if (game_id != "") {
-      var PlayerInfo = new PlayerInfo(uid,name,team, Point(0,0),0,List())
-      gameManagerClient ! PauseGame(PlayerInfo)
+      gameManagerClient ! PauseGame(uid)
     }
   }
 }
