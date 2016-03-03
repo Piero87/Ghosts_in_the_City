@@ -62,13 +62,13 @@ object UtilFunctions {
     Point(lat,lng)
   }
   
-  def createSpaces(number : Int ): Array[Rectangle] = {
+  def createSpaces(number : Int, gameArena: Rectangle): Array[Rectangle] = {
     
     val icon_size = ConfigFactory.load().getDouble("icon_size")
     val ghost_radius = ConfigFactory.load().getDouble("ghost_radius")
     val treasure_radius = ConfigFactory.load().getDouble("treasure_radius")
-    val canvas_height = ConfigFactory.load().getDouble("space_height")
-    val canvas_width = ConfigFactory.load().getDouble("space_width")
+    val arena_width = gameArena.width
+    val arena_height = gameArena.height
     
     var nro_spaces = 0
     if(number % 2 > 0){
@@ -89,8 +89,8 @@ object UtilFunctions {
     }
     var columns = nro_spaces / rows
     
-    space_width = (canvas_width - (icon_size * 2)) / (columns)
-    space_height = (canvas_height - (icon_size * 2)) / (rows)
+    space_width = (arena_width - (icon_size * 2)) / (columns)
+    space_height = (arena_height - (icon_size * 2)) / (rows)
     
     var spaces = new Array[Rectangle](nro_spaces)
     

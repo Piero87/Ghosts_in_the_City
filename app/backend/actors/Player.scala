@@ -18,11 +18,11 @@ object Player {
   /**
    * Actor Props 
    */
-  def props(uid: String, name: String, team: Int, area : Polygon, GMbackend: ActorRef): Props = Props(new Player(uid, name, team, area, GMbackend))
+  def props(uid: String, name: String, team: Int, area : Rectangle, GMbackend: ActorRef): Props = Props(new Player(uid, name, team, area, GMbackend))
   
 }
 
-class Player(uid: String, name: String, team: Int, area : Polygon, GMbackend: ActorRef) extends Actor{
+class Player(uid: String, name: String, team: Int, area : Rectangle, GMbackend: ActorRef) extends Actor{
   
   val logger = new CustomLogger("PlayerActor")
   
