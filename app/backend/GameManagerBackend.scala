@@ -175,16 +175,12 @@ class GameManagerBackend () extends Actor {
         if (paused_players.size > 0) {
           for (player <- paused_players) {
             if (now - player._2 > 10000) {
-              game_status = StatusGame.FINISHED
-              val future = gameManagerClient ? KillYourself
-              future.onSuccess { 
-                case KillMyself => 
-                  logger.log("GameManagerBackend: GMClient will die")
-                  self ! PoisonPill
-              }
-              future onFailure {
-                case e: Exception => logger.log("******GAME MANAGER BACKEND KILL ERROR ******")
-              }
+              // Invio le info di terminazione partita a causa di un utente che è uscito a causa di un disservizio e non è tornato
+              var all_player_info = players.map(x => x._1).toList
+              gameManagerClient ! BroadcastVictoryResponse(Team.NO_ENOUGH_PLAYER,all_player_info)
+        
+              self ! Finish
+              
             }
           }
           val tmp_g = ghosts.map(x => x._1)
