@@ -1,7 +1,7 @@
 #
 # The main page.
 #
-# This class handles most of the user interactions with the buttons/menus/forms on the page, as well as manages
+# This class handles most of the player interactions with the buttons/menus/forms on the page, as well as manages
 # the WebSocket connection.	It delegates to other classes to manage everything else.
 #
 define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
@@ -16,14 +16,14 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			@sounds("on")
 			@debug("off")
 						
-			# User data
-			@username = ko.observable()
-			@useruid = ko.observable()
-			@usergold = ko.observable()
-			@userkeys = ko.observable()
+			# Player data
+			@playername = ko.observable()
+			@playeruid = ko.observable()
+			@playergold = ko.observable()
+			@playerkeys = ko.observable()
 			
-			@usergold(0)
-			@userkeys(0)
+			@playergold(0)
+			@playerkeys(0)
 			
 			# Game data
 			@gameready = ko.observable(false)
@@ -56,10 +56,10 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			@connecting = ko.observable()
 			@closing = false
 			
-			# Load previously user name if set
-			if localStorage.username
-				@username(localStorage.username)
-				@useruid(localStorage.uid)
+			# Load previously player name if set
+			if localStorage.playername
+				@playername(localStorage.playername)
+				@playeruid(localStorage.uid)
 				
 				@connect()
 		
@@ -68,7 +68,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			@connecting("Connecting...")
 			@disconnected(null)
 			
-			@ws = new WebSocket(jsRoutes.controllers.Application.login(@username(), @useruid()).webSocketURL())
+			@ws = new WebSocket(jsRoutes.controllers.Application.login(@playername(), @playeruid()).webSocketURL())
 			
 			# When the websocket opens
 			@ws.onopen = (event) =>
@@ -76,7 +76,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 				@connected(true)
 				$("#ghostbusters-song").get(0).play()
 				
-				@game_client_engine = new GameClientEngine(@useruid(), @ws)
+				@game_client_engine = new GameClientEngine(@playeruid(), @ws)
 				
 				if localStorage.gameid
 					@gameid(localStorage.gameid)
@@ -99,14 +99,14 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					@connected(false)
 					@closing = false
 					localStorage.removeItem("uid")
-					localStorage.removeItem("username")
+					localStorage.removeItem("playername")
 					localStorage.removeItem("gameid")
 			
 			# Handle the stream
 			@ws.onmessage = (event) =>
 				json = JSON.parse(event.data)
-				if json.event == "user-positions"
-					console.log('User Position Received!')
+				if json.event == "player-positions"
+					console.log('player Position Received!')
 					# Update all the markers on the map
 					#@map.updateMarkers(json.positions.features)
 					
@@ -136,17 +136,10 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					@gameready(true)
 					@gameid(json.game.id)
 					localStorage.setItem("gameid", @gameid())
-					@gamename(json.game.name)
-					game_details = json.game.name.split "__"
-					@gamecreator(game_details[0].split("_").join(" "))
-					date = new Date(parseInt( game_details[1], 10 ));
-					hours = date.getHours()
-					minutes = "0" + date.getMinutes()
-					seconds = "0" + date.getSeconds()
-					@gametime(hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2))
+					setGameName(json.game.name)
 					@gamemaxplayers(json.game.n_players)
 					
-					@game_client_engine = new GameClientEngine(@useruid(), @ws) if (@game_client_engine == null)
+					@game_client_engine = new GameClientEngine(@playeruid(), @ws) if (@game_client_engine == null)
 					
 					$("#game-result-won").hide()
 					$("#game-result-lost").hide()
@@ -168,14 +161,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 							@refreshPlayerList(json)
 						when 1 # game started
 							
-							@gamename(json.game.name)
-							game_details = json.game.name.split "__"
-							@gamecreator(game_details[0].split("_").join(" "))
-							date = new Date(parseInt( game_details[1], 10 ));
-							hours = date.getHours()
-							minutes = "0" + date.getMinutes()
-							seconds = "0" + date.getSeconds()
-							@gametime(hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2))
+							setGameName(json.game.name)
 							
 							console.log(json)
 							console.log('Fight!')
@@ -185,7 +171,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 							@game_client_engine.setGhosts(json.game.ghosts)
 							@game_client_engine.setTreasures(json.game.treasures)
 							@game_client_engine.startGame()
-							@usergold(player.gold) for player in json.game.players when player.uid == @useruid()
+							@playergold(player.gold) for player in json.game.players when player.uid == @playeruid()
 						when 2 # game paused
 							console.log('Hold on!')
 							@game_client_engine.pauseGame()
@@ -198,13 +184,13 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 										
 				else if json.event == "update_player_position"
 					if @gamestarted()
-						@game_client_engine.busterMove(json.user.uid, json.user.pos.x, json.user.pos.y)
+						@game_client_engine.busterMove(json.player.uid, json.player.pos.x, json.player.pos.y)
 						
-				else if json.event == "update_user_info"
+				else if json.event == "update_player_info"
 					if @gamestarted()
 						console.log(json)
-						@usergold(json.user.gold)
-						@userkeys(json.user.keys.length)
+						@playergold(json.player.gold)
+						@playerkeys(json.player.keys.length)
 						
 				else if json.event == "update_ghosts_positions"
 					if @gamestarted()
@@ -240,7 +226,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					
 				else if json.event == "game_results"
 					# "team" [0,1,-1] : winning team
-					# "players" [list of user_info] : players of the game
+					# "players" [list of player_info] : players of the game
 					player_team = -1
 					
 					@game_team_RED.removeAll()
@@ -250,7 +236,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 						for player in json.players
 							i = i + 1
 							player.index = i
-							if (player.uid == @useruid())
+							if (player.uid == @playeruid())
 								player_team = player.team
 							if (player.team == 0)
 								@game_team_RED.push(player)
@@ -304,16 +290,17 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 				@debug("on")
 				@game_client_engine.toggleDebug(true)
 		
-		# The user clicked connect
-		submitUsername: ->
-			@useruid(@generateUID())
-			localStorage.setItem("uid", @useruid())
-			localStorage.setItem("username", @username())
+		# The player clicked connect
+		submitPlayerName: ->
+			@playername(@playername().replace(/ /g,''))
+			@playeruid(@generateUID())
+			localStorage.setItem("uid", @playeruid())
+			localStorage.setItem("playername", @playername())
 			@connect()
 		
 		# New Game 
 		newGame: ->
-			gamename = @username()
+			gamename = @playername()
 			gamemaxplayers = @gamemaxplayers()
 			console.log("New Game")
 			@ws.send(JSON.stringify
@@ -415,6 +402,16 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			id = ""
 			id += Math.random().toString(36).substr(2) while id.length < 8
 			id.substr 0, 8
+		
+		setGameName: (game_name) ->
+			@gamename(game_name)
+			game_details = game_name.split "__"
+			@gamecreator(game_details[0].split("_").join(" "))
+			date = new Date(parseInt( game_details[1], 10 ));
+			hours = date.getHours()
+			minutes = "0" + date.getMinutes()
+			seconds = "0" + date.getSeconds()
+			@gametime(hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2))
 		
 		refreshPlayerList: (json) ->
 			# Compute missing players

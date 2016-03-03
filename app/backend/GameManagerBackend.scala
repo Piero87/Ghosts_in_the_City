@@ -19,7 +19,7 @@ import scala.util.Random
 class GameManagerBackend () extends Actor {
   
   var gameManagerClient: ActorRef = _
-  var players: MutableList[Tuple2[UserInfo, ActorRef]] = MutableList()
+  var players: MutableList[Tuple2[PlayerInfo, ActorRef]] = MutableList()
   var ghosts: MutableList[Tuple2[GhostInfo, ActorRef]] = MutableList()
   var treasures: MutableList[Tuple2[TreasureInfo, ActorRef]] = MutableList()
   var traps: MutableList[Trap] = MutableList()
@@ -47,7 +47,7 @@ class GameManagerBackend () extends Actor {
   implicit val ec = context.dispatcher
   
   def receive = {
-    case NewGame(name,n_players,user,ref) =>
+    case NewGame(name,n_players,player,ref) =>
       logger.log("NewGame request")
       game_name = name
       game_n_players = n_players
@@ -55,7 +55,7 @@ class GameManagerBackend () extends Actor {
       logger.log("GMBackend NewGame From: "+ref.toString())
       gameManagerClient = ref
       var rnd_team = selectTeam()
-      val p = new UserInfo(user.uid,user.name,rnd_team,user.pos,initial_gold,List())
+      val p = new PlayerInfo(player.uid,player.name,rnd_team,player.pos,initial_gold,List())
       players = players :+ Tuple2(p,null)
       val tmp_g = ghosts.map(x => x._1)
       val tmp_t = treasures.map(x => x._1)
@@ -67,14 +67,14 @@ class GameManagerBackend () extends Actor {
       val tmp_t = treasures.map(x => x._1)
       val tmp_p = players.map(x => x._1)
       sender ! Game(game_id,game_name,game_n_players,game_status,tmp_p,tmp_g,tmp_t)
-    case JoinGame(game,user,ref) =>
+    case JoinGame(game,player,ref) =>
       logger.log("Join Request riceived")
       if (players.size < game_n_players) {
         logger.log("Join Request accepted")
         //Scegliamo un Team Random Blu o Rosso
         var rnd_team = selectTeam()
         
-        val p = new UserInfo(user.uid,user.name,rnd_team,user.pos,initial_gold,List())
+        val p = new PlayerInfo(player.uid,player.name,rnd_team,player.pos,initial_gold,List())
         players = players :+ Tuple2(p,null)
         val tmp_g = ghosts.map(x => x._1)
         val tmp_t = treasures.map(x => x._1)
@@ -90,17 +90,17 @@ class GameManagerBackend () extends Actor {
         //***Failure message
         logger.log("GMB: non ci sono più posti per la partita, attaccati al cazzo")
       }
-    case ResumeGame(gameid: String, user: UserInfo, ref: ActorRef) =>
+    case ResumeGame(gameid: String, player: PlayerInfo, ref: ActorRef) =>
       logger.log("ResumeGame Request")
-      paused_players = paused_players.filterNot(elm => elm._1 == user.uid)
+      paused_players = paused_players.filterNot(elm => elm._1 == player.uid)
       // Svegliamo il giocatore che è appena tornato!
       val tmp_g = ghosts.map(x => x._1)
       val tmp_t = treasures.map(x => x._1)
       val tmp_p = players.map(x => x._1)
       sender ! Game(game_id,game_name,game_n_players,game_status,tmp_p,tmp_g,tmp_t)
-    case PauseGame(user: UserInfo) =>
+    case PauseGame(player: PlayerInfo) =>
       logger.log("PauseGame Request")
-      paused_players = paused_players :+ Tuple2(user.uid, System.currentTimeMillis())
+      paused_players = paused_players :+ Tuple2(player.uid, System.currentTimeMillis())
       ghosts.map {ghost =>
         ghost._2 ! GhostPause
       }
@@ -111,16 +111,16 @@ class GameManagerBackend () extends Actor {
       val tmp_t = treasures.map(x => x._1)
       val tmp_p = players.map(x => x._1)
       gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,tmp_p,tmp_g,tmp_t))
-    case LeaveGame(user: UserInfo) =>
+    case LeaveGame(player: PlayerInfo) =>
       logger.log("LeaveGame Request") 
-      players = players.filterNot(elm => elm._1.uid == user.uid)
+      players = players.filterNot(elm => elm._1.uid == player.uid)
       sender ! Success
      
       // Se non abbiamo più giocatori dobbiamo dire al GameManager Client  di uccidersi
       if (players.size == 0 || game_status == StatusGame.STARTED) {
         
-        var all_user_info = players.map(x => x._1).toList
-        gameManagerClient ! BroadcastVictoryResponse(Team.NO_ENOUGH_PLAYER,all_user_info)
+        var all_player_info = players.map(x => x._1).toList
+        gameManagerClient ! BroadcastVictoryResponse(Team.NO_ENOUGH_PLAYER,all_player_info)
         
         self ! Finish
       } else {
@@ -130,12 +130,12 @@ class GameManagerBackend () extends Actor {
         // Ci sono ancora giocatori nella lista quindi aggiorna lo stato
         gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,tmp_p,tmp_g,tmp_t))
       }
-    case UpdatePosition(user) =>
-      var player_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == user.uid) => i}).head
+    case UpdatePosition(player) =>
+      var player_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == player.uid) => i}).head
       var u_tmp = players(player_index)._1
-      var user_info = new UserInfo(u_tmp.uid,u_tmp.name,u_tmp.team,user.pos,u_tmp.gold,u_tmp.keys)
-      players(player_index) = players(player_index).copy(_1 = user_info)
-      sender ! BroadcastUpdatePosition(user)
+      var player_info = new PlayerInfo(u_tmp.uid,u_tmp.name,u_tmp.team,player.pos,u_tmp.gold,u_tmp.keys)
+      players(player_index) = players(player_index).copy(_1 = player_info)
+      sender ! BroadcastUpdatePosition(player)
       
     case UpdateGhostsPositions =>
       //Logger.info("UpdateGhostsPositionsBroadcast")
@@ -204,11 +204,11 @@ class GameManagerBackend () extends Actor {
         }
         
       }
-    case SetTrapRequest(user) => 
+    case SetTrapRequest(player_info) => 
       /* Il GMB ha ricevuto la richiesta del client di mettere una trappola,
        * per controllare che il client sia consistente con il suo attore, 
        * spediamo la richiesta all'attore player e se potrà farlo sarà lui a dire "NewTrap" */
-      var player = players.filter(_._1.uid == user.uid).head
+      var player = players.filter(_._1.uid == player_info.uid).head
       player._2 ! SetTrap(player._1.gold,player._1.pos)
       
     case NewTrap(uid,gold,pos) =>
@@ -216,12 +216,12 @@ class GameManagerBackend () extends Actor {
        * lui sa le cose, quindi la piazziamo senza fare domande */
       var player_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == uid) => i}).head
       var u_tmp = players(player_index)._1
-      var user_info = new UserInfo(u_tmp.uid,u_tmp.name,u_tmp.team,u_tmp.pos,gold,u_tmp.keys)
-      players(player_index) = players(player_index).copy(_1 = user_info)
+      var player_info = new PlayerInfo(u_tmp.uid,u_tmp.name,u_tmp.team,u_tmp.pos,gold,u_tmp.keys)
+      players(player_index) = players(player_index).copy(_1 = player_info)
       var trap = new Trap(pos)
       traps = traps :+ trap
       gameManagerClient ! BroadcastNewTrap(trap.getTrapInfo)
-      gameManagerClient ! UpdateUserInfo(user_info)
+      gameManagerClient ! UpdatePlayerInfo(player_info)
       
     case RemoveTrap(uid) =>
       /* Una trappola è scattata 10 secondi fa e ora è tempo che venga rimossa */
@@ -258,7 +258,7 @@ class GameManagerBackend () extends Actor {
         var check_empty = true
         var keys_tmp: MutableList[Key] = MutableList()
         var gold_tmp = 0
-        var user_keys = u_tmp.keys
+        var player_keys = u_tmp.keys
         
         var gold_found_message = false
         var key_found_message = false
@@ -268,7 +268,7 @@ class GameManagerBackend () extends Actor {
           //Se è diverso da stringa vuota vuol dire che ho usato una chiave per aprirlo e la rimuovo dal giocatore
           if (t._5 != "")
           {
-            user_keys = user_keys.filter(_.getKeyUID != t._5)
+            player_keys = player_keys.filter(_.getKeyUID != t._5)
           }
           
           if (t._2.getKeyUID != "") {
@@ -297,8 +297,8 @@ class GameManagerBackend () extends Actor {
           logger.log("New Message! code: " + MsgCodes.T_EMPTY + " option: 0 to: " + uid_p + " game_id:" + game_id)
           gameManagerClient ! MessageCode(uid_p, MsgCodes.T_EMPTY,"0")
         } else {
-          var user_info = new UserInfo(u_tmp.uid,u_tmp.name,u_tmp.team,u_tmp.pos,u_tmp.gold+gold_tmp,List.concat(user_keys,keys_tmp))
-          players(player_index) = players(player_index).copy(_1 = user_info)
+          var player_info = new PlayerInfo(u_tmp.uid,u_tmp.name,u_tmp.team,u_tmp.pos,u_tmp.gold+gold_tmp,List.concat(player_keys,keys_tmp))
+          players(player_index) = players(player_index).copy(_1 = player_info)
           val tmp_t_info = treasures.map(x => x._1)
           gameManagerClient ! BroadcastUpdateTreasure(tmp_t_info)
           if (gold_found_message && key_found_message)
@@ -313,7 +313,7 @@ class GameManagerBackend () extends Actor {
             gameManagerClient ! MessageCode(uid_p, MsgCodes.GOLD_FOUND,gold_tmp.toString())
           }
           
-          gameManagerClient ! UpdateUserInfo(user_info)
+          gameManagerClient ! UpdatePlayerInfo(player_info)
           
           var remaining_closed_treasures = treasures.filter(_._1.status == 0)
           
@@ -322,17 +322,17 @@ class GameManagerBackend () extends Actor {
             var team_red_gold = ((players.filter(_._1.team == Team.RED)).map(x => x._1.gold)).sum
             var team_blue_gold = ((players.filter(_._1.team == Team.BLUE)).map(x => x._1.gold)).sum
             
-            var all_user_info = players.map(x => x._1).toList
+            var all_player_info = players.map(x => x._1).toList
             
             if (team_red_gold > team_blue_gold) {
               //La squadra rossa ha vinto
-              gameManagerClient ! BroadcastVictoryResponse(Team.RED,all_user_info)
+              gameManagerClient ! BroadcastVictoryResponse(Team.RED,all_player_info)
             } else if (team_red_gold < team_blue_gold) {
               //La squadra blu ha vinto
-              gameManagerClient ! BroadcastVictoryResponse(Team.BLUE,all_user_info)
+              gameManagerClient ! BroadcastVictoryResponse(Team.BLUE,all_player_info)
             } else {
               //Pareggio
-              gameManagerClient ! BroadcastVictoryResponse(Team.UNKNOWN,all_user_info)
+              gameManagerClient ! BroadcastVictoryResponse(Team.UNKNOWN,all_player_info)
             }
             
             context.system.scheduler.scheduleOnce(1000 millis, self, Finish)
@@ -387,16 +387,16 @@ class GameManagerBackend () extends Actor {
             attacked_keys = List()
             attacker_keys = List.concat(att_tmp.keys, u_tmp.keys)
           }
-          var attacker_info = new UserInfo(att_tmp.uid,att_tmp.name,att_tmp.team,att_tmp.pos,att_tmp.gold+gold_stolen,attacker_keys)
+          var attacker_info = new PlayerInfo(att_tmp.uid,att_tmp.name,att_tmp.team,att_tmp.pos,att_tmp.gold+gold_stolen,attacker_keys)
           players(attacker_index) = players(attacker_index).copy(_1 = attacker_info)
-          gameManagerClient ! UpdateUserInfo(attacker_info)
+          gameManagerClient ! UpdatePlayerInfo(attacker_info)
           logger.log("Player " + u_tmp.name + " attacked from: " + att_tmp)
         }
 
-        var attacked_info = new UserInfo(u_tmp.uid,u_tmp.name,u_tmp.team,u_tmp.pos,gold_remain,attacked_keys)
+        var attacked_info = new PlayerInfo(u_tmp.uid,u_tmp.name,u_tmp.team,u_tmp.pos,gold_remain,attacked_keys)
         players(attacked_index) = players(attacked_index).copy(_1 = attacked_info)
         gameManagerClient ! MessageCode(uid, attack_type,gold_stolen.toString())
-        gameManagerClient ! UpdateUserInfo(attacked_info)
+        gameManagerClient ! UpdatePlayerInfo(attacked_info)
       }
     case Finish =>
       game_status = StatusGame.FINISHED
@@ -435,9 +435,9 @@ class GameManagerBackend () extends Actor {
     position_players = UtilFunctions.randomPositionsInSpace(spaces(spaces.length - 1), n_treasures_and_ghosts-1)
     
     for(i <- 0 to game_n_players-1) {
-      val user = players(i)._1
-      val p = new UserInfo(user.uid,user.name,user.team,Point(position_players(i).latitude,position_players(i).longitude),user.gold,user.keys)
-      val player_actor = context.actorOf(Props(new Player(user.uid,user.name,user.team,polygon,self)), name = user.uid)
+      val player = players(i)._1
+      val p = new PlayerInfo(player.uid,player.name,player.team,Point(position_players(i).latitude,position_players(i).longitude),player.gold,player.keys)
+      val player_actor = context.actorOf(Props(new Player(player.uid,player.name,player.team,polygon,self)), name = player.uid)
       players(i) = Tuple2(p,player_actor)
       player_actor ! UpdatePlayerPos(Point(position_players(i).latitude,position_players(i).longitude))
     }

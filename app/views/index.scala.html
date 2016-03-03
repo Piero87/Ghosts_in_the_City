@@ -20,7 +20,7 @@
             </div>
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav navbar-right">
-                	<li data-bind="ifnot: disconnected"><a class="ghostbuster-font" href="javascript:void(0);">Hello <span data-bind="text: username"></span>!</a></li>
+                	<li data-bind="ifnot: disconnected"><a class="ghostbuster-font" href="javascript:void(0);">Hello <span data-bind="text: playername"></span>!</a></li>
                 	<li data-bind="ifnot: disconnected, click: toggleMusic"><a class="ghostbuster-font" href="javascript:void(0);">Music: <span data-bind="text: music"></span></a></li>
                 	<li data-bind="ifnot: disconnected, click: toggleSounds"><a class="ghostbuster-font" href="javascript:void(0);">Sounds: <span data-bind="text: sounds"></span></a></li>
                     <li data-bind="ifnot: disconnected, click: disconnect"><a class="ghostbuster-font" href="javascript:void(0);">Disconnect</a></li>
@@ -51,10 +51,10 @@
 		
         <div data-bind="visible: disconnected" align="center">
         	<div class="bordered" style="max-width: 200px;">
-	            <form role="form" data-bind="submit: submitUsername">
+	            <form role="form" data-bind="submit: submitPlayerName">
 	                <div class="form-group">
-	                    <input type="text" class="form-control" data-bind="value: username" placeholder="Username"/>
-	                    <button class="btn ghostbuster-font font-big" type="submit">Enter</button>
+	                    <input type="text" class="form-control" data-bind="value: playername" placeholder="Name"/>
+	                    <button class="btn ghostbuster-font font-big" type="submit">Login</button>
 	                </div>
 	            </form>
             </div>
@@ -103,10 +103,10 @@
 	        	</div>
         	</div>
         	<div data-bind="visible: gameready" align="center">
-        		<div data-bind="visible: (username() != gamecreator())">
+        		<div data-bind="visible: (playername() != gamecreator())">
         			<h1 class="ghostbuster-font font-big">Mission created by <span data-bind="text: gamecreator"></span> at <span data-bind="text: gametime"></span></h1>
         		</div>
-	        	<div data-bind="visible: (username() == gamecreator())">
+	        	<div data-bind="visible: (playername() == gamecreator())">
         			<h1 class="ghostbuster-font font-big">You created this mission at <span data-bind="text: gametime"></span></h1>
         		</div>
 	        	<p class="ghostbuster-font">[mission with <span data-bind="text: gamemaxplayers"></span> ghostbusters]</p>
@@ -124,7 +124,7 @@
 					    		<span class="col-xs-6 ghostbuster-font font-big line-with-icon" align="left"> 
 						    	  	<span>
 						    			<span data-bind="text: name"></span>
-						    			<span class="ghostbuster-font font-small" align="left" data-bind="visible: uid == $parent.useruid()"> (you)</span>
+						    			<span class="ghostbuster-font font-small" align="left" data-bind="visible: uid == $parent.playeruid()"> (you)</span>
 						    	  	</span>				    	  	
 						    	</span>
 							    
@@ -141,7 +141,7 @@
 					    		<span class="col-xs-6 ghostbuster-font font-big line-with-icon" align="left"> 
 						    	  	<span>
 						    			<span data-bind="text: name"></span>
-						    			<span class="ghostbuster-font font-small" align="left" data-bind="visible: uid == $parent.useruid()"> (you)</span>
+						    			<span class="ghostbuster-font font-small" align="left" data-bind="visible: uid == $parent.playeruid()"> (you)</span>
 						    	  	</span>					    	  	
 						    	</span>
 							    	
@@ -168,10 +168,10 @@
 		        	</div>
 		        	<div class="ghostbuster-font" align="center" style="margin: 5px;">
 		        		<span class="gold-owned font-big">
-		        			gold owned: <b><span data-bind="text: usergold"></span></b> $
+		        			gold owned: <b><span data-bind="text: playergold"></span></b> $
 		        		</span>
 		        		<span class="keys-owned font-big">
-		        			keys found: <b><span data-bind="text: userkeys"></span></b>
+		        			keys found: <b><span data-bind="text: playerkeys"></span></b>
 		        		</span>
 		        	</div>
 		        	<hr>
@@ -207,7 +207,7 @@
 						    		<span class="col-xs-6 ghostbuster-font font-big line-with-icon" align="left"> 
 							    	  	<span>
 							    			<span data-bind="text: name"></span>
-							    			<span class="ghostbuster-font font-small" align="left" data-bind="visible: uid == $parent.useruid()"> (you)</span>
+							    			<span class="ghostbuster-font font-small" align="left" data-bind="visible: uid == $parent.playeruid()"> (you)</span>
 							    	  	</span>				    	  	
 							    	</span>
 								    	
@@ -224,7 +224,7 @@
 						    		<span class="col-xs-6 ghostbuster-font font-big line-with-icon" align="left"> 
 							    	  	<span>
 							    			<span data-bind="text: name"></span>
-							    			<span class="ghostbuster-font font-small" align="left" data-bind="visible: uid == $parent.useruid()"> (you)</span>
+							    			<span class="ghostbuster-font font-small" align="left" data-bind="visible: uid == $parent.playeruid()"> (you)</span>
 							    	  	</span>					    	  	
 							    	</span>
 								    	
@@ -260,7 +260,7 @@
 					    		<span class="col-xs-6 ghostbuster-font font-big line-with-icon" align="left"> 
 						    	  	<span>
 						    			<span data-bind="text: name"></span>
-						    			<span class="ghostbuster-font font-small" align="left" data-bind="visible: uid == $parent.useruid()"> (you)</span>
+						    			<span class="ghostbuster-font font-small" align="left" data-bind="visible: uid == $parent.playeruid()"> (you)</span>
 						    			<span class="gold-owned"><span data-bind="text: gold"></span>$</span>
 						    	  	</span>				    	  	
 						    	</span>
@@ -278,7 +278,7 @@
 					    		<span class="col-xs-6 ghostbuster-font font-big line-with-icon" align="left"> 
 						    	  	<span>
 						    			<span data-bind="text: name"></span>
-						    			<span class="ghostbuster-font font-small" align="left" data-bind="visible: uid == $parent.useruid()"> (you)</span>
+						    			<span class="ghostbuster-font font-small" align="left" data-bind="visible: uid == $parent.playeruid()"> (you)</span>
 						    			<span class="gold-owned"><span data-bind="text: gold"></span>$</span> 
 						    	  	</span>					    	  	
 						    	</span>

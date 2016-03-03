@@ -79,14 +79,14 @@ case class IAttackYou(attacker_uid: String, attack_type: Int, gold_perc_stolen: 
 
 // Player 
 case object PlayersInfo
-case class UpdatePosition(user: UserInfo)
-case class BroadcastUpdatePosition(user: UserInfo)
-case class Players(players: MutableList[Tuple2[UserInfo, ActorRef]])
+case class UpdatePosition(player: PlayerInfo)
+case class BroadcastUpdatePosition(player: PlayerInfo)
+case class Players(players: MutableList[Tuple2[PlayerInfo, ActorRef]])
 case class UpdatePlayerPos(pos: Point)
-case class UserInfo(uid: String, name: String, team: Int, pos: Point, gold: Int, keys: List[Key])
-case class UpdateUserInfo(user: UserInfo)
+case class PlayerInfo(uid: String, name: String, team: Int, pos: Point, gold: Int, keys: List[Key])
+case class UpdatePlayerInfo(player: PlayerInfo)
 case class OpenTreasureRequest(uid: String)
-case class OpenTreasure(treasures: List[ActorRef], user: UserInfo)
+case class OpenTreasure(treasures: List[ActorRef], player: PlayerInfo)
 case class GoldStolen(gold: Int)
 case class HitPlayerRequest(player_uid: String)
 case class AttackHim(player: ActorRef)
@@ -103,7 +103,7 @@ case class BroadcastUpdateTreasure(treasures: MutableList[TreasureInfo])
 case class UpdateTreasure(uid: String, status: Int)
 
 // Trap
-case class SetTrapRequest(user: UserInfo)
+case class SetTrapRequest(player: PlayerInfo)
 case class SetTrap(gold: Int, pos: Point)
 case class TrapInfo(uid: String, pos: Point, status: Int)
 case class NewTrap(uid: String, gold: Int, pos: Point)
@@ -114,17 +114,17 @@ case class BroadcastRemoveTrap(trap: TrapInfo)
 
 // Game
 case class GameStatusBroadcast(game: Game)
-case class JoinGame(game: Game, user: UserInfo, ref: ActorRef = null)
-case class ResumeGame(game_id: String, user: UserInfo, ref: ActorRef)
+case class JoinGame(game: Game, player: PlayerInfo, ref: ActorRef = null)
+case class ResumeGame(game_id: String, player: PlayerInfo, ref: ActorRef)
 case class GameHandler(game: Game, ref: ActorRef = null)
-case class LeaveGame(user: UserInfo)
-case class PauseGame(user: UserInfo)
-case class NewGame(name: String, n_players: Int, user: UserInfo, ref: ActorRef = null)
-case class Game(id: String, name: String, n_players: Int, status: Int, players: MutableList[UserInfo], ghosts: MutableList[GhostInfo], treasures: MutableList[TreasureInfo])
+case class LeaveGame(player: PlayerInfo)
+case class PauseGame(player: PlayerInfo)
+case class NewGame(name: String, n_players: Int, player: PlayerInfo, ref: ActorRef = null)
+case class Game(id: String, name: String, n_players: Int, status: Int, players: MutableList[PlayerInfo], ghosts: MutableList[GhostInfo], treasures: MutableList[TreasureInfo])
 case class GamesList(list: List[Game])
 case object GamesList
 case object GameStatus
-case class BroadcastVictoryResponse(team: Int,players: List[UserInfo])
+case class BroadcastVictoryResponse(team: Int,players: List[PlayerInfo])
 
 
 // Actor
@@ -142,16 +142,16 @@ case class JoinGameJSON(event: String, game: Game)
 case class LeaveGameJSON(event: String)
 case class ResumeGameJSON(event:String, game_id: String)
 case class UpdatePositionJSON(event: String, pos: Point)
-case class BroadcastUpdatePositionJSON(event: String, user: UserInfo)
+case class BroadcastUpdatePositionJSON(event: String, player: PlayerInfo)
 case class BroadcastGhostsPositionsJSON(event: String, ghosts: MutableList[GhostInfo])
 case class SetTrapJSON(event: String)
 case class BroadcastNewTrapJSON(event: String, trap: TrapInfo)
 case class BroadcastTrapActivatedJSON(event:String, trap: TrapInfo)
 case class BroadcastRemoveTrapJSON(event:String, trap: TrapInfo)
-case class UpdateUserInfoJSON(event: String, user: UserInfo)
+case class UpdatePlayerInfoJSON(event: String, player: PlayerInfo)
 case class MessageCodeJSON(event: String, code: Int, option: String)
 case class UpdateTreasureJSON(event: String, treasures: MutableList[TreasureInfo])
-case class VictoryResponseJSON(event: String, team: Int, players: List[UserInfo])
+case class VictoryResponseJSON(event: String, team: Int, players: List[PlayerInfo])
     
 import play.api.libs.json._
 
@@ -163,8 +163,8 @@ object CommonMessages {
   implicit val keyReads = Json.reads[Key]
   implicit val keyWrites = Json.writes[Key]
   
-  implicit val playerInfoReads = Json.reads[UserInfo]
-  implicit val playerInfoWrites = Json.writes[UserInfo]
+  implicit val playerInfoReads = Json.reads[PlayerInfo]
+  implicit val playerInfoWrites = Json.writes[PlayerInfo]
   
   implicit val leaveGameReads = Json.reads[LeaveGameJSON]
   implicit val leaveGameWrites = Json.writes[LeaveGameJSON]
@@ -220,8 +220,8 @@ object CommonMessages {
   implicit val broadcastRemoveTrapJSONReads = Json.reads[BroadcastRemoveTrapJSON]
   implicit val broadcastRemoveTrapJSONWrites = Json.writes[BroadcastRemoveTrapJSON]
   
-  implicit val updateUserInfoJSONReads = Json.reads[UpdateUserInfoJSON]
-  implicit val updateUserInfoJSONWrites = Json.writes[UpdateUserInfoJSON]
+  implicit val updatePlayerInfoJSONReads = Json.reads[UpdatePlayerInfoJSON]
+  implicit val updatePlayerInfoJSONWrites = Json.writes[UpdatePlayerInfoJSON]
   
   implicit val messageCodeJSONReads = Json.reads[MessageCodeJSON]
   implicit val messageCodeJSONWrites = Json.writes[MessageCodeJSON]

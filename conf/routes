@@ -6,7 +6,7 @@
 GET     /                           controllers.Application.index
 
 # The websocket
-GET        /login/:username/:uid       controllers.Application.login(username, uid)
+GET        /login/:name/:uid       controllers.Application.login(name, uid)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

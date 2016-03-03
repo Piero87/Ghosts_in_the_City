@@ -36,13 +36,13 @@ class Player(uid: String, name: String, team: Int, area : Polygon, GMbackend: Ac
       } else {
         origin ! MessageCode(uid, MsgCodes.NO_TRAP,"")
       }
-    case OpenTreasure(treasures,user) =>
+    case OpenTreasure(treasures,player) =>
       
       var origin = sender
       implicit val ec = context.dispatcher
       val taskFutures: List[Future[Tuple5[Int,Key,Int,String,String]]] = treasures map { t =>
           implicit val timeout = Timeout(5 seconds)
-          (t ? Open(user.pos,user.keys)).mapTo[Tuple5[Int,Key,Int,String,String]]
+          (t ? Open(player.pos,player.keys)).mapTo[Tuple5[Int,Key,Int,String,String]]
       }
       
       //The call to Future.sequence is necessary to transform the List of Future[(String, Int)] into a Future of List[(String, Int)].
@@ -52,7 +52,7 @@ class Player(uid: String, name: String, team: Int, area : Polygon, GMbackend: Ac
         case results: List[Tuple5[Int,Key,Int,String,String]] =>
           //Fare qualcosa
           logger.log("risultato apertura tesori")
-          origin ! TreasureResponse(user.uid, results)
+          origin ! TreasureResponse(player.uid, results)
       }
     case IAttackYou(attacker_uid, attack_type, gold_perc_stolen, key_stolen) =>
       if(attack_type == MsgCodes.HUMAN_ATTACK){

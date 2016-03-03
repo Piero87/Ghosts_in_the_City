@@ -1,6 +1,6 @@
 define () ->
 	class GameClientEngine
-		constructor: (id_user, websocket) ->
+		constructor: (id_player, websocket) ->
 
 			@space_width = $("#conf_space_width").val()
 			@space_height = $("#conf_space_height").val()
@@ -15,7 +15,7 @@ define () ->
 			@gameLoop = null
 
 			@ws = websocket
-			@user_id = id_user
+			@player_id = id_player
 
 			# canvas
 			@ctx = undefined
@@ -68,7 +68,7 @@ define () ->
 			canvas_container.appendChild(@canvas)
 			# Make sure you got the context.
 			if @canvas.getContext
-				# If you have it, create a canvas user interface element.
+				# If you have it, create a canvas player interface element.
 				# Specify 2d canvas type.
 				@ctx = @canvas.getContext('2d')
 				# Paint it black.
@@ -253,7 +253,7 @@ define () ->
 				)
 				# Draw team square color in the corner bottom-right
 				
-				if buster.uid == @user_id
+				if buster.uid == @player_id
 					if buster.team == 0
 						team_img = @team_red_you
 					else if buster.team == 1
@@ -330,7 +330,7 @@ define () ->
 		# Get key press.
 		
 		whatKey: (evt) ->
-			for buster, i in @busters when buster.uid == @user_id
+			for buster, i in @busters when buster.uid == @player_id
 				
 				# Arrows keys
 				keys = [

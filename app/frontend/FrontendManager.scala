@@ -19,19 +19,19 @@ class FrontendManager extends Actor {
   
   
   def receive = {
-    case NewGame(name,n_players,user,ref) =>
+    case NewGame(name,n_players,player,ref) =>
       logger.log("NewGame request")
-      newGame(name,n_players,user,ref)
+      newGame(name,n_players,player,ref)
     case GamesList =>
       gamesList(sender)
-    case JoinGame(game,user,ref) =>
+    case JoinGame(game,player,ref) =>
       game_manager_frontends.map {gm_fe =>
-        gm_fe forward JoinGame(game,user,ref)
+        gm_fe forward JoinGame(game,player,ref)
       }
-    case ResumeGame(game_id, user, ref) =>
+    case ResumeGame(game_id, player, ref) =>
        logger.log("ResumeGame request")
        game_manager_frontends.map {gm_fe =>
-         gm_fe forward ResumeGame(game_id,user,ref)
+         gm_fe forward ResumeGame(game_id,player,ref)
        } 
     
     case "BackendRegistration" if !backends.contains(sender()) =>
@@ -50,14 +50,14 @@ class FrontendManager extends Actor {
       
   }
   
-  def newGame (name: String,n_players: Int, user: UserInfo, ref: ActorRef) = {
+  def newGame (name: String,n_players: Int, player: PlayerInfo, ref: ActorRef) = {
     backendCounter += 1
     var b = backends(backendCounter % backends.size)
     val gm_client = context.actorOf(Props(new GameManagerClient(b)), name = name)
     context watch gm_client
     game_manager_frontends = game_manager_frontends :+ gm_client
     logger.log("Backend selected and Actor created, forwarding message...")
-    gm_client forward NewGame(name,n_players, user,ref)
+    gm_client forward NewGame(name,n_players, player,ref)
   }
   
   def gamesList (origin: ActorRef) = {

@@ -22,22 +22,22 @@ class GameManagerClient (backend: ActorRef) extends Actor {
   
   val logger = new CustomLogger("GameManagerClient")
   var gameManagerBackend: ActorRef = _
-  var clientsConnections: MutableList[Tuple2[UserInfo, ActorRef]] = MutableList()
+  var clientsConnections: MutableList[Tuple2[PlayerInfo, ActorRef]] = MutableList()
   var game_name = ""
   var game_id = ""
   var game_n_players = 0
   var game_status = StatusGame.WAITING
   
   def receive = {
-    case NewGame(name,n_players,user,ref) =>
-      logger.log("NewGame request (" + user.name + ")")
+    case NewGame(name,n_players,player,ref) =>
+      logger.log("NewGame request (" + player.name + ")")
       game_name = name
       game_n_players = n_players
       val origin = sender
-      var p = user
+      var p = player
       clientsConnections = clientsConnections :+ Tuple2(p,ref)
 
-      val future = backend ? NewGame(name,n_players,user,self)
+      val future = backend ? NewGame(name,n_players,player,self)
       future.onSuccess { 
         case GameHandler(game,ref) => 
           logger.log("GameManagerBackend path: "+sender.path)
@@ -49,15 +49,15 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       future onFailure {
         case e: Exception => logger.log("NEW GAME ERROR: " + e.getMessage + " FROM " + sender.path)
       }
-    case JoinGame(game,user,ref) =>
-      logger.log("JoinGame request, GameID: " + game_id + " (" + user.name + ")")
+    case JoinGame(game,player,ref) =>
+      logger.log("JoinGame request, GameID: " + game_id + " (" + player.name + ")")
       if (game_status == 0 && game_id == game.id) {
-        logger.log("JoinGame request ACCEPTED, GameID: " + game_id + " (" + user.name + ")")
+        logger.log("JoinGame request ACCEPTED, GameID: " + game_id + " (" + player.name + ")")
         // Per sicurezza ci salviamo i dati del client connection che ci ha mandato la richiesta di join
-        var p = user
+        var p = player
         var ccref = ref
         val origin = sender
-        val future = gameManagerBackend ? JoinGame(game,user)
+        val future = gameManagerBackend ? JoinGame(game,player)
         future.onSuccess { 
           case Game(id,name,n_players, status,players,ghosts,treasures) => 
             logger.log("GameManagerBackend path: "+sender.path)
@@ -69,17 +69,17 @@ class GameManagerClient (backend: ActorRef) extends Actor {
           case e => logger.log("JOIN GAME ERROR: " + e.getMessage + " FROM " + sender.path)
         }
       }
-    case ResumeGame(gameid,user,ref) =>
+    case ResumeGame(gameid,player,ref) =>
       if (game_id == gameid) {
-        logger.log("ResumeGame request, GameID: " + gameid + " (" + user.name + ")")
-        var p = user
+        logger.log("ResumeGame request, GameID: " + gameid + " (" + player.name + ")")
+        var p = player
         var ccref = ref
         val origin = sender
-        val future = gameManagerBackend ? ResumeGame(gameid,user,ref)
+        val future = gameManagerBackend ? ResumeGame(gameid,player,ref)
         future.onSuccess { 
           case Game(id,name,n_players, status,players,ghosts,treasures) => 
             for (i <- 0 to clientsConnections.size-1) {
-              if (clientsConnections(i)._1.uid == user.uid) {
+              if (clientsConnections(i)._1.uid == player.uid) {
                 clientsConnections(i) = clientsConnections(i).copy(_2 = ref)
               }
             }
@@ -97,16 +97,16 @@ class GameManagerClient (backend: ActorRef) extends Actor {
         cc._2 forward GameStatusBroadcast(game)
       }
       
-    case PauseGame(user:UserInfo) =>
-      logger.log("PauseGame request (" + user.name + ")")
-      gameManagerBackend ! PauseGame(user)
+    case PauseGame(player:PlayerInfo) =>
+      logger.log("PauseGame request (" + player.name + ")")
+      gameManagerBackend ! PauseGame(player)
     
-    case LeaveGame(user: UserInfo) =>
-      logger.log("LeaveGame request (" + user.name + ")")
-      val future = gameManagerBackend ? LeaveGame(user)
+    case LeaveGame(player: PlayerInfo) =>
+      logger.log("LeaveGame request (" + player.name + ")")
+      val future = gameManagerBackend ? LeaveGame(player)
       future.onSuccess { 
         case Success =>
-          clientsConnections = clientsConnections.filterNot(elm => elm._1.uid == user.uid)       
+          clientsConnections = clientsConnections.filterNot(elm => elm._1.uid == player.uid)       
       }
       future onFailure {
         case e: Exception => logger.log("LEAVE GAME ERROR: " + e.getMessage + " FROM " + sender.path)
@@ -122,20 +122,20 @@ class GameManagerClient (backend: ActorRef) extends Actor {
        sender ! KillMyself
        self ! PoisonPill
     
-    case UpdatePosition(user) =>
-      gameManagerBackend ! UpdatePosition(user)
+    case UpdatePosition(player) =>
+      gameManagerBackend ! UpdatePosition(player)
     
-    case BroadcastUpdatePosition(user) =>
+    case BroadcastUpdatePosition(player) =>
       clientsConnections.map {cc =>
-        if (cc._1.uid != user.uid) cc._2 forward BroadcastUpdatePosition(user)
+        if (cc._1.uid != player.uid) cc._2 forward BroadcastUpdatePosition(player)
       }
     
     case BroadcastGhostsPositions(ghosts) =>
       clientsConnections.map {cc =>
         cc._2 forward BroadcastGhostsPositions(ghosts)
       }
-    case SetTrapRequest(user) =>
-      gameManagerBackend ! SetTrapRequest(user)
+    case SetTrapRequest(player) =>
+      gameManagerBackend ! SetTrapRequest(player)
     
     case HitPlayerRequest(p_uid) =>
       gameManagerBackend ! HitPlayerRequest(p_uid)
@@ -151,9 +151,9 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       clientsConnections.map {cc =>
         cc._2 forward BroadcastRemoveTrap(trap)
       }
-    case UpdateUserInfo(user) =>
+    case UpdatePlayerInfo(player) =>
       clientsConnections.map {cc =>
-        if (cc._1.uid == user.uid) cc._2 forward UpdateUserInfo(user)
+        if (cc._1.uid == player.uid) cc._2 forward UpdatePlayerInfo(player)
       }
     case MessageCode(uid,code,option) =>
       clientsConnections.map {cc =>

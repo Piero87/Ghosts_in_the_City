@@ -64,7 +64,7 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
             
             var found_someone = false
             var target_tastness : Double = 0.0
-            var target_info : UserInfo = null
+            var target_info : PlayerInfo = null
             var target_actor : ActorRef = null
             
             players.foreach { p =>
@@ -154,7 +154,7 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
       } 
   }
   
-  def attackPlayer(player_info: UserInfo, player_actor : ActorRef) = {
+  def attackPlayer(player_info: PlayerInfo, player_actor : ActorRef) = {
     
     var gold_available = smellPlayerGold(player_info)
     var distance_x = player_info.pos.latitude - ghostpos.latitude
@@ -234,7 +234,7 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
     }
   }
   
-  def smellPlayerGold(player : UserInfo): Int = {
+  def smellPlayerGold(player : PlayerInfo): Int = {
     var gold_toSteal_double = 0.0
     gold_toSteal_double = player.gold * ghost_hunger(level)
     
