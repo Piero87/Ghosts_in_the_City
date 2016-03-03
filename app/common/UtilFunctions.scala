@@ -8,36 +8,28 @@ class CustomLogger (o: String) {
   var origin = o
   def log(msg: String) {
     var milliseconds = System.currentTimeMillis()
-    var seconds = (milliseconds / 1000) % 60;
-    var minutes = ((milliseconds / (1000*60)) % 60);
-    var hours = ((milliseconds / (1000*60*60)) % 24);
-    Logger.info("[" + hours + ":" + minutes + ":" + seconds + " - " + origin + "]: " + msg)
+    var seconds = "0" + (milliseconds / 1000) % 60;
+    var minutes = "0" + ((milliseconds / (1000*60)) % 60);
+    var hours = "0" + ((milliseconds / (1000*60*60)) % 24);
+    Logger.info("[" + hours.takeRight(2) + ":" + minutes.takeRight(2) + ":" + seconds.takeRight(2) + " - " + origin + "]: " + msg)
   }
 }
 
 object UtilFunctions {
   
-  def randomPositionInSpace(space: (Double,Double,Double,Double,Boolean)): Point = {
+  def randomPositionInSpace(space: Rectangle): Point = {
     val rnd = new Random()
-    var x_inital = space._1
-    var x_final = space._2
-    var y_inital = space._3
-    var y_final = space._4
-    var lat = x_inital + rnd.nextInt(x_final.toInt - x_inital.toInt)
-    var lng = y_inital + rnd.nextInt(y_final.toInt - y_inital.toInt)
+    var lat = space.origin.latitude + ( space.width * rnd.nextDouble() )
+    var lng = space.origin.longitude + ( space.height * rnd.nextDouble() )
     return Point(lat,lng)
   }
   
-  def randomPositionsInSpace(space: (Double,Double,Double,Double,Boolean), n_player: Int): Array[Point] = {
+  def randomPositionsInSpace(space: Rectangle, n_player: Int): Array[Point] = {
     val rnd = new Random()
-    var x_inital = space._1
-    var x_final = space._2
-    var y_inital = space._3
-    var y_final = space._4
     var pos = new Array[Point](n_player)
     for(i <- 0 to (n_player-1)){
-      var lat = x_inital + rnd.nextInt(x_final.toInt - x_inital.toInt)
-      var lng = y_inital + rnd.nextInt(y_final.toInt - y_inital.toInt)
+      var lat = space.origin.latitude + ( space.width * rnd.nextDouble() )
+    var lng = space.origin.longitude + ( space.height * rnd.nextDouble() )
       pos(i) = Point(lat,lng)
     }
     return pos 
@@ -70,16 +62,14 @@ object UtilFunctions {
     Point(lat,lng)
   }
   
-  def createSpaces(number : Int ): Array[(Double,Double,Double,Double,Boolean)] = {
+  def createSpaces(number : Int ): Array[Rectangle] = {
     
-    var icon_size = ConfigFactory.load().getDouble("icon_size")
-    var ghost_radius = ConfigFactory.load().getDouble("ghost_radius")
-    var treasure_radius = ConfigFactory.load().getDouble("treasure_radius")
-    var space_height = ConfigFactory.load().getDouble("space_height")
-    var space_width = ConfigFactory.load().getDouble("space_width")
+    val icon_size = ConfigFactory.load().getDouble("icon_size")
+    val ghost_radius = ConfigFactory.load().getDouble("ghost_radius")
+    val treasure_radius = ConfigFactory.load().getDouble("treasure_radius")
+    val canvas_height = ConfigFactory.load().getDouble("space_height")
+    val canvas_width = ConfigFactory.load().getDouble("space_width")
     
-    //divido sempre lo spazio totale per un numero pari di spaces dove in ognuno andrà un tesoro e in uno i giocatori
-    // che sono sempre pari
     var nro_spaces = 0
     if(number % 2 > 0){
       nro_spaces = number + 1
@@ -87,53 +77,33 @@ object UtilFunctions {
       nro_spaces = number
     }
     
-    var column = 0
+    var rows = 0
+    var space_width = 0.0
+    var space_height = 0.0
+    
     //se il numero degli spazi è divisibile per 3 faccio 3 colonne, se no 2; definisco la grandezza di ogni spazio
-    if((nro_spaces%3) == 0){
-      column = 3
-      space_width = (space_width-(icon_size *2)) / (3)
-      space_height = (space_height-(icon_size)) / (nro_spaces/3)
+    if((nro_spaces % 3) == 0){
+      rows = 3
     }else{
-      column = 2
-      space_width = (space_width-(icon_size *2)) / (2)
-      space_height = (space_height-(icon_size)) / (nro_spaces/2)
+      rows = 2
     }
+    var columns = nro_spaces / rows
     
-    var spaces = new Array[(Double, Double, Double, Double, Boolean)](nro_spaces)
+    space_width = (canvas_width - (icon_size * 2)) / (columns)
+    space_height = (canvas_height - (icon_size * 2)) / (rows)
     
-    var i = 0
-    var j = 0
-    var count = 0
-    //inizializzo le dimensioni per lo space iniziale
-    var width_start = icon_size
-    var height_start = icon_size
-    var height_finish = space_height
+    var spaces = new Array[Rectangle](nro_spaces)
     
-    var width_finish = 0.0 //mi serve solo inizializzarla
+    var index = 0
+    //inizializzo le dimensioni per lo spazio iniziale
+    var lat_start = 0
+    var lng_start = 0
     
-    for(i <- 0 to (nro_spaces / column.toInt) - 1){
-      for(j <- 0 to column.toInt - 1){
-//        if (i == 0 && j == 0){
-//          width_start = icon_size
-//          height_start = icon_size
-//          width_finish = space_width
-//          height_finish = space_height
-//        }else{
-//          width_start = width_finish
-//          width_finish = width_finish + space_width
-//        }
-        if (i == 0 && j == 0){
-          width_finish = icon_size
-        }
-        width_start = width_finish
-        width_finish = width_finish + space_width
-        
-        spaces(count) = (width_start, width_finish, height_start, height_finish, false)
-        count = count + 1
+    for(col <- 0 to columns - 1){
+      for(row <- 0 to rows - 1){
+        spaces(index) = new Rectangle(new Point( (lat_start + (space_width * col)) , (lng_start + (space_height * row))), space_width, space_height)
+        index += 1  
       }
-      height_start = height_finish
-      height_finish = height_finish + space_height
-      width_finish = icon_size
     }
     
     return spaces
