@@ -136,7 +136,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					@gameready(true)
 					@gameid(json.game.id)
 					localStorage.setItem("gameid", @gameid())
-					setGameName(json.game.name)
+					@setGameName(json.game.name)
 					@gamemaxplayers(json.game.n_players)
 					
 					@game_client_engine = new GameClientEngine(@playeruid(), @ws) if (@game_client_engine == null)
@@ -161,7 +161,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 							@refreshPlayerList(json)
 						when 1 # game started
 							
-							setGameName(json.game.name)
+							@setGameName(json.game.name)
 							
 							console.log(json)
 							console.log('Fight!')
