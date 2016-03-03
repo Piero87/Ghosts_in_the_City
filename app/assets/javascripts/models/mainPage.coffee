@@ -184,7 +184,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 										
 				else if json.event == "update_player_position"
 					if @gamestarted()
-						@game_client_engine.busterMove(json.player.uid, json.player.pos.x, json.player.pos.y)
+						@game_client_engine.busterMove(json.player.uid, json.player.pos.latitude, json.player.pos.longitude)
 						
 				else if json.event == "update_player_info"
 					if @gamestarted()
@@ -194,7 +194,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 						
 				else if json.event == "update_ghosts_positions"
 					if @gamestarted()
-						@game_client_engine.ghostMove(ghost.uid, ghost.mood, ghost.pos.x, ghost.pos.y) for ghost in json.ghosts
+						@game_client_engine.ghostMove(ghost.uid, ghost.mood, ghost.pos.latitude, ghost.pos.longitude) for ghost in json.ghosts
 				
 				else if json.event == "update_treasures"
 					console.log("Tesoro aperto!")
@@ -204,7 +204,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 				
 				else if json.event == "new_trap"
 					if @gamestarted()
-						@game_client_engine.newTrap(json.trap.uid, json.trap.pos.x, json.trap.pos.y)
+						@game_client_engine.newTrap(json.trap.uid, json.trap.pos.latitude, json.trap.pos.longitude)
 						console.log "Nuova trappola!"
 						# console.log json.trap
 				
