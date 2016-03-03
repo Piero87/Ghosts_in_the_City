@@ -31,6 +31,7 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
   implicit val timeout = Timeout(5 seconds)
   
   var ghostpos: Point = position
+  var last_attack: Long = 0
   var mood = GhostMood.CALM
   var GMbackend: ActorRef = _
   val ghost_radius = level * ConfigFactory.load().getDouble("ghost_radius")
@@ -157,17 +158,22 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
   def attackPlayer(player_info: PlayerInfo, player_actor : ActorRef) = {
     
     var gold_available = smellPlayerGold(player_info)
-    var distance_x = player_info.pos.latitude - ghostpos.latitude
-    var distance_y = player_info.pos.longitude - ghostpos.longitude
+    var distance_latitude = player_info.pos.latitude - ghostpos.latitude
+    var distance_longitude = player_info.pos.longitude - ghostpos.longitude
     
-    if (Math.abs(distance_x) < icon_size/2 && Math.abs(distance_y) < icon_size/2 && gold_available > 0) {
+    if (Math.abs(distance_latitude) < icon_size/2 && Math.abs(distance_longitude) < icon_size/2 && gold_available > 0) {
+      
+      var now = System.currentTimeMillis()
+      if (now >= last_attack + 1500 ) {
+        last_attack = now
         // Giocatore raggiunto! Gli rubo i soldi
-        
         val future = player_actor ? IAttackYou(uid, MsgCodes.PARANORMAL_ATTACK, ghost_hunger(level), 0)
         val result = Await.result(future, timeout.duration).asInstanceOf[Int]
         if(result > 0){
           treasure ! IncreaseGold(result)
         }
+      }
+      
     } else {
       // Giocatore non abbastanza vicino, mi muovo verso di lui
       
@@ -195,17 +201,17 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
   }
   
   def chooseNextMovement(target: Point) : Int = {
-    var distance_x = target.latitude - ghostpos.latitude
-    var distance_y = target.longitude - ghostpos.longitude
+    var distance_latitude = target.latitude - ghostpos.latitude
+    var distance_longitude = target.longitude - ghostpos.longitude
     var next_move = Movement.STILL
-    if (Math.abs(distance_x) > Math.abs(distance_y) && Math.abs(distance_x) > icon_size/4) {
-			if (distance_x > 0){
+    if (Math.abs(distance_latitude) > Math.abs(distance_longitude) && Math.abs(distance_latitude) > icon_size/4) {
+			if (distance_latitude > 0){
 				next_move = Movement.RIGHT
 			} else {
 				next_move = Movement.LEFT
 			}
-		} else if (Math.abs(distance_x) < Math.abs(distance_y) && Math.abs(distance_y) > icon_size/4) {
-	     if (distance_y > 0){
+		} else if (Math.abs(distance_latitude) < Math.abs(distance_longitude) && Math.abs(distance_longitude) > icon_size/4) {
+	     if (distance_longitude > 0){
          next_move = Movement.DOWN
        } else {
          next_move = Movement.UP
