@@ -97,16 +97,16 @@ class GameManagerClient (backend: ActorRef) extends Actor {
         cc._2 forward GameStatusBroadcast(game)
       }
       
-    case PauseGame(player:PlayerInfo) =>
-      logger.log("PauseGame request (" + player.name + ")")
-      gameManagerBackend ! PauseGame(player)
+    case PauseGame(p_uid) =>
+      logger.log("PauseGame request (" + p_uid + ")")
+      gameManagerBackend ! PauseGame(p_uid)
     
-    case LeaveGame(player: PlayerInfo) =>
-      logger.log("LeaveGame request (" + player.name + ")")
-      val future = gameManagerBackend ? LeaveGame(player)
+    case LeaveGame(p_uid) =>
+      logger.log("LeaveGame request (" + p_uid + ")")
+      val future = gameManagerBackend ? LeaveGame(p_uid)
       future.onSuccess { 
         case Success =>
-          clientsConnections = clientsConnections.filterNot(elm => elm._1.uid == player.uid)       
+          clientsConnections = clientsConnections.filterNot(elm => elm._1.uid == p_uid)       
       }
       future onFailure {
         case e: Exception => logger.log("LEAVE GAME ERROR: " + e.getMessage + " FROM " + sender.path)

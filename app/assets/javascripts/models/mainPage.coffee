@@ -308,6 +308,9 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			@ws.send(JSON.stringify
 				event: "new_game"
 				name: gamename
+				pos:
+					latitude: parseInt( 0, 10 )
+					longitude: parseInt( 0, 10 )
 				n_players: parseInt( gamemaxplayers, 10 )
 			)
 		
@@ -322,6 +325,9 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			@ws.send(JSON.stringify
 				event: "join_game"
 				game: game
+				pos:
+					latitude: parseInt( 0, 10 )
+					longitude: parseInt( 0, 10 )
 			)
 		
 		# Resume Game
