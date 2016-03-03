@@ -155,22 +155,12 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
   }
   
   def attackPlayer(player_info: UserInfo, player_actor : ActorRef) = {
-    var ghost_move : Int = chooseNextMovement(player_info.pos)
-    var new_position : Point = computeNextPosition(ghost_move)
-    
-    //if (area.contains(new_position)){
-    if ((icon_size < new_position.x && new_position.x < width-icon_size) && (icon_size < new_position.y && new_position.y < height-icon_size)) {  
-       if(level == 3 || new_position.distanceFrom(position_treasure) < treasure_radius){
-         ghostpos = new_position
-         GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
-       }
-    }
     
     var gold_available = smellPlayerGold(player_info)
     var distance_x = player_info.pos.x - ghostpos.x
     var distance_y = player_info.pos.y - ghostpos.y
     
-    if (Math.abs(distance_x) < icon_size/4 && Math.abs(distance_y) < icon_size/4 && gold_available > 0) {
+    if (Math.abs(distance_x) < icon_size/2 && Math.abs(distance_y) < icon_size/2 && gold_available > 0) {
         // Giocatore raggiunto! Gli rubo i soldi
         
         val future = player_actor ? IAttackYou(uid, MsgCodes.PARANORMAL_ATTACK, ghost_hunger(level), 0)
@@ -178,7 +168,20 @@ class Ghost(uid: String, area : Polygon, position: Point, level: Int, treasure: 
         if(result > 0){
           treasure ! IncreaseGold(result)
         }
+    } else {
+      // Giocatore non abbastanza vicino, mi muovo verso di lui
+      
+      var ghost_move : Int = chooseNextMovement(player_info.pos)
+      var new_position : Point = computeNextPosition(ghost_move)
+      
+      //if (area.contains(new_position)){
+      if ((icon_size < new_position.x && new_position.x < width-icon_size) && (icon_size < new_position.y && new_position.y < height-icon_size)) {  
+         if(level == 3 || new_position.distanceFrom(position_treasure) < treasure_radius){
+           ghostpos = new_position
+           GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
+         }
       }
+    }
   }
   
   def returnToTreasure = {
