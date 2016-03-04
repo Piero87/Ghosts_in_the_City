@@ -311,6 +311,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 				pos:
 					latitude: parseInt( 0, 10 )
 					longitude: parseInt( 0, 10 )
+				game_area_edge: parseInt( 0, 10 )
 				n_players: parseInt( gamemaxplayers, 10 )
 			)
 		
@@ -444,73 +445,74 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 				when -1
 					# NO_TRAP - no enough money to set a trap
 					message = "You cannot set a trap, asshole!"
-					type = "error"
+					type = "alert"
 				when -2
 					# OUT_OF_AREA - out of area
 					message = "Come inside, quick, you'll catch a cold out there!"
-					type = "error"
+					type = "show-banner"
 				when -3
 					# T_NEEDS_KEY - the treasure needs the key to be opened
 					message = "This treasure is locked and you don't have the right key."
-					type = "error"
+					type = "alert"
 					$("#treasure-locked").get(0).play()
 				when -4
 					# NOT_ENOUGH_PLAYERS - not enough player
 					message = "Some moron leaved the mission and has not come back in time..."
-					type = "error"
+					type = "alert"
 				when -5
 					# T_EMPTY - treasure empty
 					message = "oh oh, there's nothing here."
-					type = "error"
+					type = "alert"
 				when -6
 					# NO_T_NEAR_YOU - no treasure nearby
 					message = "There are no treasure near you, moron."
-					type = "error"
+					type = "alert"
 				when 1
 					# PARANORMAL_ATTACK - attacked from ghost
 					message = "Ghost Attack! You lost " + option + "$!"
-					type = "message"
+					type = "alert"
 					$("#ghost-attack").get(0).play()
 				when 2
 					# HUMAN_ATTACK - attacked from human
 					message = "Ouch!"
-					type = "message"
+					type = "alert"
 					$("#player-attack").get(0).play()
 				when 3
 					# KEY_FOUND - key found
 					message = "You have found a key! Yay!"
-					type = "message"
+					type = "alert"
 					$("#keys-found").get(0).play()
 				when 4
 					# GOLD_FOUND - gold found
 					message = "You have found " + option + "$! You are filthy rich now!"
-					type = "message"
+					type = "alert"
 					$("#gold-found").get(0).play()
 				when 5
 					# K_G_FOUND - key and gold found
 					message = "Jackpot! " + option + "$ and a key!"
-					type = "message"
+					type = "alert"
 					$("#gold-found").get(0).play()
 					$("#keys-found").delay(600).get(0).play()
-				when 6
-					# VICTORY - victory
-					message = "Your team won this game! Congratulations!"
-					type = "message"
 				when 7
-					# LOST - lost
-					message = "Your team has been defeated! Looooooosers!"
-					type = "message"
+					# BACK_IN_AREA - player has returned inside the game area
+					message = "Your team won this game! Congratulations!"
+					type = "hide-banner"
 			
 			alert = $('#message-alert')
 			alert.html(message)
-			if (type == "error")
+			if (c < 0)
 				color = "red"
-			else if (type == "message")
+			else if (c > 0)
 				color = "blue"
 			
 			alert.css('background-color', color);
-			alert.fadeIn('fast').delay(1000).fadeOut('fast').delay(300)
-			
+			if (type == "alert")
+				alert.fadeIn('fast').delay(1000).fadeOut('fast').delay(300)
+			else if (type == "show-banner")
+				alert.fadeIn('fast')
+			else if (type == "hide-banner")
+				alert.fadeOut('fast')
+				
 			console.log(message)
 					
 			

@@ -142,18 +142,16 @@ class GameManagerBackend () extends Actor {
         gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,tmp_p,tmp_g,tmp_t))
       }
     case UpdatePosition(player) =>
-      logger.log("Player pos: " + player.pos)
-      if (canvas.contains(player.pos)) {
-        logger.log("DENTRO!")
-        var player_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == player.uid) => i}).head
-        var u_tmp = players(player_index)._1
-        var player_info = new PlayerInfo(u_tmp.uid,u_tmp.name,u_tmp.p_type,u_tmp.team,player.pos,u_tmp.gold,u_tmp.keys)
-        players(player_index) = players(player_index).copy(_1 = player_info)
-        sender ! BroadcastUpdatePosition(player)
-      } else {
-        logger.log("FUORI!")
+      var player_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == player.uid) => i}).head
+      var u_tmp = players(player_index)._1
+      if (!canvas.contains(player.pos)) {
         gameManagerClient ! MessageCode(player.uid,MsgCodes.OUT_OF_AREA,"")
+      } else if (!canvas.contains(u_tmp.pos)) {
+        gameManagerClient ! MessageCode(player.uid,MsgCodes.BACK_IN_AREA,"")
       }
+      var player_info = new PlayerInfo(u_tmp.uid,u_tmp.name,u_tmp.p_type,u_tmp.team,player.pos,u_tmp.gold,u_tmp.keys)
+      players(player_index) = players(player_index).copy(_1 = player_info)
+      sender ! BroadcastUpdatePosition(player)
     case UpdateGhostsPositions =>
       //Logger.info("UpdateGhostsPositionsBroadcast")
       val tmp_g = ghosts.map(x => x._1)
