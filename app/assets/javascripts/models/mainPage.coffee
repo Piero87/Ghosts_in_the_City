@@ -65,15 +65,15 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 		
 		$(window).load ->
 			
-			$("ghostbusters-song").get(0).volume = 0.1
-    	    $("ghostbusters-theme").get(0).volume = 0.2
-    	    $("gold-found").get(0).volume = 0.5
-    	    $("keys-found").get(0).volume = 0.5
-    	    $("trap-activated").get(0).volume = 0.5
-    	    $("treasure-locked").get(0).volume = 0.5
-    	    $("treasure-opening").get(0).volume = 0.5
-    	    $("ghost-attack").get(0).volume = 0.5
-    	    $("player-attack").get(0).volume = 0.5
+			document.getElementById("ghostbusters-song").get(0).volume = 0.1
+			document.getElementById("ghostbusters-theme").volume = 0.2
+			document.getElementById("gold-found").volume = 0.5
+			document.getElementById("keys-found").volume = 0.5
+			document.getElementById("trap-activated").volume = 0.5
+			document.getElementById("treasure-locked").volume = 0.5
+			document.getElementById("treasure-opening").volume = 0.5
+			document.getElementById("ghost-attack").volume = 0.5
+			document.getElementById("player-attack").volume = 0.5
 			
 			$(".page-loader div").fadeOut();
 			$(".page-loader").delay(200).fadeOut("slow");
