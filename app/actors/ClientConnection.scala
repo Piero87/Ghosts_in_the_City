@@ -62,6 +62,7 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
           newGameResult match {
             case s: JsSuccess[NewGameJSON] =>
               var p_pos = s.get.pos
+              var game_area_edge = s.get.game_area_edge
               logger.log("Player position: " + p_pos)
               if(p_pos.latitude != 0.0 && p_pos.longitude != 0.0){
                 // Verify that the location that was sent is different from 0.0,0.0 (defeault for the web player) to determine if the client 
@@ -71,7 +72,7 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
                 player_type = PlayerType.WEB
               }
               var player_info = new PlayerInfo(uid,name,player_type,team,p_pos,0,List())
-              val future = frontendManager ? NewGame(s.get.name.replaceAll(" ", "_") + "__" + System.currentTimeMillis(),s.get.n_players,player_info,self)
+              val future = frontendManager ? NewGame(s.get.name.replaceAll(" ", "_") + "__" + System.currentTimeMillis(),s.get.n_players,player_info,game_area_edge,self)
               future.onSuccess {
                 case GameHandler(game,ref) => 
                   if (ref != null) gameManagerClient = ref

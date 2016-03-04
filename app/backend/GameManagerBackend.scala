@@ -29,6 +29,7 @@ class GameManagerBackend () extends Actor {
   var game_n_players = 0
   var game_status = StatusGame.WAITING
   var previous_game_status = -1
+  var game_creator = PlayerType.UNKNOWN
   
   var paused_players:MutableList[Tuple2[String, Long]] = MutableList()
   val icon_size = ConfigFactory.load().getDouble("icon_size")
@@ -45,6 +46,7 @@ class GameManagerBackend () extends Actor {
   val ghost_radius = ConfigFactory.load().getDouble("ghost_radius")
   val trap_radius = ConfigFactory.load().getDouble("trap_radius")
   val canvas = new Polygon(List(new Point(0, 0), new Point(arena_width, 0), new Point(arena_width, arena_height), new Point(0, arena_height)))
+  var reality = new Polygon(List())
   
   val logger = new CustomLogger("GameManagerBackend")
   
@@ -52,10 +54,14 @@ class GameManagerBackend () extends Actor {
   implicit val ec = context.dispatcher
   
   def receive = {
-    case NewGame(name,n_players,player,ref) =>
+    case NewGame(name,n_players,player,ga_edge,ref) =>
       logger.log("NewGame request")
       game_name = name
       game_n_players = n_players
+      if(player.p_type == PlayerType.WEARABLE){
+        game_creator = PlayerType.WEARABLE
+        reality = new Polygon(List(player.pos,new Point(player.pos.latitude,))
+      }
       game_status = StatusGame.WAITING
       logger.log("GMBackend NewGame From: "+ref.toString())
       gameManagerClient = ref

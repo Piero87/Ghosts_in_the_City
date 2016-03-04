@@ -27,9 +27,9 @@ class FrontendManager extends Actor {
    * It helds all the messages that could be sent to the FrontendManager actor from ClientConnection or server
    */
   def receive = {
-    case NewGame(name,n_players,player,ref) =>
+    case NewGame(name,n_players,player,game_area_edge,ref) =>
       logger.log("NewGame request")
-      newGame(name,n_players,player,ref)
+      newGame(name,n_players,player,game_area_edge,ref)
     case GamesList =>
       gamesList(sender)
     case JoinGame(game,player,ref) =>
@@ -64,7 +64,7 @@ class FrontendManager extends Actor {
    * New Game method.
    * It forwards the new game requests to a backend in the backend list selected through the round-robin algorithm
    */
-  def newGame (name: String,n_players: Int, player: PlayerInfo, ref: ActorRef) = {
+  def newGame (name: String,n_players: Int, player: PlayerInfo, game_area_edge: Double, ref: ActorRef) = {
     backendCounter += 1
     var b = backends(backendCounter % backends.size)
     val gm_client = context.actorOf(Props(new GameManagerClient(b)), name = name)
@@ -73,7 +73,7 @@ class FrontendManager extends Actor {
     context watch gm_client
     game_manager_frontends = game_manager_frontends :+ gm_client
     logger.log("Backend selected and Actor created, forwarding message...")
-    gm_client forward NewGame(name,n_players, player,ref)
+    gm_client forward NewGame(name,n_players, player,game_area_edge,ref)
   }
   
   /**

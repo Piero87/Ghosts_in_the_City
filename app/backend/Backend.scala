@@ -70,9 +70,9 @@ class Backend extends Actor {
     case state: CurrentClusterState =>
       state.members.filter(_.status == MemberStatus.Up) foreach register
     case MemberUp(m) => register(m)
-    case NewGame(name,n_players,player,ref) =>
+    case NewGame(name,n_players,player,game_area_edge,ref) =>
       logger.log("NewGame request")
-      newGame(name,n_players,player,ref)
+      newGame(name,n_players,player,game_area_edge,ref)
     case GamesList =>
       gamesList(sender)
     case Terminated(a) =>
@@ -85,13 +85,13 @@ class Backend extends Actor {
    * It creates a GameManagerBackend actor that will "talk" directly with its respectly GameManagerClient actor. 
    * After that, we will forward to it the new game request.
    */
-  def newGame (name: String, n_players: Int, player: PlayerInfo, ref: ActorRef) = {
+  def newGame (name: String, n_players: Int, player: PlayerInfo, game_area_edge: Double, ref: ActorRef) = {
     val gm_backend = context.actorOf(Props[GameManagerBackend], name = name)
     context watch gm_backend
     game_manager_backends = game_manager_backends :+ gm_backend
     logger.log("Backend: Actor created, forward message...")
     logger.log("Backend PreForward: "+ref.toString())
-    gm_backend forward NewGame(name,n_players,player,ref)
+    gm_backend forward NewGame(name,n_players,player,game_area_edge,ref)
     
   }
   

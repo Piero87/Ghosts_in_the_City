@@ -45,7 +45,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
    * It helds all the messages that could be sent to the ClientConnection actor from client or server
    */
   def receive = {
-    case NewGame(name,n_players,player,ref) =>
+    case NewGame(name,n_players,player,game_area_edge,ref) =>
       logger.log("NewGame request (" + player.name + ")")
       game_name = name
       game_n_players = n_players
@@ -54,7 +54,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       // We store all ClientConnection actors for that particular game
       clientsConnections = clientsConnections :+ Tuple2(p,ref)
       // Wait for the backend succes response to new game request 
-      val future = backend ? NewGame(name,n_players,player,self)
+      val future = backend ? NewGame(name,n_players,player,game_area_edge,self)
       future.onSuccess { 
         case GameHandler(game,ref) => 
           logger.log("GameManagerBackend path: "+sender.path)
