@@ -146,8 +146,6 @@ class GameManagerBackend () extends Actor {
       } else {
         gameManagerClient ! MessageCode(player.uid,MsgCodes.OUT_OF_AREA,"")
       }
-        
-      
     case UpdateGhostsPositions =>
       //Logger.info("UpdateGhostsPositionsBroadcast")
       val tmp_g = ghosts.map(x => x._1)
