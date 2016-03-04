@@ -32,14 +32,17 @@ class GameManagerBackend () extends Actor {
   var previous_game_status = -1
   
   var paused_players:MutableList[Tuple2[String, Long]] = MutableList()
-  var icon_size = ConfigFactory.load().getDouble("icon_size")
-  var initial_gold = ConfigFactory.load().getDouble("initial_gold").toInt
-  var ghost_level1_damage = ConfigFactory.load().getDouble("ghost_hunger_level1")
-  var ghost_level2_damage = ConfigFactory.load().getDouble("ghost_hunger_level2")
-  var ghost_level3_damage = ConfigFactory.load().getDouble("ghost_hunger_level3")
-  var min_treasure_gold = ConfigFactory.load().getInt("min_treasure_gold")
-  var max_treasure_gold = ConfigFactory.load().getInt("max_treasure_gold")
-  var ghosts_per_treasure = ConfigFactory.load().getInt("ghosts_per_treasure")
+  val icon_size = ConfigFactory.load().getDouble("icon_size")
+  val initial_gold = ConfigFactory.load().getDouble("initial_gold").toInt
+  val ghost_level1_damage = ConfigFactory.load().getDouble("ghost_hunger_level1")
+  val ghost_level2_damage = ConfigFactory.load().getDouble("ghost_hunger_level2")
+  val ghost_level3_damage = ConfigFactory.load().getDouble("ghost_hunger_level3")
+  val min_treasure_gold = ConfigFactory.load().getInt("min_treasure_gold")
+  val max_treasure_gold = ConfigFactory.load().getInt("max_treasure_gold")
+  val ghosts_per_treasure = ConfigFactory.load().getInt("ghosts_per_treasure")
+  val arena_width = ConfigFactory.load().getDouble("space_width")
+  val arena_height = ConfigFactory.load().getDouble("space_height")
+  val canvas = new Rectangle(new Point(0,0), arena_width, arena_height)
   
   val logger = new CustomLogger("GameManagerBackend")
   
@@ -416,19 +419,13 @@ class GameManagerBackend () extends Actor {
   }
   
   def newGame () = {
-      //...inizializza attori partita
-    var width = ConfigFactory.load().getDouble("space_width")
-    var height = ConfigFactory.load().getDouble("space_height")
-    
     // inizializziamo i parametri di partita
     trap_radius = ConfigFactory.load().getDouble("trap_radius")
 
-    var polygon = new Polygon(List(Point(0,0),Point(0,height),Point(width,0),Point(width,height)))
-    
     var n_treasures_and_ghosts = game_n_players*2
     var n_free_ghosts = game_n_players + 1
     
-    var spaces = UtilFunctions.createSpaces(n_treasures_and_ghosts)
+    var spaces = UtilFunctions.createSpaces(n_treasures_and_ghosts, canvas)
     
     var position_players = new Array[Point](game_n_players)
     position_players = UtilFunctions.randomPositionsInSpace(spaces(spaces.length - 1), n_treasures_and_ghosts-1)
@@ -436,7 +433,7 @@ class GameManagerBackend () extends Actor {
     for(i <- 0 to game_n_players-1) {
       val player = players(i)._1
       val p = new PlayerInfo(player.uid,player.name,player.p_type,player.team,Point(position_players(i).latitude,position_players(i).longitude),player.gold,player.keys)
-      val player_actor = context.actorOf(Props(new Player(player.uid,player.name,player.team,polygon,self)), name = player.uid)
+      val player_actor = context.actorOf(Props(new Player(player.uid,player.name,player.team,canvas,self)), name = player.uid)
       players(i) = Tuple2(p,player_actor)
       player_actor ! UpdatePlayerPos(Point(position_players(i).latitude,position_players(i).longitude))
     }
@@ -514,7 +511,7 @@ class GameManagerBackend () extends Actor {
         var ghost_id = randomString(8)
         var p_g = new Point (ghost_postion.latitude,ghost_postion.longitude)
         val g_level = rnd.nextInt(2)+1
-        val ghost = context.actorOf(Props(new Ghost(ghost_id,polygon,p_g,g_level,treasures.last._2,pos_t,treasure_id)), name = ghost_id)
+        val ghost = context.actorOf(Props(new Ghost(ghost_id,canvas,p_g,g_level,treasures.last._2,pos_t,treasure_id)), name = ghost_id)
         var ghost_info = new GhostInfo(ghost_id,g_level,GhostMood.CALM,p_g)
         ghosts = ghosts :+ Tuple2(ghost_info,ghost)
       }
@@ -530,7 +527,7 @@ class GameManagerBackend () extends Actor {
       var free_ghost_id = randomString(8)
       var free_p_g = new Point (free_ghost_postion.latitude, free_ghost_postion.longitude)
       val n_treasure = rnd.nextInt(treasures.size)
-      val free_ghost = context.actorOf(Props(new Ghost(free_ghost_id,polygon,free_p_g,3,treasures(n_treasure)._2,treasures(n_treasure)._1.pos,treasures(n_treasure)._1.uid)), name = free_ghost_id)
+      val free_ghost = context.actorOf(Props(new Ghost(free_ghost_id,canvas,free_p_g,3,treasures(n_treasure)._2,treasures(n_treasure)._1.pos,treasures(n_treasure)._1.uid)), name = free_ghost_id)
       var free_ghost_info = new GhostInfo(free_ghost_id,3,GhostMood.CALM,free_p_g)
       ghosts = ghosts :+ Tuple2(free_ghost_info,free_ghost)
     }

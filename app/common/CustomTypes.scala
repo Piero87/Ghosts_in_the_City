@@ -4,12 +4,56 @@ import scala.collection.mutable
 
 sealed case class Point(latitude: Double, longitude: Double){
   
-  var pos_latitude = latitude // x
-  var pos_longitude = longitude // y
+  // latitude == x
+  // longitude == y
   
   def distanceFrom(p: Point): Double = {
-    Math.sqrt(Math.pow((p.latitude - pos_latitude),2) + Math.pow((p.longitude - pos_longitude),2))
+    Math.sqrt(Math.pow((p.latitude - latitude),2) + Math.pow((p.longitude - longitude),2))
   }
+  
+  def convertToReality(canvas: Rectangle, reality: Rectangle) : Point = {
+    // w_canvas : lat_canvas = w_reality : lat_reality
+    var reality_lat = (latitude * reality.width) / canvas.width
+    // h_canvas : lng_canvas = h_reality : lng_reality
+    var reality_lng = (longitude * reality.height) / canvas.height
+    new Point(reality_lat, reality_lng)
+  }
+  
+  def convertToCanvas(canvas: Rectangle, reality: Rectangle) : Point = {
+    // w_canvas : lat_canvas = w_reality : lat_reality
+    var canvas_lat = (latitude * reality.width) / canvas.width
+    // h_canvas : lng_canvas = h_reality : lng_reality
+    var canvas_lng = (longitude * reality.height) / canvas.height
+    new Point(canvas_lat, canvas_lng)
+  }
+  
+}
+
+/*
+ * O--------------------------A
+ * |													|
+ * |													|
+ * |													|
+ * C--------------------------B
+ * 
+ * O = origin
+ */
+
+sealed case class Rectangle(origin: Point, width: Double, height: Double){
+  
+  val A = new Point(origin.latitude + width, origin.longitude)
+  val B = new Point(origin.latitude + width, origin.longitude + height)
+  val C = new Point(origin.latitude, origin.longitude + height)
+  val edges = List(origin, A, B, C)
+  
+  def contains(p: Point): Boolean = {
+    if ((origin.latitude < p.latitude) && (B.latitude > p.latitude) &&
+        (origin.latitude < p.longitude) && (B.longitude > p.longitude)) {
+      return true
+    }
+    return false
+  }
+  
 }
 
 sealed case class Polygon(points: List[Point]){
