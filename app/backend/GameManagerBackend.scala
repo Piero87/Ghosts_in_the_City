@@ -553,7 +553,7 @@ class GameManagerBackend () extends Actor {
       context.system.scheduler.scheduleOnce(500 millis, self, UpdateGhostsPositions)
     } catch {
       case e: PointOutOfPolygonException => logger.log("ERROR! Position error " + e.getMessage)
-      case e: Exception => logger.log("ERROR! " + e.getMessage)
+      case e: Exception => logger.log("ERROR! " + e)
     }
     
   }
