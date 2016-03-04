@@ -56,28 +56,27 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			@connecting = ko.observable()
 			@closing = false
 			
-			$( window ).load(function() {
-	    	    document.getElementById("ghostbusters-song").volume = 0.1;
-	    	    document.getElementById("ghostbusters-theme").volume = 0.2;
-	    	    document.getElementById("gold-found").volume = 0.5;
-	    	    document.getElementById("keys-found").volume = 0.5;
-	    	    document.getElementById("trap-activated").volume = 0.5;
-	    	    document.getElementById("treasure-locked").volume = 0.5;
-	    	    document.getElementById("treasure-opening").volume = 0.5;
-	    	    document.getElementById("ghost-attack").volume = 0.5;
-	    	    document.getElementById("player-attack").volume = 0.5;
-	    	    
-	    	    $(".page-loader div").fadeOut();
-	            $(".page-loader").delay(200).fadeOut("slow");
-	    	    
-	    	}
-			
 			# Load previously player name if set
 			if localStorage.playername
 				@playername(localStorage.playername)
 				@playeruid(localStorage.uid)
 				
 				@connect()
+		
+		$(window).load ->
+			
+			document.getElementById("ghostbusters-song").volume = 0.1
+    	    document.getElementById("ghostbusters-theme").volume = 0.2
+    	    document.getElementById("gold-found").volume = 0.5
+    	    document.getElementById("keys-found").volume = 0.5
+    	    document.getElementById("trap-activated").volume = 0.5
+    	    document.getElementById("treasure-locked").volume = 0.5
+    	    document.getElementById("treasure-opening").volume = 0.5
+    	    document.getElementById("ghost-attack").volume = 0.5
+    	    document.getElementById("player-attack").volume = 0.5
+			
+			$(".page-loader div").fadeOut();
+			$(".page-loader").delay(200).fadeOut("slow");
 			
 		# Connect
 		connect: ->
