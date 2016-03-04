@@ -16,25 +16,68 @@ class CustomLogger (o: String) {
 }
 
 object UtilFunctions {
-  
+  /*
   def randomPositionInSpace(space: Rectangle): Point = {
     val rnd = new Random()
     var lat = space.origin.latitude + ( space.width * rnd.nextDouble() )
     var lng = space.origin.longitude + ( space.height * rnd.nextDouble() )
     return Point(lat,lng)
   }
+  */
+  val max_try = 100
+  val logger = new CustomLogger("UtilFunctions")
   
-  def randomPositionsInSpace(space: Rectangle, n_player: Int): Array[Point] = {
+  def randomPositionInSpace(rect_space: Rectangle, permitted_area: Polygon): Point = {
+    logger.log("Space: " + rect_space)
+    var safety_check = max_try
     val rnd = new Random()
-    var pos = new Array[Point](n_player)
-    for(i <- 0 to (n_player-1)){
+    var point : Point = null
+    do {
+      var lat = rect_space.origin.latitude + ( rect_space.width * rnd.nextDouble() )
+      var lng = rect_space.origin.longitude + ( rect_space.height * rnd.nextDouble() )
+      point = new Point(lat,lng)
+      logger.log("randomPositionInSpace - attempt: " + (max_try - safety_check) + ", point: " + point)
+      safety_check -= 1
+    } while (!permitted_area.contains(point) && safety_check != 0)
+    if (safety_check == 0){
+      throw new PointOutOfPolygonException("from randomPositionInSpace")
+    }
+    logger.log("randomPositionInSpace - point: " + point)
+    return point
+  }
+  /*
+  def randomPositionsInSpace(space: Rectangle, n_positions: Int): Array[Point] = {
+    val rnd = new Random()
+    var pos = new Array[Point](n_positions)
+    for(i <- 0 to (n_positions-1)){
       var lat = space.origin.latitude + ( space.width * rnd.nextDouble() )
     var lng = space.origin.longitude + ( space.height * rnd.nextDouble() )
       pos(i) = Point(lat,lng)
     }
     return pos 
   }
-  
+  */
+  def randomPositionsInSpace(rect_space: Rectangle, permitted_area: Polygon, n_positions: Int): Array[Point] = {
+    var safety_check = max_try
+    var pos = new Array[Point](n_positions)
+    val rnd = new Random()
+    for(i <- 0 to n_positions-1){
+      safety_check = max_try
+      var point : Point = null
+      do {
+        var lat = rect_space.origin.latitude + ( rect_space.width * rnd.nextDouble() )
+        var lng = rect_space.origin.longitude + ( rect_space.height * rnd.nextDouble() )
+        point = new Point(lat,lng)
+        safety_check -= 1
+      } while (!permitted_area.contains(point) && safety_check != 0)
+      if (safety_check == 0){
+        throw new PointOutOfPolygonException("from randomPositionsInSpace")
+      }
+      pos(i) = point
+    }
+    return pos
+  }
+  /*
   def randomPositionAroundPoint(point : Point) : Point = {
     var icon_size = ConfigFactory.load().getInt("icon_size")
     var treasure_radius = ConfigFactory.load().getInt("treasure_radius")
@@ -61,14 +104,26 @@ object UtilFunctions {
     
     Point(lat,lng)
   }
+  */
   
-  def createSpaces(number : Int, gameArena: Rectangle): Array[Rectangle] = {
-    
-    val icon_size = ConfigFactory.load().getDouble("icon_size")
-    val ghost_radius = ConfigFactory.load().getDouble("ghost_radius")
-    val treasure_radius = ConfigFactory.load().getDouble("treasure_radius")
-    val arena_width = gameArena.width
-    val arena_height = gameArena.height
+  def randomPositionAroundPoint(target_point: Point, radius: Double, permitted_area: Polygon) : Point = {
+    var safety_check = max_try
+    val rnd = new Random()
+    var point : Point = null
+    do {
+      point = new Point(target_point.latitude + rnd.nextDouble() * radius, target_point.longitude + rnd.nextDouble() * radius)
+      safety_check -= 1
+    } while (!permitted_area.contains(point) && safety_check != 0)
+    if (safety_check == 0){
+      logger.log("randomPositionAroundPoint - safety_check failed")
+      throw new PointOutOfPolygonException("from randomPositionAroundPoint")
+    }
+    logger.log("randomPositionAroundPoint - point: " + point)
+    return point
+  }
+  
+  /*
+  def createSpaces(number : Int, area: Rectangle): Array[Rectangle] = {
     
     var nro_spaces = 0
     if(number % 2 > 0){
@@ -89,8 +144,8 @@ object UtilFunctions {
     }
     var columns = nro_spaces / rows
     
-    space_width = (arena_width - (icon_size * 2)) / (columns)
-    space_height = (arena_height - (icon_size * 2)) / (rows)
+    space_width = area.width / columns
+    space_height = area.height / rows
     
     var spaces = new Array[Rectangle](nro_spaces)
     
@@ -109,5 +164,46 @@ object UtilFunctions {
     return spaces
     
   }
-  
+  */
+  def createSpaces(number : Int, area: Polygon): Array[Rectangle] = {
+    
+    var nro_spaces = 0
+    if(number % 2 > 0){
+      nro_spaces = number + 1
+    }else{
+      nro_spaces = number
+    }
+    
+    var rows = 0
+    var space_width = 0.0
+    var space_height = 0.0
+    
+    //se il numero degli spazi è divisibile per 3 faccio 3 colonne, se no 2; definisco la grandezza di ogni spazio
+    if((nro_spaces % 3) == 0){
+      rows = 3
+    }else{
+      rows = 2
+    }
+    var columns = nro_spaces / rows
+    
+    space_width = area.getRectangleThatContainsPolygon().width / columns
+    space_height = area.getRectangleThatContainsPolygon().height / rows
+    
+    var spaces = new Array[Rectangle](nro_spaces)
+    
+    var index = 0
+    //inizializzo le dimensioni per lo spazio iniziale
+    var lat_start = 0
+    var lng_start = 0
+    
+    for(col <- 0 to columns - 1){
+      for(row <- 0 to rows - 1){
+        spaces(index) = new Rectangle(new Point((lat_start + (space_width * col)) , (lng_start + (space_height * row))), space_width, space_height)
+        index += 1  
+      }
+    }
+    
+    return spaces
+    
+  }
 }
