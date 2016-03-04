@@ -311,6 +311,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 				pos:
 					latitude: parseInt( 0, 10 )
 					longitude: parseInt( 0, 10 )
+				game_area_edge: parseInt( 0, 10 )
 				n_players: parseInt( gamemaxplayers, 10 )
 			)
 		
