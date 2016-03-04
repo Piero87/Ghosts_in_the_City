@@ -8,11 +8,23 @@ import scala.util.{Failure, Success}
 import common._
 import akka.actor.PoisonPill
 import scala.collection.mutable.MutableList
-
+/**
+ * Factory for [[actors.GameManagerClient]] instances.
+ * Represents the abstraction of a single game manager client-side.
+ * It receives the messages from ClientConnection or FrontendManager actor and
+ * send them to the backend-side actors.
+ */
 object GameManagerClient {
   
   def props(backend: ActorRef) = Props(new GameManagerClient(backend))
 }
+
+/**
+ * Actor GameManagerClient implementation class.
+ * 
+ * @constructor create a new actor with backend actor ref.
+ * @param backend 
+ */
 class GameManagerClient (backend: ActorRef) extends Actor {
   
   import GameManagerClient._
@@ -28,6 +40,10 @@ class GameManagerClient (backend: ActorRef) extends Actor {
   var game_n_players = 0
   var game_status = StatusGame.WAITING
   
+  /**
+   * Receive method.
+   * It helds all the messages that could be sent to the ClientConnection actor from client or server
+   */
   def receive = {
     case NewGame(name,n_players,player,ref) =>
       logger.log("NewGame request (" + player.name + ")")
@@ -35,8 +51,9 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       game_n_players = n_players
       val origin = sender
       var p = player
+      // We store all ClientConnection actors for that particular game
       clientsConnections = clientsConnections :+ Tuple2(p,ref)
-
+      // Wait for the backend succes response to new game request 
       val future = backend ? NewGame(name,n_players,player,self)
       future.onSuccess { 
         case GameHandler(game,ref) => 
@@ -53,7 +70,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       logger.log("JoinGame request, GameID: " + game_id + " (" + player.name + ")")
       if (game_status == 0 && game_id == game.id) {
         logger.log("JoinGame request ACCEPTED, GameID: " + game_id + " (" + player.name + ")")
-        // Per sicurezza ci salviamo i dati del client connection che ci ha mandato la richiesta di join
+        // We save the ClientConnection data that has sent the join request
         var p = player
         var ccref = ref
         val origin = sender
@@ -61,6 +78,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
         future.onSuccess { 
           case Game(id,name,n_players, status,players,ghosts,treasures) => 
             logger.log("GameManagerBackend path: "+sender.path)
+            // If the join has success add the ClientConnection actor to the others
             clientsConnections = clientsConnections :+ Tuple2(p,ccref)
             var g = new Game(id,name,n_players,status,players,ghosts,treasures)
             origin ! GameHandler(g,self)
@@ -80,6 +98,8 @@ class GameManagerClient (backend: ActorRef) extends Actor {
           case Game(id,name,n_players, status,players,ghosts,treasures) => 
             for (i <- 0 to clientsConnections.size-1) {
               if (clientsConnections(i)._1.uid == player.uid) {
+                // When a player resume a game after a connection trouble we update the ClientConnection actor
+                // ref in our clientConnections actors list
                 clientsConnections(i) = clientsConnections(i).copy(_2 = ref)
               }
             }
