@@ -552,7 +552,8 @@ class GameManagerBackend () extends Actor {
         
       context.system.scheduler.scheduleOnce(500 millis, self, UpdateGhostsPositions)
     } catch {
-      case e: Exception => logger.log("ERRORE! Ci sono dei problemi con le posizioni, bisogna cambiare il poligono di gioco")
+      case e: PointOutOfPolygonException => logger.log("ERROR! Position error " + e.getMessage)
+      case e: Exception => logger.log("ERROR! Something went wrong...")
     }
     
   }

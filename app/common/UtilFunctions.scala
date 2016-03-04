@@ -25,9 +25,9 @@ object UtilFunctions {
   }
   */
   val max_try = 100
-  var safety_check = max_try
   
   def randomPositionInSpace(rect_space: Rectangle, permitted_area: Polygon): Point = {
+    var safety_check = max_try
     val rnd = new Random()
     var lat = rect_space.origin.latitude + ( rect_space.width * rnd.nextDouble() )
     var lng = rect_space.origin.longitude + ( rect_space.height * rnd.nextDouble() )
@@ -37,7 +37,7 @@ object UtilFunctions {
       safety_check -= 1
     } while (!permitted_area.contains(point) || safety_check != 0)
     if (safety_check == 0){
-      throw new PointOutOfPolygonException
+      throw new PointOutOfPolygonException("from randomPositionInSpace")
     }
     return point
   }
@@ -54,6 +54,7 @@ object UtilFunctions {
   }
   */
   def randomPositionsInSpace(rect_space: Rectangle, permitted_area: Polygon, n_positions: Int): Array[Point] = {
+    var safety_check = max_try
     var pos = new Array[Point](n_positions)
     val rnd = new Random()
     for(i <- 0 to (n_positions-1)){
@@ -66,7 +67,7 @@ object UtilFunctions {
         safety_check -= 1
       } while (!permitted_area.contains(point) || safety_check != 0)
       if (safety_check == 0){
-        throw new PointOutOfPolygonException
+        throw new PointOutOfPolygonException("from randomPositionsInSpace")
       }
       pos(i) = point
     }
@@ -102,6 +103,7 @@ object UtilFunctions {
   */
   
   def randomPositionAroundPoint(point: Point, radius: Double, permitted_area: Polygon) : Point = {
+    var safety_check = max_try
     val rnd = new Random()
     var point : Point = null
     do {
@@ -109,7 +111,7 @@ object UtilFunctions {
       safety_check -= 1
     } while (!permitted_area.contains(point) || safety_check != 0)
     if (safety_check == 0){
-      throw new PointOutOfPolygonException
+      throw new PointOutOfPolygonException("from randomPositionAroundPoint")
     }
     return point
   }
