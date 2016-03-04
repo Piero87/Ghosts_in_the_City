@@ -59,6 +59,7 @@ object MsgCodes extends Enumeration {
   val GOLD_FOUND = 4
   val K_G_FOUND = 5
   val T_SUCCESS_OPENED = 6
+  val BACK_IN_AREA = 7
    
 }
 
@@ -127,7 +128,7 @@ case class ResumeGame(game_id: String, player: PlayerInfo, ref: ActorRef)
 case class GameHandler(game: Game, ref: ActorRef = null)
 case class LeaveGame(uid: String)
 case class PauseGame(uid: String)
-case class NewGame(name: String, n_players: Int, player: PlayerInfo, ref: ActorRef = null)
+case class NewGame(name: String, n_players: Int, player: PlayerInfo, game_area_edge: Double, ref: ActorRef = null)
 case class Game(id: String, name: String, n_players: Int, status: Int, players: MutableList[PlayerInfo], ghosts: MutableList[GhostInfo], treasures: MutableList[TreasureInfo])
 case class GamesList(list: List[Game])
 case object GamesList
@@ -142,7 +143,7 @@ case object CheckPaused
 
 
 // Json
-case class NewGameJSON(event: String, name: String, pos: Point, n_players: Int)
+case class NewGameJSON(event: String, name: String, pos: Point, game_area_edge: Double, n_players: Int)
 case class GameJSON(event: String, game: Game)
 case class GamesListResponseJSON(event: String, list: List[Game])
 case class GamesListRequestJSON(event: String)
