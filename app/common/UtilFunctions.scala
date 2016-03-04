@@ -36,7 +36,7 @@ object UtilFunctions {
     do {
       point = new Point(lat,lng)
       safety_check -= 1
-    } while (!permitted_area.contains(point) || safety_check != 0)
+    } while (!permitted_area.contains(point) && safety_check != 0)
     if (safety_check == 0){
       logger.log("randomPositionInSpace - safety_check failed")
       throw new PointOutOfPolygonException("from randomPositionInSpace")
@@ -71,7 +71,7 @@ object UtilFunctions {
         point = new Point(lat,lng)
         logger.log("randomPositionsInSpace - attempt: " + (max_try - safety_check) + ", point: " + point)
         safety_check -= 1
-      } while (!permitted_area.contains(point) || safety_check != 0)
+      } while (!permitted_area.contains(point) && safety_check != 0)
       if (safety_check == 0){
         logger.log("randomPositionsInSpace - safety_check failed")
         throw new PointOutOfPolygonException("from randomPositionsInSpace")
@@ -117,7 +117,7 @@ object UtilFunctions {
     do {
       point = new Point(point.latitude + rnd.nextDouble() * radius, point.longitude + rnd.nextDouble() * radius)
       safety_check -= 1
-    } while (!permitted_area.contains(point) || safety_check != 0)
+    } while (!permitted_area.contains(point) && safety_check != 0)
     if (safety_check == 0){
       logger.log("randomPositionAroundPoint - safety_check failed")
       throw new PointOutOfPolygonException("from randomPositionAroundPoint")
