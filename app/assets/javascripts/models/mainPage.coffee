@@ -56,7 +56,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			@connecting = ko.observable()
 			@closing = false
 			
-			window.onload = function() {
+			$( window ).load(function() {
 	    	    document.getElementById("ghostbusters-song").volume = 0.1;
 	    	    document.getElementById("ghostbusters-theme").volume = 0.2;
 	    	    document.getElementById("gold-found").volume = 0.5;
