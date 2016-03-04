@@ -25,6 +25,7 @@ object UtilFunctions {
   }
   */
   val max_try = 100
+  val logger = new CustomLogger("UtilFunctions")
   
   def randomPositionInSpace(rect_space: Rectangle, permitted_area: Polygon): Point = {
     var safety_check = max_try
@@ -37,8 +38,10 @@ object UtilFunctions {
       safety_check -= 1
     } while (!permitted_area.contains(point) || safety_check != 0)
     if (safety_check == 0){
+      logger.log("randomPositionInSpace - safety_check failed")
       throw new PointOutOfPolygonException("from randomPositionInSpace")
     }
+    logger.log("randomPositionInSpace - point: " + point)
     return point
   }
   /*
@@ -57,18 +60,22 @@ object UtilFunctions {
     var safety_check = max_try
     var pos = new Array[Point](n_positions)
     val rnd = new Random()
-    for(i <- 0 to (n_positions-1)){
+    for(i <- 0 to n_positions-1){
       safety_check = max_try
+      logger.log("Player #" + i+1)
       var lat = rect_space.origin.latitude + ( rect_space.width * rnd.nextDouble() )
       var lng = rect_space.origin.longitude + ( rect_space.height * rnd.nextDouble() )
       var point : Point = null
       do {
         point = new Point(lat,lng)
+        logger.log("randomPositionsInSpace - attempt: " + (max_try - safety_check) + ", point: " + point)
         safety_check -= 1
       } while (!permitted_area.contains(point) || safety_check != 0)
       if (safety_check == 0){
+        logger.log("randomPositionsInSpace - safety_check failed")
         throw new PointOutOfPolygonException("from randomPositionsInSpace")
       }
+      logger.log("randomPositionsInSpace - point: " + point)
       pos(i) = point
     }
     return pos
@@ -111,8 +118,10 @@ object UtilFunctions {
       safety_check -= 1
     } while (!permitted_area.contains(point) || safety_check != 0)
     if (safety_check == 0){
+      logger.log("randomPositionAroundPoint - safety_check failed")
       throw new PointOutOfPolygonException("from randomPositionAroundPoint")
     }
+    logger.log("randomPositionAroundPoint - point: " + point)
     return point
   }
   

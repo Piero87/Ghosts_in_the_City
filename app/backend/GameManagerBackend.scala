@@ -53,8 +53,6 @@ class GameManagerBackend () extends Actor {
   
   def receive = {
     case NewGame(name,n_players,player,ref) =>
-      var check_contains = canvas.contains(new Point(1000,500))
-      logger.log("The point (1000,500) is in canvas? " + check_contains)
       logger.log("NewGame request")
       game_name = name
       game_n_players = n_players
@@ -437,7 +435,9 @@ class GameManagerBackend () extends Actor {
       var spaces = UtilFunctions.createSpaces(n_treasures_and_ghosts, canvas)
       var position_players = new Array[Point](game_n_players)
       position_players = UtilFunctions.randomPositionsInSpace(spaces(spaces.length - 1), canvas, n_treasures_and_ghosts-1)
-    
+      
+      logger.log("randomPositionsInSpace is done!")
+      
       for(i <- 0 to game_n_players-1) {
         val player = players(i)._1
         val p = new PlayerInfo(player.uid,player.name,player.p_type,player.team,Point(position_players(i).latitude,position_players(i).longitude),player.gold,player.keys)
