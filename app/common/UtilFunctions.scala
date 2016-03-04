@@ -106,12 +106,12 @@ object UtilFunctions {
   }
   */
   
-  def randomPositionAroundPoint(point: Point, radius: Double, permitted_area: Polygon) : Point = {
+  def randomPositionAroundPoint(target_point: Point, radius: Double, permitted_area: Polygon) : Point = {
     var safety_check = max_try
     val rnd = new Random()
     var point : Point = null
     do {
-      point = new Point(point.latitude + rnd.nextDouble() * radius, point.longitude + rnd.nextDouble() * radius)
+      point = new Point(target_point.latitude + rnd.nextDouble() * radius, target_point.longitude + rnd.nextDouble() * radius)
       safety_check -= 1
     } while (!permitted_area.contains(point) && safety_check != 0)
     if (safety_check == 0){
