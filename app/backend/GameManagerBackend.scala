@@ -58,10 +58,10 @@ class GameManagerBackend () extends Actor {
       logger.log("NewGame request")
       game_name = name
       game_n_players = n_players
-      if(player.p_type == PlayerType.WEARABLE){
-        game_creator = PlayerType.WEARABLE
-        reality = new Polygon(List(player.pos,new Point(player.pos.latitude,))
-      }
+//      if(player.p_type == PlayerType.WEARABLE){
+//        game_creator = PlayerType.WEARABLE
+//        reality = new Polygon(List(player.pos,new Point(player.pos.latitude,))
+//      }
       game_status = StatusGame.WAITING
       logger.log("GMBackend NewGame From: "+ref.toString())
       gameManagerClient = ref
