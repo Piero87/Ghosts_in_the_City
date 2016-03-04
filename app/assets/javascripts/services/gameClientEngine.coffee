@@ -403,31 +403,31 @@ define () ->
 				# Left arrow.
 				when 37
 					@busters[i].latitude = @busters[i].latitude - @move
-					if @busters[i].latitude < (@icon_size / 2)
+					#if @busters[i].latitude < (@icon_size / 2)
 						# If at edge, reset buster position and set flag.
-						@busters[i].latitude = (@icon_size / 2)
-						flag = 1
+						#@busters[i].latitude = (@icon_size / 2)
+						#flag = 1
 				# Right arrow.
 				when 39
 					@busters[i].latitude = @busters[i].latitude + @move
-					if @busters[i].latitude > @space_width - (@icon_size / 2)
+					#if @busters[i].latitude > @space_width - (@icon_size / 2)
 						# If at edge, reset buster position and set flag.
-						@busters[i].latitude = @space_width - @move
-						flag = 1
+						#@busters[i].latitude = @space_width - @move
+						#flag = 1
 				# Down arrow
 				when 40
 					@busters[i].longitude = @busters[i].longitude + @move
-					if @busters[i].longitude > @space_height - (@icon_size / 2)
+					#if @busters[i].longitude > @space_height - (@icon_size / 2)
 						# If at edge, reset buster position and set flag.
-						@busters[i].longitude = @space_height - @move
-						flag = 1
+						#@busters[i].longitude = @space_height - @move
+						#flag = 1
 				# Up arrow 
 				when 38
 					@busters[i].longitude = @busters[i].longitude - @move
-					if @busters[i].longitude < (@icon_size / 2)
+					#if @busters[i].longitude < (@icon_size / 2)
 						# If at edge, reset buster position and set flag.
-						@busters[i].longitude = (@icon_size / 2)
-						flag = 1
+						#@busters[i].longitude = (@icon_size / 2)
+						#flag = 1
 			
 			# If flag is set, the buster did not move.
 			# Put everything backBuster the way it was.
