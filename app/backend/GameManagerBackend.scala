@@ -136,6 +136,7 @@ class GameManagerBackend () extends Actor {
         gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,tmp_p,tmp_g,tmp_t))
       }
     case UpdatePosition(player) =>
+      logger.log("Player pos: " + player.pos)
       if (canvas.contains(player.pos)) {
         var player_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == player.uid) => i}).head
         var u_tmp = players(player_index)._1
