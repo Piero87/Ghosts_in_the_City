@@ -53,6 +53,8 @@ class GameManagerBackend () extends Actor {
   
   def receive = {
     case NewGame(name,n_players,player,ref) =>
+      var check_contains = canvas.contains(new Point(10,10))
+      logger.log("The point (10,10) is in canvas? " + check_contains)
       logger.log("NewGame request")
       game_name = name
       game_n_players = n_players
