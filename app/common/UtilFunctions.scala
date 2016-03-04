@@ -31,10 +31,10 @@ object UtilFunctions {
     logger.log("Space: " + rect_space)
     var safety_check = max_try
     val rnd = new Random()
-    var lat = rect_space.origin.latitude + ( rect_space.width * rnd.nextDouble() )
-    var lng = rect_space.origin.longitude + ( rect_space.height * rnd.nextDouble() )
     var point : Point = null
     do {
+      var lat = rect_space.origin.latitude + ( rect_space.width * rnd.nextDouble() )
+      var lng = rect_space.origin.longitude + ( rect_space.height * rnd.nextDouble() )
       point = new Point(lat,lng)
       logger.log("randomPositionInSpace - attempt: " + (max_try - safety_check) + ", point: " + point)
       safety_check -= 1
