@@ -2,6 +2,8 @@ package common
 
 import scala.collection.mutable
 
+class PointOutOfPolygonException(message: String = null, cause: Throwable = null) extends RuntimeException(message, cause)
+
 sealed case class Point(latitude: Double, longitude: Double){
   
   // latitude == x
@@ -41,14 +43,15 @@ sealed case class Point(latitude: Double, longitude: Double){
 
 sealed case class Rectangle(origin: Point, width: Double, height: Double){
   
-  val A = new Point(origin.latitude + width, origin.longitude)
-  val B = new Point(origin.latitude + width, origin.longitude + height)
-  val C = new Point(origin.latitude, origin.longitude + height)
-  val edges = List(origin, A, B, C)
+  val TopLeftCorner = origin
+  val TopRightCorner = new Point(origin.latitude + width, origin.longitude)
+  val BottomRightCorner = new Point(origin.latitude + width, origin.longitude + height)
+  val BottomLeftCorner = new Point(origin.latitude, origin.longitude + height)
+  val edges = List(origin, TopRightCorner, BottomRightCorner, BottomLeftCorner)
   
   def contains(p: Point): Boolean = {
-    if ((origin.latitude < p.latitude) && (B.latitude > p.latitude) &&
-        (origin.latitude < p.longitude) && (B.longitude > p.longitude)) {
+    if ((origin.latitude < p.latitude) && (BottomRightCorner.latitude > p.latitude) &&
+        (origin.latitude < p.longitude) && (BottomRightCorner.longitude > p.longitude)) {
       return true
     }
     return false
@@ -56,6 +59,42 @@ sealed case class Rectangle(origin: Point, width: Double, height: Double){
   
 }
 
+sealed case class Polygon(vertex: List[Point]){
+  
+  def contains(point: Point): Boolean = {
+    val vertex_closed = vertex :+ vertex.head
+    val n_vertex = vertex_closed.length
+    val latitudes : List[Double] = vertex_closed.map { x => x.latitude }
+    val longitudes : List[Double] = vertex_closed.map { x => x.longitude }
+    var contained = false
+    var i = 0
+    var j = n_vertex - 1
+    while (i < n_vertex) {
+      if (((longitudes(i) > point.longitude) != (longitudes(j) > point.longitude)) && 
+          (point.latitude < (latitudes(j) - latitudes(i)) * (point.longitude - longitudes(i)) / (longitudes(j) - longitudes(i)) + latitudes(i))){
+        contained = !contained;
+      }
+      j = i
+      i += 1
+    }
+    contained
+  }
+  
+  def getRectangleThatContainsPolygon(): Rectangle = {
+    
+    val latitudes = vertex.map { x => x.latitude }
+    val min_lat = latitudes.reduceLeft(_ min _)
+    val max_lat = latitudes.reduceLeft(_ max _)
+    
+    val longitudes = vertex.map { y => y.longitude }
+    val min_lng = longitudes.reduceLeft(_ min _)
+    val max_lng = longitudes.reduceLeft(_ max _)
+    
+    new Rectangle(new Point(min_lat, min_lng), (max_lat - min_lat), (max_lng - min_lng))
+  }
+  
+}
+/*
 sealed case class Polygon(points: List[Point]){
   
   val polygonPoints = points
@@ -99,4 +138,4 @@ case class Edge(_1: Point, _2: Point) {
  
   final val epsilon = 0.00001
 }
- 
+*/

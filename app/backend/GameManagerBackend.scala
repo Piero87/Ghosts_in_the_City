@@ -23,7 +23,6 @@ class GameManagerBackend () extends Actor {
   var ghosts: MutableList[Tuple2[GhostInfo, ActorRef]] = MutableList()
   var treasures: MutableList[Tuple2[TreasureInfo, ActorRef]] = MutableList()
   var traps: MutableList[Trap] = MutableList()
-  var trap_radius: Double = 0
   
   var game_name = ""
   var game_id = java.util.UUID.randomUUID.toString
@@ -42,7 +41,10 @@ class GameManagerBackend () extends Actor {
   val ghosts_per_treasure = ConfigFactory.load().getInt("ghosts_per_treasure")
   val arena_width = ConfigFactory.load().getDouble("space_width")
   val arena_height = ConfigFactory.load().getDouble("space_height")
-  val canvas = new Rectangle(new Point(0,0), arena_width, arena_height)
+  val treasure_radius = ConfigFactory.load().getDouble("treasure_radius")
+  val ghost_radius = ConfigFactory.load().getDouble("ghost_radius")
+  val trap_radius = ConfigFactory.load().getDouble("trap_radius")
+  val canvas = new Polygon(List(new Point(0, 0), new Point(0, arena_height), new Point(arena_width, 0), new Point(arena_width, arena_height)))
   
   val logger = new CustomLogger("GameManagerBackend")
   
@@ -134,11 +136,16 @@ class GameManagerBackend () extends Actor {
         gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,tmp_p,tmp_g,tmp_t))
       }
     case UpdatePosition(player) =>
-      var player_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == player.uid) => i}).head
-      var u_tmp = players(player_index)._1
-      var player_info = new PlayerInfo(u_tmp.uid,u_tmp.name,u_tmp.p_type,u_tmp.team,player.pos,u_tmp.gold,u_tmp.keys)
-      players(player_index) = players(player_index).copy(_1 = player_info)
-      sender ! BroadcastUpdatePosition(player)
+      if (canvas.contains(player.pos)) {
+        var player_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == player.uid) => i}).head
+        var u_tmp = players(player_index)._1
+        var player_info = new PlayerInfo(u_tmp.uid,u_tmp.name,u_tmp.p_type,u_tmp.team,player.pos,u_tmp.gold,u_tmp.keys)
+        players(player_index) = players(player_index).copy(_1 = player_info)
+        sender ! BroadcastUpdatePosition(player)
+      } else {
+        gameManagerClient ! MessageCode(player.uid,MsgCodes.OUT_OF_AREA,"")
+      }
+        
       
     case UpdateGhostsPositions =>
       //Logger.info("UpdateGhostsPositionsBroadcast")
@@ -420,128 +427,131 @@ class GameManagerBackend () extends Actor {
   
   def newGame () = {
     // inizializziamo i parametri di partita
-    trap_radius = ConfigFactory.load().getDouble("trap_radius")
-
     var n_treasures_and_ghosts = game_n_players*2
     var n_free_ghosts = game_n_players + 1
     
-    var spaces = UtilFunctions.createSpaces(n_treasures_and_ghosts, canvas)
+    try {
+      
+      var spaces = UtilFunctions.createSpaces(n_treasures_and_ghosts, canvas)
+      var position_players = new Array[Point](game_n_players)
+      position_players = UtilFunctions.randomPositionsInSpace(spaces(spaces.length - 1), canvas, n_treasures_and_ghosts-1)
     
-    var position_players = new Array[Point](game_n_players)
-    position_players = UtilFunctions.randomPositionsInSpace(spaces(spaces.length - 1), n_treasures_and_ghosts-1)
-    
-    for(i <- 0 to game_n_players-1) {
-      val player = players(i)._1
-      val p = new PlayerInfo(player.uid,player.name,player.p_type,player.team,Point(position_players(i).latitude,position_players(i).longitude),player.gold,player.keys)
-      val player_actor = context.actorOf(Props(new Player(player.uid,player.name,player.team,canvas,self)), name = player.uid)
-      players(i) = Tuple2(p,player_actor)
-      player_actor ! UpdatePlayerPos(Point(position_players(i).latitude,position_players(i).longitude))
-    }
-    
-    val rnd_key = new Random()
-    
-    var n_treasures_tmp = n_treasures_and_ghosts
-    var n_keys_tmp = rnd_key.nextInt(n_treasures_and_ghosts/2)
-    var n_treasures_closed_tmp = n_keys_tmp
-    var index = 0
-    
-    var keys_container = MutableList[Key]()
-    
-    for (i <- 0 to n_keys_tmp-1) {
-      var key = new Key(randomString(8))
-      keys_container = keys_container :+ key
-    }
-    
-    var empty_key = new Key("")
+      for(i <- 0 to game_n_players-1) {
+        val player = players(i)._1
+        val p = new PlayerInfo(player.uid,player.name,player.p_type,player.team,Point(position_players(i).latitude,position_players(i).longitude),player.gold,player.keys)
+        val player_actor = context.actorOf(Props(new Player(player.uid,player.name,player.team,self)), name = player.uid)
+        players(i) = Tuple2(p,player_actor)
+        player_actor ! UpdatePlayerPos(Point(position_players(i).latitude,position_players(i).longitude))
+      }
+      
+      val rnd_key = new Random()
+      
+      var n_treasures_tmp = n_treasures_and_ghosts
+      var n_keys_tmp = rnd_key.nextInt(n_treasures_and_ghosts/2)
+      var n_treasures_closed_tmp = n_keys_tmp
+      var index = 0
+      
+      var keys_container = MutableList[Key]()
+      
+      for (i <- 0 to n_keys_tmp-1) {
+        var key = new Key(randomString(8))
+        keys_container = keys_container :+ key
+      }
+      
+      var empty_key = new Key("")
+            
+      var spaces_shuffled = (util.Random.shuffle(spaces.toList)).toArray
+      
+      for(i <- 0 to n_treasures_and_ghosts-1){
+        
+        // Creazione tesori
+        
+        var treasure_position : Point = UtilFunctions.randomPositionInSpace(spaces_shuffled(i), canvas)
+        logger.log("Treasure[" + i + "] position: ("+ treasure_position.latitude +","+ treasure_position.longitude +")")
+        
+        var treasure_id = randomString(8)
+        
+        val rnd = new Random()
+        var gold = rnd.nextInt(max_treasure_gold-min_treasure_gold)+min_treasure_gold
+        var pos_t = new Point (treasure_position.latitude,treasure_position.longitude)
+        var treasure_info = new TreasureInfo(treasure_id,0,pos_t)
+        
+        if (n_keys_tmp != 0) {
           
-    var spaces_shuffled = (util.Random.shuffle(spaces.toList)).toArray
-    
-    for(i <- 0 to n_treasures_and_ghosts-1){
-      
-      // Creazione tesori
-      var treasure_position : Point = UtilFunctions.randomPositionInSpace(spaces_shuffled(i))
-      logger.log("Treasure[" + i + "] position: ("+ treasure_position.latitude +","+ treasure_position.longitude +")")
-      
-      var treasure_id = randomString(8)
-      
-      val rnd = new Random()
-      var gold = rnd.nextInt(max_treasure_gold-min_treasure_gold)+min_treasure_gold
-      var pos_t = new Point (treasure_position.latitude,treasure_position.longitude)
-      var treasure_info = new TreasureInfo(treasure_id,0,pos_t)
-      
-      if (n_keys_tmp != 0) {
-        
-        var tmp_key = keys_container(index)
-        var treasure = context.actorOf(Props(new Treasure(treasure_id,pos_t,Tuple2(tmp_key,gold),Tuple2(false,empty_key),self)), name = treasure_id)
-        treasures = treasures :+ Tuple2(treasure_info,treasure)
-        n_keys_tmp = n_keys_tmp-1
-        
-        if (keys_container.size == index+1)
+          var tmp_key = keys_container(index)
+          var treasure = context.actorOf(Props(new Treasure(treasure_id,pos_t,Tuple2(tmp_key,gold),Tuple2(false,empty_key),self)), name = treasure_id)
+          treasures = treasures :+ Tuple2(treasure_info,treasure)
+          n_keys_tmp = n_keys_tmp-1
+          
+          if (keys_container.size == index+1)
+          {
+            index = 0
+          } else {
+            index = index +1
+          }
+          
+        } else if (n_treasures_closed_tmp != 0)
         {
-          index = 0
+          var tmp_key = keys_container(index)
+          var treasure = context.actorOf(Props(new Treasure(treasure_id,pos_t,Tuple2(empty_key,gold),Tuple2(true,tmp_key),self)), name = treasure_id)
+          treasures = treasures :+ Tuple2(treasure_info,treasure)
+          n_treasures_closed_tmp = n_treasures_closed_tmp-1
+          
+          if (keys_container.size == index+1)
+          {
+            index = 0
+          } else {
+            index = index +1
+          }
+          
         } else {
-          index = index +1
+          var treasure = context.actorOf(Props(new Treasure(treasure_id,pos_t,Tuple2(empty_key,gold),Tuple2(false,empty_key),self)), name = treasure_id)
+          treasures = treasures :+ Tuple2(treasure_info,treasure)
         }
         
-      } else if (n_treasures_closed_tmp != 0)
-      {
-        var tmp_key = keys_container(index)
-        var treasure = context.actorOf(Props(new Treasure(treasure_id,pos_t,Tuple2(empty_key,gold),Tuple2(true,tmp_key),self)), name = treasure_id)
-        treasures = treasures :+ Tuple2(treasure_info,treasure)
-        n_treasures_closed_tmp = n_treasures_closed_tmp-1
-        
-        if (keys_container.size == index+1)
-        {
-          index = 0
-        } else {
-          index = index +1
+        for(i <- 1 to ghosts_per_treasure){
+          var ghost_postion : Point = UtilFunctions.randomPositionAroundPoint(treasure_position, treasure_radius, canvas)
+          logger.log("Ghost[" + i + "] position: ("+ ghost_postion.latitude +","+ ghost_postion.longitude +")")
+          
+          // Creazione dei due fantasmi a guardia dei tesori
+          // Fantasma 1
+          var ghost_id = randomString(8)
+          var p_g = new Point (ghost_postion.latitude,ghost_postion.longitude)
+          val g_level = rnd.nextInt(2)+1
+          val ghost = context.actorOf(Props(new Ghost(ghost_id,canvas,p_g,g_level,treasures.last._2,pos_t,treasure_id)), name = ghost_id)
+          var ghost_info = new GhostInfo(ghost_id,g_level,GhostMood.CALM,p_g)
+          ghosts = ghosts :+ Tuple2(ghost_info,ghost)
         }
         
-      } else {
-        var treasure = context.actorOf(Props(new Treasure(treasure_id,pos_t,Tuple2(empty_key,gold),Tuple2(false,empty_key),self)), name = treasure_id)
-        treasures = treasures :+ Tuple2(treasure_info,treasure)
       }
       
-      for(i <- 1 to ghosts_per_treasure){
-        var ghost_postion : Point = UtilFunctions.randomPositionAroundPoint(treasure_position)
-        logger.log("Ghost[" + i + "] position: ("+ ghost_postion.latitude +","+ ghost_postion.longitude +")")
+      for(i <- 0 to n_free_ghosts-1){ //l'ultimo space è dei giocatori e non ha fantasmi
+        var free_ghost_postion = UtilFunctions.randomPositionInSpace(spaces(i), canvas)
+        logger.log("Free Ghost[" + i + "] position: ("+ free_ghost_postion.latitude +","+ free_ghost_postion.longitude +")")
         
-        // Creazione dei due fantasmi a guardia dei tesori
-        // Fantasma 1
-        var ghost_id = randomString(8)
-        var p_g = new Point (ghost_postion.latitude,ghost_postion.longitude)
-        val g_level = rnd.nextInt(2)+1
-        val ghost = context.actorOf(Props(new Ghost(ghost_id,canvas,p_g,g_level,treasures.last._2,pos_t,treasure_id)), name = ghost_id)
-        var ghost_info = new GhostInfo(ghost_id,g_level,GhostMood.CALM,p_g)
-        ghosts = ghosts :+ Tuple2(ghost_info,ghost)
+        // Fantasmi liberi di girare per tutta l'area
+        val rnd = new Random()
+        var free_ghost_id = randomString(8)
+        var free_p_g = new Point (free_ghost_postion.latitude, free_ghost_postion.longitude)
+        val n_treasure = rnd.nextInt(treasures.size)
+        val free_ghost = context.actorOf(Props(new Ghost(free_ghost_id,canvas,free_p_g,3,treasures(n_treasure)._2,treasures(n_treasure)._1.pos,treasures(n_treasure)._1.uid)), name = free_ghost_id)
+        var free_ghost_info = new GhostInfo(free_ghost_id,3,GhostMood.CALM,free_p_g)
+        ghosts = ghosts :+ Tuple2(free_ghost_info,free_ghost)
       }
       
+      game_status = StatusGame.STARTED
+      val tmp_g = ghosts.map(x => x._1)
+      val tmp_t = treasures.map(x => x._1)
+      val tmp_p = players.map(x => x._1)
+      gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,tmp_p,tmp_g,tmp_t))
+      for (i <- 0 to ghosts.size-1) {
+        ghosts(i)._2 ! GhostStart
+      }
+        
+      context.system.scheduler.scheduleOnce(500 millis, self, UpdateGhostsPositions)
+    } catch {
+      case e: Exception => logger.log("ERRORE! Ci sono dei problemi con le posizioni, bisogna cambiare il poligono di gioco")
     }
-    
-    for(i <- 0 to n_free_ghosts-1){ //l'ultimo space è dei giocatori e non ha fantasmi
-      var free_ghost_postion = UtilFunctions.randomPositionInSpace(spaces(i))
-      logger.log("Free Ghost[" + i + "] position: ("+ free_ghost_postion.latitude +","+ free_ghost_postion.longitude +")")
-      
-      // Fantasmi liberi di girare per tutta l'area
-      val rnd = new Random()
-      var free_ghost_id = randomString(8)
-      var free_p_g = new Point (free_ghost_postion.latitude, free_ghost_postion.longitude)
-      val n_treasure = rnd.nextInt(treasures.size)
-      val free_ghost = context.actorOf(Props(new Ghost(free_ghost_id,canvas,free_p_g,3,treasures(n_treasure)._2,treasures(n_treasure)._1.pos,treasures(n_treasure)._1.uid)), name = free_ghost_id)
-      var free_ghost_info = new GhostInfo(free_ghost_id,3,GhostMood.CALM,free_p_g)
-      ghosts = ghosts :+ Tuple2(free_ghost_info,free_ghost)
-    }
-    
-    game_status = StatusGame.STARTED
-    val tmp_g = ghosts.map(x => x._1)
-    val tmp_t = treasures.map(x => x._1)
-    val tmp_p = players.map(x => x._1)
-    gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,tmp_p,tmp_g,tmp_t))
-    for (i <- 0 to ghosts.size-1) {
-      ghosts(i)._2 ! GhostStart
-    }
-      
-    context.system.scheduler.scheduleOnce(500 millis, self, UpdateGhostsPositions)
     
   }
   

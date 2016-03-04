@@ -20,10 +20,10 @@ object Ghost{
    */
   case object UpdateGhostPosition
   
-  def props(uid: String, arena: Rectangle, position: Point, level: Int, treasure: ActorRef,position_treasure: Point, t_uid: String) = Props(new Ghost(uid, arena,position, level, treasure,position_treasure, t_uid))
+  def props(uid: String, arena: Polygon, position: Point, level: Int, treasure: ActorRef,position_treasure: Point, t_uid: String) = Props(new Ghost(uid, arena,position, level, treasure,position_treasure, t_uid))
 }
 
-class Ghost(uid: String, arena : Rectangle, position: Point, level: Int, treasure: ActorRef, position_treasure: Point, t_uid: String) extends Actor {
+class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure: ActorRef, position_treasure: Point, t_uid: String) extends Actor {
   
   import context._
   import Ghost._
