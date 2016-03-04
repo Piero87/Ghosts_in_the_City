@@ -26,7 +26,7 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
   var player_type = PlayerType.UNKNOWN
   
   val logger = new CustomLogger("ClientConnection")
-  logger.log("Ciao mondo! L'utente " + name + " si è appena collegato!")
+  logger.log("Ciao giocatore chiamato " + name + "!")
   
   def receive = {
     case msg: JsValue =>
@@ -37,6 +37,7 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
           newGameResult match {
             case s: JsSuccess[NewGameJSON] =>
               var p_pos = s.get.pos
+              logger.log("Player position: " + p_pos)
               if(p_pos.latitude != 0.0 && p_pos.longitude != 0.0){
                 // Verifico che la posizione che mi è stata inviata sia diversa da 0.0,0.0(quella difeaul del web) per determinare se il client
                 // è un wearable o no. Se è wearable lo scrivo in player info e gli inserisco la posizione che mi è stata inviata dal client
