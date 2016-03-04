@@ -44,7 +44,7 @@ class GameManagerBackend () extends Actor {
   val treasure_radius = ConfigFactory.load().getDouble("treasure_radius")
   val ghost_radius = ConfigFactory.load().getDouble("ghost_radius")
   val trap_radius = ConfigFactory.load().getDouble("trap_radius")
-  val canvas = new Polygon(List(new Point(0, 0), new Point(0, arena_height), new Point(arena_width, 0), new Point(arena_width, arena_height)))
+  val canvas = new Polygon(List(new Point(0, 0), new Point(arena_width, 0), new Point(arena_width, arena_height), new Point(0, arena_height)))
   
   val logger = new CustomLogger("GameManagerBackend")
   
