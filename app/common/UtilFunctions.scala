@@ -57,16 +57,17 @@ object UtilFunctions {
   }
   */
   def randomPositionsInSpace(rect_space: Rectangle, permitted_area: Polygon, n_positions: Int): Array[Point] = {
+    logger.log("Space: " + rect_space)
     var safety_check = max_try
     var pos = new Array[Point](n_positions)
     val rnd = new Random()
     for(i <- 0 to n_positions-1){
       safety_check = max_try
       logger.log("Player #" + i+1)
-      var lat = rect_space.origin.latitude + ( rect_space.width * rnd.nextDouble() )
-      var lng = rect_space.origin.longitude + ( rect_space.height * rnd.nextDouble() )
       var point : Point = null
       do {
+        var lat = rect_space.origin.latitude + ( rect_space.width * rnd.nextDouble() )
+        var lng = rect_space.origin.longitude + ( rect_space.height * rnd.nextDouble() )
         point = new Point(lat,lng)
         logger.log("randomPositionsInSpace - attempt: " + (max_try - safety_check) + ", point: " + point)
         safety_check -= 1
