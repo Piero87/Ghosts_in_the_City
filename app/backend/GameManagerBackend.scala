@@ -58,10 +58,23 @@ class GameManagerBackend () extends Actor {
       logger.log("NewGame request")
       game_name = name
       game_n_players = n_players
-//      if(player.p_type == PlayerType.WEARABLE){
-//        game_creator = PlayerType.WEARABLE
-//        reality = new Polygon(List(player.pos,new Point(player.pos.latitude,))
-//      }
+      if(player.p_type == PlayerType.WEARABLE){
+        game_creator = PlayerType.WEARABLE
+        // Calculate the point of the game real area
+        /*
+				* P---------A
+				* |					|
+				* |					|
+				* |					|
+				* C---------B
+				* 
+			  * P = point sent from the new game request user
+				*/
+        var vertexA = Vertex.createVertexWithNewLat(player.pos, ga_edge)
+        var vertexB = Vertex.createVertexWithNewLatLong(player.pos, ga_edge)
+        var vertexC = Vertex.createVertexWithNewLong(player.pos, ga_edge)
+        reality = new Polygon(List(player.pos,vertexA,vertexB,vertexC))
+      }
       game_status = StatusGame.WAITING
       logger.log("GMBackend NewGame From: "+ref.toString())
       gameManagerClient = ref
@@ -94,8 +107,10 @@ class GameManagerBackend () extends Actor {
         //Ora mandiamo il messaggio di update game status a tutti i giocatori (***Dobbiamo evitare di mandarlo a quello che si è
         //appena Joinato?
         gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,tmp_p,tmp_g,tmp_t))
-        if (players.size == game_n_players) {
-          newGame ()
+        if (players.size == game_n_players && game_creator == PlayerType.WEARABLE) {
+          newGame(reality)
+        }else if (players.size == game_n_players && game_creator == PlayerType.WEB){
+          newGame(canvas)
         }
       } else {
         //***Failure message
@@ -430,16 +445,17 @@ class GameManagerBackend () extends Actor {
     args.foreach(println)
   }
   
-  def newGame () = {
+  def newGame (game_area: Polygon) = {
     // inizializziamo i parametri di partita
     var n_treasures_and_ghosts = game_n_players*2
     var n_free_ghosts = game_n_players + 1
     
     try {
       
-      var spaces = UtilFunctions.createSpaces(n_treasures_and_ghosts, canvas)
-      var position_players = new Array[Point](game_n_players)
-      position_players = UtilFunctions.randomPositionsInSpace(spaces(spaces.length - 1), canvas, n_treasures_and_ghosts-1)
+      var spaces = UtilFunctions.createSpaces(n_treasures_and_ghosts, game_area)
+      var n_player = (players.filter(x => x._1.p_type == PlayerType.WEB)).size
+      var position_players = new Array[Point](n_player)
+      position_players = UtilFunctions.randomPositionsInSpace(spaces(spaces.length - 1), game_area, n_treasures_and_ghosts-1)
       
       logger.log("randomPositionsInSpace is done!")
       

@@ -31,6 +31,28 @@ sealed case class Point(latitude: Double, longitude: Double){
   
 }
 
+object Vertex {
+  def createVertexWithNewLat(p: Point, d: Double): Point = {
+    val r_earth = 6371
+    var new_lat = p.latitude + (d/r_earth) * (180/Math.PI)
+    var vertex = new Point(new_lat,p.longitude)
+    vertex
+  }
+  def createVertexWithNewLong(p: Point, d: Double): Point = {
+    val r_earth = 6371
+    var new_lon = p.longitude + (d/r_earth) * (180/Math.PI) / Math.cos(p.latitude * Math.PI/180)
+    var vertex = new Point(p.latitude,new_lon)
+    vertex
+  }
+  def createVertexWithNewLatLong(p: Point, d: Double): Point = {
+    val r_earth = 6371
+    var new_lat = p.latitude + (d/r_earth) * (180/Math.PI)
+    var new_lon = p.longitude + (d/r_earth) * (180/Math.PI) / Math.cos(p.latitude * Math.PI/180)
+    var vertex = new Point(new_lat,new_lon)
+    vertex
+  }
+}
+
 /*
  * O--------------------------A
  * |													|
