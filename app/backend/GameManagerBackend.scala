@@ -452,19 +452,18 @@ class GameManagerBackend () extends Actor {
     try {
       var spaces = UtilFunctions.createSpaces(n_treasures_and_ghosts, game_area)
       
-      // Only if game type is equal to "web" I will create random position for players
       logger.log(game_type)
-      if(game_type == GameType.WEB){
-        var position_players = new Array[Point](game_n_players)
-        position_players = UtilFunctions.randomPositionsInSpace(spaces(spaces.length - 1), game_area, n_treasures_and_ghosts-1)
-        
-        logger.log("randomPositionsInSpace is done!")
-        
-        for(i <- 0 to game_n_players-1) {
-          logger.log("Player [" + (i+1) + "] position: " + position_players(i))
-          val player = players(i)._1
-          val p = new PlayerInfo(player.uid,player.name,player.team,Point(position_players(i).latitude,position_players(i).longitude),player.gold,player.keys)
+      for(i <- 0 to game_n_players-1) {
+        val player = players(i)._1
+        var player_pos = player.pos
+        if (game_type == GameType.WEB){
+          // Only if game type is equal to "web" I will create random position for players
+          player_pos = UtilFunctions.randomPositionInSpace(spaces(spaces.length - 1), game_area)
         }
+        logger.log("Player [" + (i+1) + "] position: " + player_pos)
+        val p = new PlayerInfo(player.uid,player.name,player.team,Point(player_pos.latitude,player_pos.longitude),player.gold,player.keys)
+        val player_actor = context.actorOf(Props(new Player(player.uid,player.name,player.team,self)), name = player.uid)
+        players(i) = Tuple2(p,player_actor)
       }
       
       val rnd_key = new Random()
