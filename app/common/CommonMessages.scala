@@ -71,6 +71,14 @@ object PlayerType extends Enumeration {
   val UNKNOWN = ""
 }
 
+object GameType extends Enumeration {
+  type GameType = String
+  
+  val REALITY = "reality"
+  val WEB = "web"
+  val UNKNOWN = ""
+}
+
 // Game Engine
 case class MessageCode(uid: String, code: Int, option: String)
 case object Finish
@@ -92,7 +100,7 @@ case class UpdatePosition(player: PlayerInfo)
 case class BroadcastUpdatePosition(player: PlayerInfo)
 case class Players(players: MutableList[Tuple2[PlayerInfo, ActorRef]])
 case class UpdatePlayerPos(pos: Point)
-case class PlayerInfo(uid: String, name: String, p_type: String, team: Int, pos: Point, gold: Int, keys: List[Key])
+case class PlayerInfo(uid: String, name: String, team: Int, pos: Point, gold: Int, keys: List[Key])
 case class UpdatePlayerInfo(player: PlayerInfo)
 case class OpenTreasureRequest(uid: String)
 case class OpenTreasure(treasures: List[ActorRef], player: PlayerInfo)
@@ -128,8 +136,8 @@ case class ResumeGame(game_id: String, player: PlayerInfo, ref: ActorRef)
 case class GameHandler(game: Game, ref: ActorRef = null)
 case class LeaveGame(uid: String)
 case class PauseGame(uid: String)
-case class NewGame(name: String, n_players: Int, player: PlayerInfo, game_area_edge: Double, ref: ActorRef = null)
-case class Game(id: String, name: String, n_players: Int, status: Int, players: MutableList[PlayerInfo], ghosts: MutableList[GhostInfo], treasures: MutableList[TreasureInfo])
+case class NewGame(name: String, n_players: Int, player: PlayerInfo, game_area_edge: Double, game_type: String, ref: ActorRef = null)
+case class Game(id: String, name: String, n_players: Int, status: Int, g_type: String, players: MutableList[PlayerInfo], ghosts: MutableList[GhostInfo], treasures: MutableList[TreasureInfo])
 case class GamesList(list: List[Game])
 case object GamesList
 case object GameStatus
@@ -143,7 +151,7 @@ case object CheckPaused
 
 
 // Json
-case class NewGameJSON(event: String, name: String, pos: Point, game_area_edge: Double, n_players: Int)
+case class NewGameJSON(event: String, name: String, pos: Point, game_area_edge: Double, n_players: Int, game_type: String)
 case class GameJSON(event: String, game: Game)
 case class GamesListResponseJSON(event: String, list: List[Game])
 case class GamesListRequestJSON(event: String)

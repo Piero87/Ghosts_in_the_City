@@ -39,22 +39,24 @@ class GameManagerClient (backend: ActorRef) extends Actor {
   var game_id = ""
   var game_n_players = 0
   var game_status = StatusGame.WAITING
+  var game_type = ""
   
   /**
    * Receive method.
    * It helds all the messages that could be sent to the ClientConnection actor from client or server
    */
   def receive = {
-    case NewGame(name,n_players,player,game_area_edge,ref) =>
+    case NewGame(name,n_players,player,game_area_edge,g_type,ref) =>
       logger.log("NewGame request (" + player.name + ")")
       game_name = name
       game_n_players = n_players
+      game_type = g_type
       val origin = sender
       var p = player
       // We store all ClientConnection actors for that particular game
       clientsConnections = clientsConnections :+ Tuple2(p,ref)
       // Wait for the backend succes response to new game request 
-      val future = backend ? NewGame(name,n_players,player,game_area_edge,self)
+      val future = backend ? NewGame(name,n_players,player,game_area_edge,g_type,self)
       future.onSuccess { 
         case GameHandler(game,ref) => 
           logger.log("GameManagerBackend path: "+sender.path)
@@ -76,11 +78,11 @@ class GameManagerClient (backend: ActorRef) extends Actor {
         val origin = sender
         val future = gameManagerBackend ? JoinGame(game,player)
         future.onSuccess { 
-          case Game(id,name,n_players, status,players,ghosts,treasures) => 
+          case Game(id,name,n_players, status,game_type,players,ghosts,treasures) => 
             logger.log("GameManagerBackend path: "+sender.path)
             // If the join has success add the ClientConnection actor to the others
             clientsConnections = clientsConnections :+ Tuple2(p,ccref)
-            var g = new Game(id,name,n_players,status,players,ghosts,treasures)
+            var g = new Game(id,name,n_players,status,game_type,players,ghosts,treasures)
             origin ! GameHandler(g,self)
         }
         future onFailure {
@@ -95,7 +97,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
         val origin = sender
         val future = gameManagerBackend ? ResumeGame(gameid,player,ref)
         future.onSuccess { 
-          case Game(id,name,n_players, status,players,ghosts,treasures) => 
+          case Game(id,name,n_players, status,game_type,players,ghosts,treasures) => 
             for (i <- 0 to clientsConnections.size-1) {
               if (clientsConnections(i)._1.uid == player.uid) {
                 // When a player resume a game after a connection trouble we update the ClientConnection actor
@@ -103,7 +105,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
                 clientsConnections(i) = clientsConnections(i).copy(_2 = ref)
               }
             }
-            var g = new Game(id,name,n_players,status,players,ghosts,treasures)
+            var g = new Game(id,name,n_players,status,game_type,players,ghosts,treasures)
             origin ! GameHandler(g,self)
         }
         future onFailure {
@@ -136,7 +138,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
        logger.log("Goodbye cruel cluster!")
        game_status = StatusGame.FINISHED
        if (clientsConnections.size > 0) {
-         var g = new Game(game_id,game_name,game_n_players,game_status,MutableList(),MutableList(),MutableList())
+         var g = new Game(game_id,game_name,game_n_players,game_status,game_type,MutableList(),MutableList(),MutableList())
          self ! GameStatusBroadcast(g)
        }
        sender ! KillMyself

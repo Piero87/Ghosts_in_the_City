@@ -39,7 +39,6 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
   implicit val ec = context.dispatcher
   var game_id = ""
   var team = Team.UNKNOWN
-  var player_type = PlayerType.UNKNOWN
   
   val logger = new CustomLogger("ClientConnection")
   logger.log("Ciao giocatore chiamato " + name + "!")
@@ -63,16 +62,10 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
             case s: JsSuccess[NewGameJSON] =>
               var p_pos = s.get.pos
               var game_area_edge = s.get.game_area_edge
+              var game_type = s.get.game_type
               logger.log("Player position: " + p_pos)
-              if(p_pos.latitude != 0.0 && p_pos.longitude != 0.0){
-                // Verify that the location that was sent is different from 0.0,0.0 (defeault for the web player) to determine if the client 
-                // is a wearable or not.
-                player_type = PlayerType.WEARABLE
-              }else{
-                player_type = PlayerType.WEB
-              }
-              var player_info = new PlayerInfo(uid,name,player_type,team,p_pos,0,List())
-              val future = frontendManager ? NewGame(s.get.name.replaceAll(" ", "_") + "__" + System.currentTimeMillis(),s.get.n_players,player_info,game_area_edge,self)
+              var player_info = new PlayerInfo(uid,name,team,p_pos,0,List())
+              val future = frontendManager ? NewGame(s.get.name.replaceAll(" ", "_") + "__" + System.currentTimeMillis(),s.get.n_players,player_info,game_area_edge,game_type,self)
               future.onSuccess {
                 case GameHandler(game,ref) => 
                   if (ref != null) gameManagerClient = ref
@@ -103,14 +96,7 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
           joinGameResult match {
             case s: JsSuccess[JoinGameJSON] =>
               var p_pos = s.get.pos
-              if(p_pos.latitude != 0.0 && p_pos.longitude != 0.0){
-                // Verify that the location that was sent is different from 0.0,0.0 (defeault for the web player) to determine if the client 
-                // is a wearable or not.
-                player_type = PlayerType.WEARABLE
-              }else{
-                player_type = PlayerType.WEB
-              }
-              var player_info = new PlayerInfo(uid,name,player_type,team,p_pos,0,List())
+              var player_info = new PlayerInfo(uid,name,team,p_pos,0,List())
               val future = frontendManager ? JoinGame(s.get.game,player_info,self)
               future.onSuccess {
                 case GameHandler(game,ref) =>  
@@ -137,7 +123,7 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
            val updatePositionResult: JsResult[UpdatePositionJSON] = msg.validate[UpdatePositionJSON](CommonMessages.updatePositionReads)
            updatePositionResult match {
             case s: JsSuccess[UpdatePositionJSON] =>
-              var PlayerInfo = new PlayerInfo(uid,name,player_type, team, s.get.pos,0,List())
+              var PlayerInfo = new PlayerInfo(uid,name, team, s.get.pos,0,List())
               gameManagerClient ! UpdatePosition(PlayerInfo)
             case e: JsError => logger.log("UPDATE PLAYER POSITION ERROR: " + e.toString() + " FROM " + sender.path)
            }
@@ -147,7 +133,7 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
            resumeGameResult match {
             case s: JsSuccess[ResumeGameJSON] =>
               var p_pos = s.get.pos
-              var player_info = new PlayerInfo(uid,name,player_type,team,p_pos,0, List())
+              var player_info = new PlayerInfo(uid,name,team,p_pos,0, List())
               val future = frontendManager ? ResumeGame(s.get.game_id,player_info, self)
               future.onSuccess {
                 case GameHandler(game,ref) =>  
