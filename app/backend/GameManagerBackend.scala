@@ -461,6 +461,7 @@ class GameManagerBackend () extends Actor {
         logger.log("randomPositionsInSpace is done!")
         
         for(i <- 0 to game_n_players-1) {
+          logger.log("Player [" + (i+1) + "] position: " + position_players(i))
           val player = players(i)._1
           val p = new PlayerInfo(player.uid,player.name,player.team,Point(position_players(i).latitude,position_players(i).longitude),player.gold,player.keys)
         }
