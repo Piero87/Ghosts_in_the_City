@@ -73,8 +73,8 @@ class Backend extends Actor {
     case NewGame(name,n_players,player,game_area_edge,game_type,ref) =>
       logger.log("NewGame request")
       newGame(name,n_players,player,game_area_edge,game_type,ref)
-    case GamesList =>
-      gamesList(sender)
+    case GamesListFiltered(game_type) =>
+      gamesList(sender, game_type)
     case Terminated(a) =>
       game_manager_backends = game_manager_backends.filterNot(_ == a)
       
@@ -100,7 +100,7 @@ class Backend extends Actor {
    * It asks to the GameManagerBackend actors saved in game_manager_backends list all the game with waiting status.
    * All the Game object are received like Future objet.
    */
-  def gamesList (origin: ActorRef) = {
+  def gamesList (origin: ActorRef, game_type: String) = {
     logger.log("GameList request")
     implicit val ec = context.dispatcher
     val taskFutures: List[Future[Game]] = game_manager_backends map { gm_be =>
@@ -112,7 +112,7 @@ class Backend extends Actor {
     val searchFuture = Future sequence taskFutures
     
     searchFuture.onSuccess {
-      case results: List[Game] => origin ! results.filter( _.status == StatusGame.WAITING )
+      case results: List[Game] => origin ! results.filter(x => x.status == StatusGame.WAITING && x.g_type == game_type)
     }
     
   }

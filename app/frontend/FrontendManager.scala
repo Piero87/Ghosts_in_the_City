@@ -30,8 +30,8 @@ class FrontendManager extends Actor {
     case NewGame(name,n_players,player,game_area_edge,game_type,ref) =>
       logger.log("NewGame request")
       newGame(name,n_players,player,game_area_edge,game_type,ref)
-    case GamesList =>
-      gamesList(sender)
+    case GamesListFiltered(game_type) =>
+      gamesList(sender,game_type)
     case JoinGame(game,player,ref) =>
       game_manager_frontends.map {gm_fe =>
         gm_fe forward JoinGame(game,player,ref)
@@ -78,14 +78,14 @@ class FrontendManager extends Actor {
   
   /**
    * Game List method.
-   * It ask to all backends the games list that they held.
+   * It ask to all backends the games list that they held filtered by game_type.
    */
-  def gamesList (origin: ActorRef) = {
+  def gamesList (origin: ActorRef, game_type: String) = {
     
     // Timeout refers to the answer waiting time to the ask command( ? )
     val taskFutures: List[Future[List[Game]]] = backends map { be =>
         implicit val timeout = Timeout(5 seconds)
-        (be ? GamesList).mapTo[List[Game]]
+        (be ? GamesListFiltered(game_type)).mapTo[List[Game]]
     }
     implicit val ec = context.dispatcher
     val searchFuture = Future sequence taskFutures

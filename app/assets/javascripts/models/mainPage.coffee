@@ -320,6 +320,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 		gamesList: ->
 			@ws.send(JSON.stringify
 				event: "games_list"
+				g_type: "web"
 			)
 		
 		# Join Game 

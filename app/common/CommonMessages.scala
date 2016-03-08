@@ -139,7 +139,7 @@ case class PauseGame(uid: String)
 case class NewGame(name: String, n_players: Int, player: PlayerInfo, game_area_edge: Double, game_type: String, ref: ActorRef = null)
 case class Game(id: String, name: String, n_players: Int, status: Int, g_type: String, players: MutableList[PlayerInfo], ghosts: MutableList[GhostInfo], treasures: MutableList[TreasureInfo])
 case class GamesList(list: List[Game])
-case object GamesList
+case class GamesListFiltered(game_type: String)
 case object GameStatus
 case class BroadcastVictoryResponse(team: Int,players: List[PlayerInfo])
 
@@ -154,7 +154,7 @@ case object CheckPaused
 case class NewGameJSON(event: String, name: String, pos: Point, game_area_edge: Double, n_players: Int, game_type: String)
 case class GameJSON(event: String, game: Game)
 case class GamesListResponseJSON(event: String, list: List[Game])
-case class GamesListRequestJSON(event: String)
+case class GamesListRequestJSON(event: String, g_type: String)
 case class JoinGameJSON(event: String, game: Game, pos: Point)
 case class LeaveGameJSON(event: String)
 case class ResumeGameJSON(event:String, game_id: String, pos: Point)

@@ -83,12 +83,18 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
           }
           
         case "games_list" =>
-          val future = frontendManager ? GamesList
-          future.onSuccess {
-            case GamesList(list) =>
-              var games_list_json = new GamesListResponseJSON("games_list",list)
-              val json = Json.toJson(games_list_json)(CommonMessages.gamesListResponseWrites)
-              upstream ! json
+          val gameListRequest: JsResult[GamesListRequestJSON] = msg.validate[GamesListRequestJSON](CommonMessages.gamesListRequestReads)
+          gameListRequest match {
+            case s: JsSuccess[GamesListRequestJSON] =>
+              var game_type = s.get.g_type
+              val future = frontendManager ? GamesListFiltered(game_type)
+              future.onSuccess {
+                case GamesList(list) =>
+                var games_list_json = new GamesListResponseJSON("games_list",list)
+                val json = Json.toJson(games_list_json)(CommonMessages.gamesListResponseWrites)
+                upstream ! json
+              }
+            case e: JsError => logger.log("NEW GAME ERROR: " + e.toString() + " FROM " + sender.path)
           }
           
         case "join_game" =>
