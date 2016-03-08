@@ -27,14 +27,14 @@ object UtilFunctions {
   val max_try = 100
   val logger = new CustomLogger("UtilFunctions")
   
-  def randomPositionInSpace(rect_space: Rectangle, permitted_area: Polygon): Point = {
+  def randomPositionInSpace(rect_space: Rectangle, permitted_area: Polygon, margin: Double): Point = {
     logger.log("Space: " + rect_space)
     var safety_check = max_try
     val rnd = new Random()
     var point : Point = null
     do {
-      var lat = rect_space.origin.latitude + ( rect_space.width * rnd.nextDouble() )
-      var lng = rect_space.origin.longitude + ( rect_space.height * rnd.nextDouble() )
+      var lat = rect_space.origin.latitude + ( (rect_space.width-margin) * rnd.nextDouble() )
+      var lng = rect_space.origin.longitude + ( (rect_space.height-margin) * rnd.nextDouble() )
       point = new Point(lat,lng)
       logger.log("randomPositionInSpace - attempt: " + (max_try - safety_check) + ", point: " + point)
       safety_check -= 1
@@ -45,18 +45,8 @@ object UtilFunctions {
     logger.log("randomPositionInSpace - point: " + point)
     return point
   }
+  
   /*
-  def randomPositionsInSpace(space: Rectangle, n_positions: Int): Array[Point] = {
-    val rnd = new Random()
-    var pos = new Array[Point](n_positions)
-    for(i <- 0 to (n_positions-1)){
-      var lat = space.origin.latitude + ( space.width * rnd.nextDouble() )
-    var lng = space.origin.longitude + ( space.height * rnd.nextDouble() )
-      pos(i) = Point(lat,lng)
-    }
-    return pos 
-  }
-  */
   def randomPositionsInSpace(rect_space: Rectangle, permitted_area: Polygon, n_positions: Int): Array[Point] = {
     var safety_check = max_try
     var pos = new Array[Point](n_positions)
@@ -77,7 +67,7 @@ object UtilFunctions {
     }
     return pos
   }
-  /*
+  
   def randomPositionAroundPoint(point : Point) : Point = {
     var icon_size = ConfigFactory.load().getInt("icon_size")
     var treasure_radius = ConfigFactory.load().getInt("treasure_radius")
