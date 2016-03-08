@@ -452,7 +452,8 @@ class GameManagerBackend () extends Actor {
     try {
       var spaces = UtilFunctions.createSpaces(n_treasures_and_ghosts, game_area)
       
-      // Only if game type is equal to "web" I will create random position for players 
+      // Only if game type is equal to "web" I will create random position for players
+      logger.log(game_type)
       if(game_type == GameType.WEB){
         var position_players = new Array[Point](game_n_players)
         position_players = UtilFunctions.randomPositionsInSpace(spaces(spaces.length - 1), game_area, n_treasures_and_ghosts-1)
