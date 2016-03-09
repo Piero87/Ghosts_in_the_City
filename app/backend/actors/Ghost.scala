@@ -114,6 +114,8 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
     
     var gold_available = smellPlayerGold(player_info)
     var player_distance = ghostpos.distanceFrom(player_info.pos, game_type)
+    logger.log("GHOST '" + uid + "' IS MAD!")
+    logger.log("Distance to player: " + player_distance)
     
     if (player_distance <= GameParameters.max_action_distance && gold_available > 0) {
       
@@ -137,7 +139,7 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
       
       var new_position : Point = ghostpos.stepTowards(player_info.pos, GameParameters.ghost_step, game_type)
       
-      logger.log("GHOST '" + uid + "' IS MAD! Current position: " + ghostpos)
+      logger.log("Current ghost position: " + ghostpos)
       
       if ( acceptablePosition(new_position) ) {
         ghostpos = position
@@ -246,7 +248,9 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
   
   def acceptablePosition(position: Point) : Boolean = {
     if (arena.contains(position)) {
+      logger.log("position contained")
       if (level == 3 || position.distanceFrom(position_treasure, game_type) >= GameParameters.treasure_radius) {
+        logger.log("movement permitted")
         return true
       }
     }
