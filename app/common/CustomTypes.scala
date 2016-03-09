@@ -106,6 +106,9 @@ sealed case class Point(latitude: Double, longitude: Double){
   }
   
   private def angle_rad_to(p: Point): Double = {
+    
+    System.out.println("target position: " + p)
+    
     val delta_lat = p.latitude - latitude
     val delta_lng = p.longitude - longitude
     
