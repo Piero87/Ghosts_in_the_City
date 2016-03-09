@@ -166,22 +166,8 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
   
   def random_move() = {
     
-    val MAX_ATTEMPTS = 100
-    var attempts = 0
-    var new_position: Point = null
-    var good_position = false
-    do {
-      new_position = ghostpos.randomStep(GameParameters.ghost_step, game_type)
-      attempts += 1
-      
-      if (arena.contains(position)) {
-      if (level == 3 || position.distanceFrom(position_treasure, game_type) >= GameParameters.treasure_radius) {
-        good_position = true
-      }
-    }
-      
-    } while (!good_position && attempts != MAX_ATTEMPTS)
-      
+    var new_position = ghostpos.randomStep(GameParameters.ghost_step, game_type)
+    
     if (arena.contains(position)) {
       if (level == 3 || position.distanceFrom(position_treasure, game_type) >= GameParameters.treasure_radius) {
         updatePosition(new_position)
