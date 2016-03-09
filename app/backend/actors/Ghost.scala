@@ -157,6 +157,7 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
     
     var new_position : Point = ghostpos.stepTowards(position_treasure, GameParameters.ghost_step, game_type)
     
+    ghostpos = new_position
     GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
   }
   
@@ -174,6 +175,9 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
       new_position = ghostpos.randomStep(GameParameters.ghost_step, game_type)
       attempts += 1
     } while (!acceptablePosition(new_position) && attempts != MAX_ATTEMPTS)
+      
+    ghostpos = new_position
+    GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
     
     /*
     val rnd = new Random()
@@ -248,9 +252,7 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
   
   def acceptablePosition(position: Point) : Boolean = {
     if (arena.contains(position)) {
-      logger.log("position contained")
       if (level == 3 || position.distanceFrom(position_treasure, game_type) >= GameParameters.treasure_radius) {
-        logger.log("movement permitted")
         return true
       }
     }
