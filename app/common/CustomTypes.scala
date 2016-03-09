@@ -153,9 +153,9 @@ sealed case class Point(latitude: Double, longitude: Double){
   def stepTowards(p: Point, length: Double, game_type: String): Point = {
     
     if (game_type == GameType.REALITY) {
-      return real_step_to(angle_rad_to(p), length)
+      return real_step_to(bearing_rad_to(p), length)
     } else {
-      return virtual_step_to(bearing_rad_to(p), length)
+      return virtual_step_to(angle_rad_to(p), length)
     }
     
   }
