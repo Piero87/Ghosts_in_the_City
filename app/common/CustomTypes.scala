@@ -1,16 +1,171 @@
 package common
 
 import scala.collection.mutable
+import com.typesafe.config.ConfigFactory
+import scala.util.Random
+
+sealed case class GameParameters(game_type: String){
+  
+  // **** GAME ARENA ****
+  
+  val canvas_width = ConfigFactory.load().getDouble("canvas_width")
+  val canvas_height = ConfigFactory.load().getDouble("canvas_height")
+  val canvas_margin = if (game_type == GameType.REALITY) {
+                          ConfigFactory.load().getDouble("real_margin") 
+                      } else { 
+                          ConfigFactory.load().getDouble("web_margin")
+                      }
+  
+  
+  // **** GHOSTS ****
+  
+  val ghost_step = if (game_type == GameType.REALITY) {
+                            ConfigFactory.load().getDouble("real_ghost_step") 
+                        } else { 
+                            ConfigFactory.load().getDouble("web_ghost_step")
+                        }
+  val ghost_radius = if (game_type == GameType.REALITY) {
+                          ConfigFactory.load().getDouble("real_ghost_radius") 
+                      } else { 
+                          ConfigFactory.load().getDouble("web_ghost_radius")
+                      }
+  val ghost_hunger = Array(0.0,
+                           ConfigFactory.load().getDouble("ghost_hunger_level1"),
+                           ConfigFactory.load().getDouble("ghost_hunger_level2"),
+                           ConfigFactory.load().getDouble("ghost_hunger_level3"))
+  
+  // **** TREASURES ****
+                           
+  val treasure_radius = if (game_type == GameType.REALITY) {
+                            ConfigFactory.load().getDouble("real_ghost_radius") 
+                        } else { 
+                            ConfigFactory.load().getDouble("web_ghost_radius")
+                        }
+  val min_treasure_gold = ConfigFactory.load().getDouble("min_treasure_gold")
+  val max_treasure_gold = ConfigFactory.load().getDouble("max_treasure_gold")
+  val ghosts_per_treasure = ConfigFactory.load().getDouble("ghosts_per_treasure")
+  
+  // **** TRAP ****
+  
+  val trap_radius = if (game_type == GameType.REALITY) {
+                        ConfigFactory.load().getDouble("real_trap_radius") 
+                    } else { 
+                        ConfigFactory.load().getDouble("web_trap_radius")
+                    }
+  
+  // **** PLAYERS ****
+  val initial_gold = ConfigFactory.load().getDouble("initial_gold")
+  
+  // **** OTHERS ****
+  val max_attack_distance = if (game_type == GameType.REALITY) {
+                                ConfigFactory.load().getDouble("real_max_attack_distance") 
+                            } else { 
+                                ConfigFactory.load().getDouble("web_max_attack_distance")
+                            }
+}
+
+
+// Custom Exceptions
 
 class PointOutOfPolygonException(message: String = null, cause: Throwable = null) extends RuntimeException(message, cause)
+
+// Geometric and Spacial types
 
 sealed case class Point(latitude: Double, longitude: Double){
   
   // latitude == x
   // longitude == y
+  val latitude_rad = Math.toRadians(latitude)
+  val longitude_rad = Math.toRadians(longitude)
   
-  def distanceFrom(p: Point): Double = {
+  private def pixelsFrom(p: Point): Double = {
     Math.sqrt(Math.pow((p.latitude - latitude),2) + Math.pow((p.longitude - longitude),2))
+  }
+  
+  private def metersFrom(p: Point): Double = {
+    var R = 6371010; // metres
+    var φ1 = Math.toRadians(latitude)
+    var φ2 = Math.toRadians(p.latitude)
+    var Δφ = Math.toRadians(p.latitude - latitude)
+    var Δλ = Math.toRadians(p.longitude - longitude)
+    
+    var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+            Math.cos(φ1) * Math.cos(φ2) *
+            Math.sin(Δλ/2) * Math.sin(Δλ/2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    
+    R * c;
+  }
+  
+  def distanceFrom(p: Point, game_type: String): Double = {
+    if (game_type == GameType.REALITY) {
+      return metersFrom(p)
+    } else {
+      return pixelsFrom(p)
+    }
+  }
+  
+  private def angle_rad_to(p: Point): Double = {
+    val delta_lat = p.latitude - latitude
+    val delta_lng = p.longitude - longitude
+    
+    Math.atan2( delta_lng , delta_lat )
+  }
+  
+  private def virtual_step_to(angle_rad: Double, pixels: Double): Point = {
+    
+    val new_lat = latitude + Math.sin( angle_rad ) * pixels
+    val new_lng = longitude + Math.cos( angle_rad ) * pixels
+    
+    new Point(new_lat, new_lng)
+    
+  }
+  
+  private def bearing_rad_to(p: Point): Double = {
+    
+    val delta_lng = p.longitude - longitude
+    
+    Math.atan2( Math.sin(delta_lng) * Math.cos(p.latitude_rad),
+                Math.cos(latitude_rad) * Math.sin(p.latitude_rad) - Math.sin(latitude_rad) * Math.cos(p.latitude_rad)*Math.cos(delta_lng))
+  }
+  
+  private def real_step_to(bearing_rad: Double, meters: Double): Point = {
+    
+    // lat2: =ASIN(SIN(lat1)*COS(d/R) + COS(lat1)*SIN(d/R)*COS(brng))
+    // lon2: =lon1 + ATAN2(COS(d/R)-SIN(lat1)*SIN(lat2), SIN(brng)*SIN(d/R)*COS(lat1))
+    
+    val R = UtilFunctions.EARTH_RADIUS;
+    
+    val new_latitude_rad = Math.asin( Math.sin(latitude_rad) * Math.cos( meters / R ) +
+                                      Math.cos(latitude_rad) * Math.sin( meters / R ) * Math.cos(bearing_rad) )
+    val new_longitude_rad = longitude + Math.atan2( Math.cos( meters / R ) - Math.sin(latitude_rad) * Math.sin(new_latitude_rad), 
+                                                    Math.cos(latitude_rad) * Math.sin( meters / R ) * Math.cos(bearing_rad) )
+    
+    new Point( Math.toDegrees(new_latitude_rad), Math.toDegrees(new_longitude_rad) )
+    
+  }
+  
+  def stepTowards(p: Point, length: Double, game_type: String): Point = {
+    
+    if (game_type == GameType.REALITY) {
+      return real_step_to(angle_rad_to(p), length)
+    } else {
+      return virtual_step_to(bearing_rad_to(p), length)
+    }
+    
+  }
+  
+  def randomStep(length: Double, game_type: String): Point = {
+    
+    val rnd = new Random()
+    val radians = rnd.nextFloat() * 2 * Math.PI;
+    
+    if (game_type == GameType.REALITY) {
+      return real_step_to(radians, length)
+    } else {
+      return virtual_step_to(radians, length)
+    }
+    
   }
   
   def convertToReality(canvas: Rectangle, reality: Rectangle) : Point = {
@@ -32,36 +187,40 @@ sealed case class Point(latitude: Double, longitude: Double){
 }
 
 object Vertex {
-  def createVertexWithNewLat(p: Point, d: Double): Point = {
-    val r_earth = 6371
-    var new_lat = p.latitude + (d/r_earth) * (180/Math.PI)
-    var vertex = new Point(new_lat,p.longitude)
-    vertex
+  
+  def createVertexWithNewLat(p: Point, dist_meters: Double): Point = {
+    
+    val r_earth = UtilFunctions.EARTH_RADIUS
+    val delta_lat = Math.toDegrees(dist_meters/r_earth)
+    
+    val new_lat = p.latitude + delta_lat
+    return new Point(new_lat,p.longitude)
+    
   }
-  def createVertexWithNewLong(p: Point, d: Double): Point = {
-    val r_earth = 6371
-    var new_lon = p.longitude + (d/r_earth) * (180/Math.PI) / Math.cos(p.latitude * Math.PI/180)
-    var vertex = new Point(p.latitude,new_lon)
-    vertex
+  
+  def createVertexWithNewLong(p: Point, dist_meters: Double): Point = {
+    
+    val r_earth = UtilFunctions.EARTH_RADIUS
+    val delta_lng = Math.toDegrees( (dist_meters/r_earth) / Math.cos(p.latitude_rad) )
+    
+    val new_lng = p.longitude + delta_lng
+    return new Point(p.latitude,new_lng)
+    
   }
-  def createVertexWithNewLatLong(p: Point, d: Double): Point = {
-    val r_earth = 6371
-    var new_lat = p.latitude + (d/r_earth) * (180/Math.PI)
-    var new_lon = p.longitude + (d/r_earth) * (180/Math.PI) / Math.cos(p.latitude * Math.PI/180)
-    var vertex = new Point(new_lat,new_lon)
-    vertex
+  
+  def createVertexWithNewLatLong(p: Point, dist_meters: Double): Point = {
+    
+    val r_earth = UtilFunctions.EARTH_RADIUS
+    val delta_lat = Math.toDegrees(dist_meters/r_earth)
+    val delta_lng = Math.toDegrees( (dist_meters/r_earth) / Math.cos(p.latitude_rad) )
+    
+    val new_lat = p.latitude + delta_lat
+    val new_lng = p.longitude + delta_lng
+    return new Point(new_lat,new_lng)
+    
   }
+  
 }
-
-/*
- * O--------------------------A
- * |													|
- * |													|
- * |													|
- * C--------------------------B
- * 
- * O = origin
- */
 
 sealed case class Rectangle(origin: Point, width: Double, height: Double){
   

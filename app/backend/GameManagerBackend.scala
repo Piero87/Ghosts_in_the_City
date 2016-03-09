@@ -32,20 +32,9 @@ class GameManagerBackend () extends Actor {
   var game_type = GameType.UNKNOWN
   
   var paused_players:MutableList[Tuple2[String, Long]] = MutableList()
-  val icon_size = ConfigFactory.load().getDouble("icon_size")
-  val initial_gold = ConfigFactory.load().getDouble("initial_gold").toInt
-  val ghost_level1_damage = ConfigFactory.load().getDouble("ghost_hunger_level1")
-  val ghost_level2_damage = ConfigFactory.load().getDouble("ghost_hunger_level2")
-  val ghost_level3_damage = ConfigFactory.load().getDouble("ghost_hunger_level3")
-  val min_treasure_gold = ConfigFactory.load().getInt("min_treasure_gold")
-  val max_treasure_gold = ConfigFactory.load().getInt("max_treasure_gold")
-  val ghosts_per_treasure = ConfigFactory.load().getInt("ghosts_per_treasure")
-  val arena_width = ConfigFactory.load().getDouble("space_width")
-  val arena_height = ConfigFactory.load().getDouble("space_height")
-  val treasure_radius = ConfigFactory.load().getDouble("treasure_radius")
-  val ghost_radius = ConfigFactory.load().getDouble("ghost_radius")
-  val trap_radius = ConfigFactory.load().getDouble("trap_radius")
   var game_area = new Polygon(List())
+  
+  var game_params: GameParameters = null
   
   val logger = new CustomLogger("GameManagerBackend")
   
@@ -74,13 +63,16 @@ class GameManagerBackend () extends Actor {
         var vertexC = Vertex.createVertexWithNewLong(player.pos, ga_edge)
         game_area = new Polygon(List(player.pos,vertexA,vertexB,vertexC))
       } else {
-        game_area = new Polygon(List(new Point(0, 0), new Point(arena_width, 0), new Point(arena_width, arena_height), new Point(0, arena_height)))
+        game_area = new Polygon(List(new Point(0, 0), 
+                                     new Point(game_params.canvas_width, 0), 
+                                     new Point(game_params.canvas_width, game_params.canvas_height), 
+                                     new Point(0, game_params.canvas_height)))
       }
       game_status = StatusGame.WAITING
       logger.log("GMBackend NewGame From: "+ref.toString())
       gameManagerClient = ref
       var rnd_team = selectTeam()
-      val p = new PlayerInfo(player.uid,player.name,rnd_team,player.pos,initial_gold,List())
+      val p = new PlayerInfo(player.uid, player.name, rnd_team, player.pos, game_params.initial_gold, List())
       players = players :+ Tuple2(p,null)
       val tmp_g = ghosts.map(x => x._1)
       val tmp_t = treasures.map(x => x._1)
@@ -177,7 +169,7 @@ class GameManagerBackend () extends Actor {
       var ghost_mood = mood
       var ghost_point = point
       for (i <- 0 to traps.size-1) {
-        var distance = point.distanceFrom(traps(i).pos)
+        var distance = point.distanceFrom(traps(i).pos, game_type)
         if (traps(i).status == TrapStatus.IDLE && distance <= trap_radius) {
           /* La trappola traps(i) ha catturato un fantasma!
            * Settiamo il fantasma come TRAPPED, lo spostiamo forzatamente
@@ -267,7 +259,7 @@ class GameManagerBackend () extends Actor {
       
     case OpenTreasureRequest(uid) =>
       var player = players.filter(_._1.uid == uid).head
-      var t_actorref_list = (treasures.filter(_._1.pos.distanceFrom(player._1.pos) <= icon_size/2)).map(x => x._2).toList
+      var t_actorref_list = (treasures.filter(_._1.pos.distanceFrom(player._1.pos, game_type) <= icon_size/2)).map(x => x._2).toList
       if (t_actorref_list.size != 0 ) {
         player._2 ! OpenTreasure(t_actorref_list,player._1)
       } else {
@@ -388,7 +380,7 @@ class GameManagerBackend () extends Actor {
       var player = players.filter(_._1.uid == uid).head
       logger.log("Hit player request from: " + player._1.name)
       var other_players = players.filterNot(_._1.uid == uid)
-      var p_actorref_list = (other_players.filter(_._1.pos.distanceFrom(player._1.pos) <= icon_size/2)).map(x => x._2).toList
+      var p_actorref_list = (other_players.filter(_._1.pos.distanceFrom(player._1.pos, game_type) <= icon_size/2)).map(x => x._2).toList
       if (p_actorref_list.size != 0 ) {
         player._2 ! AttackHim(p_actorref_list.head)
       }
@@ -450,6 +442,7 @@ class GameManagerBackend () extends Actor {
     var n_free_ghosts = game_n_players + 1
     
     try {
+      game_params = new GameParameters(game_type)
       var spaces = UtilFunctions.createSpaces(n_treasures_and_ghosts, game_area)
       
       logger.log(game_type)
@@ -540,7 +533,7 @@ class GameManagerBackend () extends Actor {
           var ghost_id = randomString(8)
           var p_g = new Point (ghost_postion.latitude,ghost_postion.longitude)
           val g_level = rnd.nextInt(2)+1
-          val ghost = context.actorOf(Props(new Ghost(ghost_id,game_area,p_g,g_level,treasures.last._2,pos_t,treasure_id)), name = ghost_id)
+          val ghost = context.actorOf(Props(new Ghost(ghost_id, game_area, p_g, g_level, treasures.last._2, pos_t, treasure_id, game_type)), name = ghost_id)
           var ghost_info = new GhostInfo(ghost_id,g_level,GhostMood.CALM,p_g)
           ghosts = ghosts :+ Tuple2(ghost_info,ghost)
         }
@@ -556,7 +549,7 @@ class GameManagerBackend () extends Actor {
         var free_ghost_id = randomString(8)
         var free_p_g = new Point (free_ghost_postion.latitude, free_ghost_postion.longitude)
         val n_treasure = rnd.nextInt(treasures.size)
-        val free_ghost = context.actorOf(Props(new Ghost(free_ghost_id,game_area,free_p_g,3,treasures(n_treasure)._2,treasures(n_treasure)._1.pos,treasures(n_treasure)._1.uid)), name = free_ghost_id)
+        val free_ghost = context.actorOf(Props(new Ghost(free_ghost_id, game_area, free_p_g, 3, treasures(n_treasure)._2, treasures(n_treasure)._1.pos, treasures(n_treasure)._1.uid, game_type)), name = free_ghost_id)
         var free_ghost_info = new GhostInfo(free_ghost_id,3,GhostMood.CALM,free_p_g)
         ghosts = ghosts :+ Tuple2(free_ghost_info,free_ghost)
       }
