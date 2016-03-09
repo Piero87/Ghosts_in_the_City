@@ -280,7 +280,6 @@ define () ->
 				area_longitude =  @ghosts[i].longitude - (@ghost_radius * @ghosts[i].level)
 				
 				if (@debug)
-					console.log("debug attivato!")
 					# Drawings
 					@ctx.drawImage(
 						@sensible_area
