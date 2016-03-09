@@ -41,9 +41,9 @@ sealed case class GameParameters(game_type: String){
                         } else { 
                             ConfigFactory.load().getDouble("web_ghost_radius")
                         }
-  val min_treasure_gold = ConfigFactory.load().getDouble("min_treasure_gold")
-  val max_treasure_gold = ConfigFactory.load().getDouble("max_treasure_gold")
-  val ghosts_per_treasure = ConfigFactory.load().getDouble("ghosts_per_treasure")
+  val min_treasure_gold = ConfigFactory.load().getInt("min_treasure_gold")
+  val max_treasure_gold = ConfigFactory.load().getInt("max_treasure_gold")
+  val ghosts_per_treasure = ConfigFactory.load().getInt("ghosts_per_treasure")
   
   // **** TRAP ****
   
@@ -54,13 +54,13 @@ sealed case class GameParameters(game_type: String){
                     }
   
   // **** PLAYERS ****
-  val initial_gold = ConfigFactory.load().getDouble("initial_gold")
+  val initial_gold = ConfigFactory.load().getInt("initial_gold")
   
   // **** OTHERS ****
-  val max_attack_distance = if (game_type == GameType.REALITY) {
-                                ConfigFactory.load().getDouble("real_max_attack_distance") 
+  val max_action_distance = if (game_type == GameType.REALITY) {
+                                ConfigFactory.load().getDouble("real_max_action_distance") 
                             } else { 
-                                ConfigFactory.load().getDouble("web_max_attack_distance")
+                                ConfigFactory.load().getDouble("web_max_action_distance")
                             }
 }
 

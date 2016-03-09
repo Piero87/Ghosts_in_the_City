@@ -91,7 +91,7 @@ class GameManagerBackend () extends Actor {
         // Scegliamo un Team Random Blu o Rosso
         var rnd_team = selectTeam()
         
-        val p = new PlayerInfo(player.uid,player.name,rnd_team,player.pos,initial_gold,List())
+        val p = new PlayerInfo(player.uid,player.name,rnd_team,player.pos,game_params.initial_gold,List())
         players = players :+ Tuple2(p,null)
         val tmp_g = ghosts.map(x => x._1)
         val tmp_t = treasures.map(x => x._1)
@@ -170,7 +170,7 @@ class GameManagerBackend () extends Actor {
       var ghost_point = point
       for (i <- 0 to traps.size-1) {
         var distance = point.distanceFrom(traps(i).pos, game_type)
-        if (traps(i).status == TrapStatus.IDLE && distance <= trap_radius) {
+        if (traps(i).status == TrapStatus.IDLE && distance <= game_params.trap_radius) {
           /* La trappola traps(i) ha catturato un fantasma!
            * Settiamo il fantasma come TRAPPED, lo spostiamo forzatamente
            * dentro la trappola e iniziamo a contare 10 secondi per poi 
@@ -259,7 +259,7 @@ class GameManagerBackend () extends Actor {
       
     case OpenTreasureRequest(uid) =>
       var player = players.filter(_._1.uid == uid).head
-      var t_actorref_list = (treasures.filter(_._1.pos.distanceFrom(player._1.pos, game_type) <= icon_size/2)).map(x => x._2).toList
+      var t_actorref_list = (treasures.filter(_._1.pos.distanceFrom(player._1.pos, game_type) <= game_params.max_action_distance)).map(x => x._2).toList
       if (t_actorref_list.size != 0 ) {
         player._2 ! OpenTreasure(t_actorref_list,player._1)
       } else {
@@ -380,7 +380,7 @@ class GameManagerBackend () extends Actor {
       var player = players.filter(_._1.uid == uid).head
       logger.log("Hit player request from: " + player._1.name)
       var other_players = players.filterNot(_._1.uid == uid)
-      var p_actorref_list = (other_players.filter(_._1.pos.distanceFrom(player._1.pos, game_type) <= icon_size/2)).map(x => x._2).toList
+      var p_actorref_list = (other_players.filter(_._1.pos.distanceFrom(player._1.pos, game_type) <= game_params.max_action_distance)).map(x => x._2).toList
       if (p_actorref_list.size != 0 ) {
         player._2 ! AttackHim(p_actorref_list.head)
       }
@@ -451,7 +451,7 @@ class GameManagerBackend () extends Actor {
         var player_pos = player.pos
         if (game_type == GameType.WEB){
           // Only if game type is equal to "web" I will create random position for players
-          margin = icon_size
+          margin = game_params.canvas_margin
           player_pos = UtilFunctions.randomPositionInSpace(spaces(spaces.length - 1), game_area, margin)
         }
         logger.log("Player [" + (i+1) + "] position: " + player_pos)
@@ -488,7 +488,7 @@ class GameManagerBackend () extends Actor {
         var treasure_id = randomString(8)
         
         val rnd = new Random()
-        var gold = rnd.nextInt(max_treasure_gold-min_treasure_gold)+min_treasure_gold
+        var gold = rnd.nextInt(game_params.max_treasure_gold - game_params.min_treasure_gold) + game_params.min_treasure_gold
         var pos_t = new Point (treasure_position.latitude,treasure_position.longitude)
         var treasure_info = new TreasureInfo(treasure_id,0,pos_t)
         
@@ -525,8 +525,8 @@ class GameManagerBackend () extends Actor {
           treasures = treasures :+ Tuple2(treasure_info,treasure)
         }
         
-        for(i <- 1 to ghosts_per_treasure){
-          var ghost_postion : Point = UtilFunctions.randomPositionAroundPoint(treasure_position, treasure_radius, game_area)
+        for(i <- 1 to game_params.ghosts_per_treasure){
+          var ghost_postion : Point = UtilFunctions.randomPositionAroundPoint(treasure_position, game_params.treasure_radius, game_area)
           logger.log("Ghost[" + i + "] position: ("+ ghost_postion.latitude +","+ ghost_postion.longitude +")")
           
           // Creazione dei due fantasmi a guardia dei tesori
