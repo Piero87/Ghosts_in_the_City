@@ -166,6 +166,38 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
          case "open_treasure" =>
            gameManagerClient ! OpenTreasureRequest(uid)
            
+         // Messages from admin client
+         case "admin_login" =>
+           val adminLoginResult: JsResult[AdminLoginJSON] = msg.validate[AdminLoginJSON](CommonMessages.adminLoginJSONReads)
+           adminLoginResult match {
+            case s: JsSuccess[AdminLoginJSON] =>
+              var a_name = s.get.name
+              var a_pwd = s.get.password
+              val future = frontendManager ? AdminLogin(a_name, a_pwd)
+              future.onSuccess {
+                case LoginResult(result) => 
+                  logger.log("Login result received")
+                  var l_json = new LoginResultJSON("login_result",result)
+                  val json = Json.toJson(l_json)(CommonMessages.loginResultJSONWrites)
+                  upstream ! json
+              }
+            case e: JsError => 
+              logger.log("ADMIN LOGIN ERROR: " + e.toString() + " FROM " + sender.path)
+           }
+         case "started_games_list" =>
+           logger.log("Admin game list request received")
+           val startedGameListRequest: JsResult[StartedGamesListRequestJSON] = msg.validate[StartedGamesListRequestJSON](CommonMessages.startedGamesListRequestReads)
+            startedGameListRequest match {
+            case s: JsSuccess[StartedGamesListRequestJSON] =>
+              val future = frontendManager ? StartedGamesList
+              future.onSuccess {
+                case GamesList(list) =>
+                var games_list_json = new GamesListResponseJSON("games_list",list)
+                val json = Json.toJson(games_list_json)(CommonMessages.gamesListResponseWrites)
+                upstream ! json
+              }
+            case e: JsError => logger.log("STARTED GAMES LIST ERROR: " + e.toString() + " FROM " + sender.path)
+          }
       }
       
     /*

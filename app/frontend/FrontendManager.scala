@@ -6,8 +6,10 @@ import common._
 import akka.pattern.ask
 import scala.concurrent.duration._
 import scala.concurrent.Future
+import util.control.Breaks._
 import scala.util.{Failure, Success}
 import backend.Backend
+
 
 /**
  * Actor FrontendManager implementation class.
@@ -41,7 +43,8 @@ class FrontendManager extends Actor {
        game_manager_frontends.map {gm_fe =>
          gm_fe forward ResumeGame(game_id,player,ref)
        } 
-    /* FrontendManager have to take trace of all active backends. 
+    /* 
+     * FrontendManager have to take trace of all active backends. 
      * That procedure is made by a registration request from the backend. 
 		 */
     case "BackendRegistration" if !backends.contains(sender()) =>
@@ -57,6 +60,14 @@ class FrontendManager extends Actor {
         logger.log("Backend removed")
         backends = backends.filterNot(_ == a)
       }
+      
+    // Admin Login stuff
+    case AdminLogin(name, password) => {
+      logger.log("Admin login request")
+      adminLogin(sender, name, password)
+    }
+    case StartedGamesList =>
+      startedGamesList(sender)
       
   }
   
@@ -94,4 +105,53 @@ class FrontendManager extends Actor {
       case results: List[List[Game]] => origin ! GamesList(results.flatten)
     }
   }
+  
+  /**
+   * Admin login method.
+   * It ask to all backends to verify the admin credentials sent.
+   * We will receive only the backend references in which the credentials were verified successfully
+   * and we save them into a MutableList. If the size of that list is equal to 0 we send back and error 
+   * message, otherwise we send a success message. 
+   */
+  def adminLogin(origin: ActorRef, name: String, password: String) = {
+    val taskFutures: List[Future[Boolean]] = backends map { be =>
+        implicit val timeout = Timeout(5 seconds)
+        (be ? AdminLogin(name,password)).mapTo[Boolean]
+    }
+    implicit val ec = context.dispatcher
+    val searchFuture = Future sequence taskFutures
+    
+    searchFuture.onSuccess {
+      case results: List[Boolean] =>
+        var logged = false
+        breakable {
+          for(b_ref <- results){
+            if(b_ref == true){
+             logged = true
+             break
+            }
+          }
+        }
+        // Send succes login message
+        origin ! LoginResult(logged)
+    }
+  }
+  
+  /**
+   * Started Game list method.
+   * It ask to all backends the started games list
+   */
+  def startedGamesList(origin: ActorRef) = {
+    val taskFutures: List[Future[List[Game]]] = backends map { be =>
+        implicit val timeout = Timeout(5 seconds)
+        (be ? StartedGamesList).mapTo[List[Game]]
+    }
+    implicit val ec = context.dispatcher
+    val searchFuture = Future sequence taskFutures
+    
+     searchFuture.onSuccess {
+      case results: List[List[Game]] => origin ! GamesList(results.flatten)
+    }
+  }
+  
 }

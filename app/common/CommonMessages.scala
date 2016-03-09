@@ -143,11 +143,16 @@ case class GamesListFiltered(game_type: String)
 case object GameStatus
 case class BroadcastVictoryResponse(team: Int,players: List[PlayerInfo])
 
-
 // Actor
 case object KillYourself
 case object KillMyself
 case object CheckPaused
+
+// All admin stuff messages
+case class AdminLogin(name: String, password: String)
+case class LoginResult(result: Boolean)
+case object StartedGamesList
+
 
 
 // Json
@@ -169,6 +174,11 @@ case class UpdatePlayerInfoJSON(event: String, player: PlayerInfo)
 case class MessageCodeJSON(event: String, code: Int, option: String)
 case class UpdateTreasureJSON(event: String, treasures: MutableList[TreasureInfo])
 case class VictoryResponseJSON(event: String, team: Int, players: List[PlayerInfo])
+
+// Admin Json
+case class AdminLoginJSON(event: String, name: String, password: String)
+case class LoginResultJSON(event: String, result: Boolean)
+case class StartedGamesListRequestJSON(event: String)
     
 import play.api.libs.json._
 
@@ -248,5 +258,14 @@ object CommonMessages {
   
   implicit val victoryResponseJSONReads = Json.reads[VictoryResponseJSON]
   implicit val victoryResponseJSONWrites = Json.writes[VictoryResponseJSON]
+  
+  implicit val adminLoginJSONReads = Json.reads[AdminLoginJSON]
+  implicit val adminLoginJSONWrites = Json.writes[AdminLoginJSON]
+  
+  implicit val loginResultJSONReads = Json.reads[LoginResultJSON]
+  implicit val loginResultJSONWrites = Json.writes[LoginResultJSON]
+  
+  implicit val startedGamesListRequestReads = Json.reads[StartedGamesListRequestJSON]
+  implicit val startedGamesListRequestWrites = Json.writes[StartedGamesListRequestJSON]
   
 }

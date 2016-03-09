@@ -44,6 +44,9 @@ class Backend extends Actor {
 
   import Backend._
   
+  val admin_name = "admin" // Magari inserirlo all'interno di conf 
+  val admin_pwd = "pwd"
+    
   val cluster = Cluster(context.system)
   var game_manager_backends: List[ActorRef] = List()
   
@@ -78,6 +81,12 @@ class Backend extends Actor {
     case Terminated(a) =>
       game_manager_backends = game_manager_backends.filterNot(_ == a)
       
+    // Admin stuff
+    case AdminLogin(name,password) =>
+      checkCredentials(sender,name,password)
+    case StartedGamesList =>
+      startedGamesList(sender)
+      
   }
 
   /**
@@ -98,7 +107,7 @@ class Backend extends Actor {
   /**
    * Game List method.
    * It asks to the GameManagerBackend actors saved in game_manager_backends list all the game with waiting status.
-   * All the Game object are received like Future objet.
+   * All the Game object are received like Future objet and before send them back they are filtered by game type.
    */
   def gamesList (origin: ActorRef, game_type: String) = {
     logger.log("GameList request")
@@ -124,4 +133,41 @@ class Backend extends Actor {
   def register(member: Member): Unit =
     if (member.hasRole("frontend"))
       context.actorSelection(RootActorPath(member.address) / "user" / "frontend") ! "BackendRegistration"
+      
+  /**
+   * Check credentials method.
+   * Verify the user login data received compared them with the backend admins parameters 
+   */
+   def checkCredentials(origin: ActorRef, name: String, password: String) ={
+      var result = false
+      logger.log("name: " + name + " pwd: " + password)
+      if(name.equals(admin_name)){
+        if(password.equals(admin_pwd)){
+          // Credentials verified successfully
+          result = true
+        }
+      }
+      logger.log("var result: " + result)
+      origin ! result
+      logger.log("Login result sent")
+    }
+  
+  /**
+   * Game List method.
+   * It asks to the GameManagerBackend actors saved in game_manager_backends list all the game with started status.
+   */
+  def startedGamesList (origin: ActorRef) = {
+    logger.log("GameList request")
+    implicit val ec = context.dispatcher
+    val taskFutures: List[Future[Game]] = game_manager_backends map { gm_be =>
+        implicit val timeout = Timeout(5 seconds)
+        (gm_be ? GameStatus).mapTo[Game]
+    }
+    val searchFuture = Future sequence taskFutures
+    
+    searchFuture.onSuccess {
+      case results: List[Game] => origin ! results.filter(x => x.status == StatusGame.STARTED)
+    }
+    
+  }
 }

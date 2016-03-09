@@ -15,6 +15,9 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			@adminName = ko.observable()
 			@adminPwd = ko.observable()
 			@admin = ko.observable(false)
+			@adminuid = ko.observable()
+			@adminpwd = ""
+			@notlogged = ko.observable(false)
 			
 			@music("on")
 			@sounds("on")
@@ -54,6 +57,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			
 			# The Web Socket
 			@ws = null
+			@adminws = null
 			
 			@disconnected = ko.observable(true)
 			@connected = ko.observable(false)
@@ -256,6 +260,69 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 						$("#game-result-won").show()
 					else 
 						$("#game-result-lost").show()
+		
+		# Admin Connect
+		adminConnect: ->
+			@connecting("Connecting...")
+			@disconnected(null)
+			
+			@adminws = new WebSocket(jsRoutes.controllers.Application.login(@adminName(), @adminuid()).webSocketURL())
+			
+			# When the websocket opens
+			@adminws.onopen = (event) =>
+				@connecting(null)
+				# Send login data to the server
+				console.log("Admin try to login")
+				@adminws.send(JSON.stringify
+					event: "admin_login"
+					name: @adminName()
+					password: @adminPwd()
+				)
+				
+			# When the websocket closes
+			@adminws.onclose = (event) =>
+				# Destroy everything and clean all
+				@disconnected(true)
+				@connected(false)
+				@closing = false
+				@playername()
+				localStorage.removeItem("admin")
+				
+			# Handle the stream
+			@adminws.onmessage = (event) =>
+				json = JSON.parse(event.data)
+				if json.event == "login_result"
+					console.log(json.result)
+					if(json.result)
+						@connecting(null)
+						@connected(true)
+						$("#ghostbusters-song").get(0).play()
+						# Setting the interval for refresh games list
+						callback = @startedGamesList.bind(this)
+						@interval = setInterval(callback, 1000)
+					else
+						@disconnected(true)
+						@connected(false)
+						@connecting(null)
+						@notlogged(true)
+						
+				else if json.event == "games_list"
+					#console.log('Games list received!')
+					@gameslist.removeAll()
+					if json.list.length > 0
+						@gamesavailable(true)
+						for game in json.list
+							game_details = game.name.split "__"
+							gamecreator = game_details[0].split("_").join(" ")
+							date = new Date(parseInt( game_details[1], 10 ));
+							hours = date.getHours()
+							minutes = "0" + date.getMinutes()
+							seconds = "0" + date.getSeconds()
+							gametime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2)
+							game.name = "Mission created by " + gamecreator + " at " + gametime
+							@gameslist.push(game)
+					else
+						@gamesavailable(false)
 					
 		# Toggle the background music
 		toggleMusic: ->
@@ -299,9 +366,8 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 		adminLogin: ->
 			if (@admin() == false)
 				@admin(true)
-			else
-				(@admin() == true)
-				@admin(false)	
+			else if (@admin() == true)
+				@admin(false)
 		
 		# The player clicked connect
 		submitPlayerName: ->
@@ -315,13 +381,12 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			
 		# Admin clicked connect
 		submitAdminData: ->
-			admin = @adminName()
-			pwd = @pwd()
-			@adminName(adminName)
-			@pwd(adminPwd)
+			@adminuid(@generateUID())
+			@playername(@adminName())
 			localStorage.setItem("admin", @adminName())
+			if(@notlogged() == true)
+				@notlogged(false)
 			@adminConnect()
-			
 		
 		# New Game 
 		newGame: ->
@@ -345,16 +410,31 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 				event: "games_list"
 				g_type: "web"
 			)
+			
+		# Admin Games list
+		startedGamesList: ->
+			@adminws.send(JSON.stringify
+				event: "started_games_list"
+			)
 		
 		# Join Game 
 		joinGame: (game) ->
-			@ws.send(JSON.stringify
-				event: "join_game"
-				game: game
-				pos:
-					latitude: parseInt( 0, 10 )
-					longitude: parseInt( 0, 10 )
-			)
+			if(@admin() != true)
+				@ws.send(JSON.stringify
+					event: "join_game"
+					game: game
+					pos:
+						latitude: parseInt( 0, 10 )
+						longitude: parseInt( 0, 10 )
+				)
+			else
+				@adminws.send(JSON.stringify
+					event: "join_game"
+					game: game
+					pos:
+						latitude: parseInt( 0, 10 )
+						longitude: parseInt( 0, 10 )
+				)
 		
 		# Resume Game
 		resumeGame: ->
@@ -370,7 +450,10 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 				@interval = null
 			@changeGameStatus(-1)
 			@closing = true
-			@ws.close()
+			if(@admin())
+				@adminws.close()
+			else
+				@ws.close()
 		
 		# Leave Game
 		leaveGame: ->

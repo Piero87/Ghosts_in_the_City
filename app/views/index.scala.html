@@ -24,7 +24,7 @@
                 	<li data-bind="ifnot: disconnected, click: toggleMusic"><a class="ghostbuster-font" href="javascript:void(0);">Music: <span data-bind="text: music"></span></a></li>
                 	<li data-bind="ifnot: disconnected, click: toggleSounds"><a class="ghostbuster-font" href="javascript:void(0);">Sounds: <span data-bind="text: sounds"></span></a></li>
                     <li data-bind="ifnot: disconnected, click: disconnect"><a class="ghostbuster-font" href="javascript:void(0);">Disconnect</a></li>
-                    <li data-bind="click: adminLogin"><a class="ghostbuster-font" href="javascript:void(0);">Control Center</a></li>
+                    <li data-bind="ifnot: connected, click: adminLogin"><a class="ghostbuster-font" href="javascript:void(0);">Control Center</a></li>
                 </ul>
             </div>
         </nav>
@@ -59,15 +59,21 @@
 	                <div class="form-group">
 	                    <input type="text" class="form-control" data-bind="value: adminName" placeholder="Name"/>
 	                    <br>
-	                    <input type="text" class="form-control" data-bind="value: adminPwd" placeholder="Password"/>
+	                    <input type="password" class="form-control" data-bind="value: adminPwd" placeholder="Password"/>
 	                    <button class="btn ghostbuster-font font-big" type="submit">Login</button>
 	                </div>
 	            </form>
             </div>
         </div>
+        
+        <br>
 
         <div data-bind="visible: connecting" align="center">
             <span data-bind="text: connecting" class="ghostbuster-font font-big">Connecting...</span>
+        </div>
+        
+        <div data-bind="visible: notlogged" align="center">
+            <span class="text-red">Wrong login data! Try again...</span>
         </div>
         
         <div data-bind="visible: connected" align="center">
@@ -85,7 +91,7 @@
 	        	<div align="center" class="font-small ghostbuster-font">(not in a positive way)</div>
 	        	<br>
 	        	<div class="bordered" style="max-width: 500px;">
-	        		<div class="container">
+	        		<div data-bind="visible: !admin()" class="container">
 	        			<form>
 	        				<fieldset>
 	        					<span class="ghostbuster-font">Number of Ghostbusters:</span> <input type="number" min="2" max="8" step="2" data-bind="value: gamemaxplayers"> 
