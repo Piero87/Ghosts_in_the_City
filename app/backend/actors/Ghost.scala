@@ -137,12 +137,13 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
       
       var new_position : Point = ghostpos.stepTowards(player_info.pos, GameParameters.ghost_step, game_type)
       
-      if (arena.contains(new_position)){
-         if(level == 3 || new_position.distanceFrom(position_treasure, game_type) < GameParameters.treasure_radius){
-           ghostpos = new_position
-           GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
-         }
+      logger.log("GHOST '" + uid + "' IS MAD! Current position: " + ghostpos)
+      
+      if ( acceptablePosition(new_position) ) {
+        ghostpos = position
+        GMbackend ! GhostPositionUpdate(uid, ghostpos , mood)
       }
+      
     }
   }
   
@@ -163,26 +164,14 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
   
   def random_move() : Unit = {
     
-    val MAX_ATTEMPTS = 10
+    val MAX_ATTEMPTS = 100
     var attempts = 0
     var new_position: Point = null
     var good_position = false
     do {
       new_position = ghostpos.randomStep(GameParameters.ghost_step, game_type)
       attempts += 1
-      
-      if (arena.contains(new_position)) {
-        if (level == 3 || new_position.distanceFrom(position_treasure, game_type) >= GameParameters.treasure_radius) {
-          good_position = true
-        }
-      }
-      
-    } while (!good_position && attempts != MAX_ATTEMPTS)
-    
-    if (good_position) {
-      ghostpos = new_position
-      GMbackend ! GhostPositionUpdate(uid, ghostpos , mood)
-    }
+    } while (!acceptablePosition(new_position) && attempts != MAX_ATTEMPTS)
     
     /*
     val rnd = new Random()
@@ -254,6 +243,15 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
     }
   }
   */
+  
+  def acceptablePosition(position: Point) : Boolean = {
+    if (arena.contains(position)) {
+      if (level == 3 || position.distanceFrom(position_treasure, game_type) >= GameParameters.treasure_radius) {
+        return true
+      }
+    }
+    return false
+  }
   
   def smellPlayerGold(player : PlayerInfo): Int = {
     var gold_toSteal_double = 0.0
