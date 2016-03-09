@@ -114,8 +114,8 @@ sealed case class Point(latitude: Double, longitude: Double){
   
   private def virtual_step_to(angle_rad: Double, pixels: Double): Point = {
     
-    val new_lat = latitude + Math.sin( angle_rad ) * pixels
-    val new_lng = longitude + Math.cos( angle_rad ) * pixels
+    val new_lat = latitude + Math.cos( angle_rad ) * pixels
+    val new_lng = longitude + Math.sin( angle_rad ) * pixels
     
     new Point(new_lat, new_lng)
     

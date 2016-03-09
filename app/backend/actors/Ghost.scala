@@ -141,9 +141,10 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
       
       logger.log("Current ghost position: " + ghostpos)
       
-      if ( acceptablePosition(new_position) ) {
-        ghostpos = position
-        GMbackend ! GhostPositionUpdate(uid, ghostpos , mood)
+      if (arena.contains(position)) {
+        if (level == 3 || position.distanceFrom(position_treasure, game_type) >= GameParameters.treasure_radius) {
+          updatePosition(new_position)
+        }
       }
       
     }
@@ -156,16 +157,14 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
     */
     
     var new_position : Point = ghostpos.stepTowards(position_treasure, GameParameters.ghost_step, game_type)
-    
-    ghostpos = new_position
-    GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
+    updatePosition(new_position)
   }
   
   def printList(args: TraversableOnce[_]): Unit = {
     args.foreach(println)
   }
   
-  def random_move() : Unit = {
+  def random_move() = {
     
     val MAX_ATTEMPTS = 100
     var attempts = 0
@@ -174,10 +173,20 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
     do {
       new_position = ghostpos.randomStep(GameParameters.ghost_step, game_type)
       attempts += 1
-    } while (!acceptablePosition(new_position) && attempts != MAX_ATTEMPTS)
       
-    ghostpos = new_position
-    GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
+      if (arena.contains(position)) {
+      if (level == 3 || position.distanceFrom(position_treasure, game_type) >= GameParameters.treasure_radius) {
+        good_position = true
+      }
+    }
+      
+    } while (!good_position && attempts != MAX_ATTEMPTS)
+      
+    if (arena.contains(position)) {
+      if (level == 3 || position.distanceFrom(position_treasure, game_type) >= GameParameters.treasure_radius) {
+        updatePosition(new_position)
+      }
+    }
     
     /*
     val rnd = new Random()
@@ -250,13 +259,9 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
   }
   */
   
-  def acceptablePosition(position: Point) : Boolean = {
-    if (arena.contains(position)) {
-      if (level == 3 || position.distanceFrom(position_treasure, game_type) >= GameParameters.treasure_radius) {
-        return true
-      }
-    }
-    return false
+  def updatePosition(position: Point) = {
+    ghostpos = position
+    GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
   }
   
   def smellPlayerGold(player : PlayerInfo): Int = {
