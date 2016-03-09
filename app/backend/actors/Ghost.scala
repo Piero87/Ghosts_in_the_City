@@ -47,7 +47,7 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
   def receive = {
     case GhostStart => 
       GMbackend = sender
-      update_pos_scheduler = system.scheduler.schedule(0 millis, 500 millis, self, UpdateGhostPosition)
+      update_pos_scheduler = system.scheduler.schedule(0 millis, 1000 millis, self, UpdateGhostPosition)
     case UpdateGhostPosition => 
       if(ghostpos.distanceFrom(position_treasure, game_type) < treasure_radius || level == 3){
        mood = GhostMood.CALM
@@ -106,10 +106,8 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
       }else{
         mood = GhostMood.TRAPPED
       }
-      update_pos_scheduler = system.scheduler.schedule(0 millis, 500 millis, self, UpdateGhostPosition)
+      update_pos_scheduler = system.scheduler.schedule(0 millis, 1000 millis, self, UpdateGhostPosition)
   }
-  
-  
   
   def attackPlayer(player_info: PlayerInfo, player_actor : ActorRef) = {
     
@@ -137,12 +135,15 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
       var new_position : Point = computeNextPosition(ghost_move)
       */
       
+      logger.log("Player position: " + player_info.pos)
+      
       var new_position : Point = ghostpos.stepTowards(player_info.pos, GameParameters.ghost_step, game_type)
       
-      logger.log("Current ghost position: " + ghostpos)
+      logger.log("New ghost position: " + ghostpos)
+      logger.log("-----------------")
       
       if (arena.contains(position)) {
-        if (level == 3 || position.distanceFrom(position_treasure, game_type) >= GameParameters.treasure_radius) {
+        if (level == 3 || position.distanceFrom(position_treasure, game_type) < GameParameters.treasure_radius) {
           updatePosition(new_position)
         }
       }
@@ -169,7 +170,7 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
     var new_position = ghostpos.randomStep(GameParameters.ghost_step, game_type)
     
     if (arena.contains(position)) {
-      if (level == 3 || position.distanceFrom(position_treasure, game_type) >= GameParameters.treasure_radius) {
+      if (level == 3 || position.distanceFrom(position_treasure, game_type) < GameParameters.treasure_radius) {
         updatePosition(new_position)
       }
     }

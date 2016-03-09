@@ -78,6 +78,8 @@ sealed case class Point(latitude: Double, longitude: Double){
   val latitude_rad = Math.toRadians(latitude)
   val longitude_rad = Math.toRadians(longitude)
   
+  private val logger = new CustomLogger("UtilFunctions")
+  
   private def pixelsFrom(p: Point): Double = {
     Math.sqrt(Math.pow((p.latitude - latitude),2) + Math.pow((p.longitude - longitude),2))
   }
@@ -113,6 +115,8 @@ sealed case class Point(latitude: Double, longitude: Double){
   }
   
   private def virtual_step_to(angle_rad: Double, pixels: Double): Point = {
+    
+    logger.log("direction: " + Math.toDegrees(angle_rad))
     
     val new_lat = latitude + Math.cos( angle_rad ) * pixels
     val new_lng = longitude + Math.sin( angle_rad ) * pixels
