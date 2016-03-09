@@ -40,7 +40,8 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
   var past_move : Int = -1
   val ghost_step : Double = GameParameters.ghost_step + 2 * level
   
-  val logger = new CustomLogger("Ghost "+uid)
+  val logger = new CustomLogger("Ghost " + uid)
+  logger.log("Arena: " + arena)
   var update_pos_scheduler : Cancellable = null
   
   def receive = {
@@ -114,7 +115,6 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
     
     var gold_available = smellPlayerGold(player_info)
     var player_distance = ghostpos.distanceFrom(player_info.pos, game_type)
-    logger.log("GHOST '" + uid + "' IS MAD!")
     logger.log("Distance to player: " + player_distance)
     
     if (player_distance <= GameParameters.max_action_distance && gold_available > 0) {
