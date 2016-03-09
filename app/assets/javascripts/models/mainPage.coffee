@@ -12,10 +12,15 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			@sounds = ko.observable()
 			@debug = ko.observable()
 			
+			@adminName = ko.observable()
+			@adminPwd = ko.observable()
+			@admin = ko.observable(false)
+			
 			@music("on")
 			@sounds("on")
 			@debug("off")
-						
+			
+			
 			# Player data
 			@playername = ko.observable()
 			@playeruid = ko.observable()
@@ -290,6 +295,14 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 				@debug("on")
 				@game_client_engine.toggleDebug(true)
 		
+		# Enable Control Center login form
+		adminLogin: ->
+			if (@admin() == false)
+				@admin(true)
+			else
+				(@admin() == true)
+				@admin(false)	
+		
 		# The player clicked connect
 		submitPlayerName: ->
 			name = @playername()
@@ -299,6 +312,16 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			localStorage.setItem("uid", @playeruid())
 			localStorage.setItem("playername", @playername())
 			@connect()
+			
+		# Admin clicked connect
+		submitAdminData: ->
+			admin = @adminName()
+			pwd = @pwd()
+			@adminName(adminName)
+			@pwd(adminPwd)
+			localStorage.setItem("admin", @adminName())
+			@adminConnect()
+			
 		
 		# New Game 
 		newGame: ->

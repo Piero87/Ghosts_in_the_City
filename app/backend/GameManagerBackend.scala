@@ -444,14 +444,15 @@ class GameManagerBackend () extends Actor {
     try {
       game_params = new GameParameters(game_type)
       var spaces = UtilFunctions.createSpaces(n_treasures_and_ghosts, game_area)
-      
-      logger.log(game_type)
+      var margin = 0.0
+      //logger.log(game_type)
       for(i <- 0 to game_n_players-1) {
         val player = players(i)._1
         var player_pos = player.pos
         if (game_type == GameType.WEB){
           // Only if game type is equal to "web" I will create random position for players
-          player_pos = UtilFunctions.randomPositionInSpace(spaces(spaces.length - 1), game_area)
+          margin = icon_size
+          player_pos = UtilFunctions.randomPositionInSpace(spaces(spaces.length - 1), game_area, margin)
         }
         logger.log("Player [" + (i+1) + "] position: " + player_pos)
         val p = new PlayerInfo(player.uid,player.name,player.team,Point(player_pos.latitude,player_pos.longitude),player.gold,player.keys)
@@ -481,7 +482,7 @@ class GameManagerBackend () extends Actor {
         
         // Creazione tesori
         
-        var treasure_position : Point = UtilFunctions.randomPositionInSpace(spaces_shuffled(i), game_area)
+        var treasure_position : Point = UtilFunctions.randomPositionInSpace(spaces_shuffled(i), game_area, margin)
         logger.log("Treasure[" + i + "] position: ("+ treasure_position.latitude +","+ treasure_position.longitude +")")
         
         var treasure_id = randomString(8)
@@ -541,7 +542,7 @@ class GameManagerBackend () extends Actor {
       }
       
       for(i <- 0 to n_free_ghosts-1){ //l'ultimo space è dei giocatori e non ha fantasmi
-        var free_ghost_postion = UtilFunctions.randomPositionInSpace(spaces(i), game_area)
+        var free_ghost_postion = UtilFunctions.randomPositionInSpace(spaces(i), game_area, margin)
         logger.log("Free Ghost[" + i + "] position: ("+ free_ghost_postion.latitude +","+ free_ghost_postion.longitude +")")
         
         // Fantasmi liberi di girare per tutta l'area
