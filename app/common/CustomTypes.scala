@@ -107,8 +107,6 @@ sealed case class Point(latitude: Double, longitude: Double){
   
   private def angle_rad_to(p: Point): Double = {
     
-    System.out.println("target position: " + p)
-    
     val delta_lat = p.latitude - latitude
     val delta_lng = p.longitude - longitude
     
@@ -116,8 +114,6 @@ sealed case class Point(latitude: Double, longitude: Double){
   }
   
   private def virtual_step_to(angle_rad: Double, pixels: Double): Point = {
-    
-    System.out.println("direction: " + Math.toDegrees(angle_rad))
     
     val new_lat = latitude + Math.cos( angle_rad ) * pixels
     val new_lng = longitude + Math.sin( angle_rad ) * pixels

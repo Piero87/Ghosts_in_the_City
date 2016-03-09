@@ -113,7 +113,6 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
     
     var gold_available = smellPlayerGold(player_info)
     var player_distance = ghostpos.distanceFrom(player_info.pos, game_type)
-    logger.log("Distance to player: " + player_distance)
     
     if (player_distance <= GameParameters.max_action_distance && gold_available > 0) {
       
@@ -135,17 +134,10 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
       var new_position : Point = computeNextPosition(ghost_move)
       */
       
-      logger.log("Player position: " + player_info.pos)
-      
       var new_position : Point = ghostpos.stepTowards(player_info.pos, GameParameters.ghost_step, game_type)
       
-      logger.log("New ghost position: " + ghostpos)
-      logger.log("-----------------")
-      
-      if (arena.contains(position)) {
-        if (level == 3 || position.distanceFrom(position_treasure, game_type) < GameParameters.treasure_radius) {
-          updatePosition(new_position)
-        }
+      if (allowedPosition(new_position)) {
+        updatePosition(new_position)
       }
       
     }
@@ -169,10 +161,8 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
     
     var new_position = ghostpos.randomStep(GameParameters.ghost_step, game_type)
     
-    if (arena.contains(position)) {
-      if (level == 3 || position.distanceFrom(position_treasure, game_type) < GameParameters.treasure_radius) {
-        updatePosition(new_position)
-      }
+    if (allowedPosition(new_position)) {
+      updatePosition(new_position)
     }
     
     /*
@@ -245,6 +235,15 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
     }
   }
   */
+  
+  def allowedPosition(position: Point): Boolean = {
+    if (arena.contains(position)) {
+      if (level == 3 || position.distanceFrom(position_treasure, game_type) < GameParameters.treasure_radius) {
+        return true
+      }
+    }
+    return false
+  }
   
   def updatePosition(position: Point) = {
     ghostpos = position
