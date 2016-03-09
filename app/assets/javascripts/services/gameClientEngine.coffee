@@ -448,6 +448,7 @@ define () ->
   			id.substr 0, 8
 			
 		toggleDebug: (debug) ->
+			alert("debug toggled!")
 			if (debug)
 				@debug = true
 			else
