@@ -47,7 +47,8 @@ class GameManagerBackend () extends Actor {
       game_name = name
       game_n_players = n_players
       game_type = g_type
-      if(g_type == GameType.REALITY){
+      game_params = new GameParameters(game_type)
+      if(game_type == GameType.REALITY){
         // Calculate the point of the game real area
         /*
 				* P---------A
@@ -442,7 +443,6 @@ class GameManagerBackend () extends Actor {
     var n_free_ghosts = game_n_players + 1
     
     try {
-      game_params = new GameParameters(game_type)
       var spaces = UtilFunctions.createSpaces(n_treasures_and_ghosts, game_area)
       var margin = 0.0
       //logger.log(game_type)
