@@ -24,12 +24,12 @@
         <script data-main="@routes.Assets.versioned("javascripts/main.js")" type="text/javascript" src="@routes.Assets.versioned("lib/requirejs/require.js")"></script>
     </head>
     <body>
-    	<input type="hidden" id="conf_icon_size" value="@play.Play.application().configuration().getString("icon_size")">
-    	<input type="hidden" id="conf_space_width" value="@play.Play.application().configuration().getString("space_width")">
-    	<input type="hidden" id="conf_space_height" value="@play.Play.application().configuration().getString("space_height")">
-    	<input type="hidden" id="conf_ghost_radius" value="@play.Play.application().configuration().getString("ghost_radius")">
-    	<input type="hidden" id="conf_treasure_radius" value="@play.Play.application().configuration().getString("treasure_radius")">
-    	<input type="hidden" id="conf_trap_radius" value="@play.Play.application().configuration().getString("trap_radius")">
+    	<input type="hidden" id="conf_icon_size" value="@play.Play.application().configuration().getString("web_margin")">
+    	<input type="hidden" id="conf_space_width" value="@play.Play.application().configuration().getString("canvas_width")">
+    	<input type="hidden" id="conf_space_height" value="@play.Play.application().configuration().getString("canvas_height")">
+    	<input type="hidden" id="conf_ghost_radius" value="@play.Play.application().configuration().getString("web_ghost_radius")">
+    	<input type="hidden" id="conf_treasure_radius" value="@play.Play.application().configuration().getString("web_treasure_radius")">
+    	<input type="hidden" id="conf_trap_radius" value="@play.Play.application().configuration().getString("web_trap_radius")">
         @content
     </body>
 </html>

@@ -40,7 +40,8 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
   var past_move : Int = -1
   val ghost_step : Double = GameParameters.ghost_step + 2 * level
   
-  val logger = new CustomLogger("Ghost "+uid)
+  val logger = new CustomLogger("Ghost " + uid)
+  logger.log("Arena: " + arena)
   var update_pos_scheduler : Cancellable = null
   
   def receive = {
@@ -114,6 +115,7 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
     
     var gold_available = smellPlayerGold(player_info)
     var player_distance = ghostpos.distanceFrom(player_info.pos, game_type)
+    logger.log("Distance to player: " + player_distance)
     
     if (player_distance <= GameParameters.max_action_distance && gold_available > 0) {
       
@@ -137,12 +139,13 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
       
       var new_position : Point = ghostpos.stepTowards(player_info.pos, GameParameters.ghost_step, game_type)
       
-      if (arena.contains(new_position)){
-         if(level == 3 || new_position.distanceFrom(position_treasure, game_type) < GameParameters.treasure_radius){
-           ghostpos = new_position
-           GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
-         }
+      logger.log("Current ghost position: " + ghostpos)
+      
+      if ( acceptablePosition(new_position) ) {
+        ghostpos = position
+        GMbackend ! GhostPositionUpdate(uid, ghostpos , mood)
       }
+      
     }
   }
   
@@ -154,6 +157,7 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
     
     var new_position : Point = ghostpos.stepTowards(position_treasure, GameParameters.ghost_step, game_type)
     
+    ghostpos = new_position
     GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
   }
   
@@ -163,26 +167,17 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
   
   def random_move() : Unit = {
     
-    val MAX_ATTEMPTS = 10
+    val MAX_ATTEMPTS = 100
     var attempts = 0
     var new_position: Point = null
     var good_position = false
     do {
       new_position = ghostpos.randomStep(GameParameters.ghost_step, game_type)
       attempts += 1
+    } while (!acceptablePosition(new_position) && attempts != MAX_ATTEMPTS)
       
-      if (arena.contains(new_position)) {
-        if (level == 3 || new_position.distanceFrom(position_treasure, game_type) >= GameParameters.treasure_radius) {
-          good_position = true
-        }
-      }
-      
-    } while (!good_position && attempts != MAX_ATTEMPTS)
-    
-    if (good_position) {
-      ghostpos = new_position
-      GMbackend ! GhostPositionUpdate(uid, ghostpos , mood)
-    }
+    ghostpos = new_position
+    GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
     
     /*
     val rnd = new Random()
@@ -254,6 +249,15 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
     }
   }
   */
+  
+  def acceptablePosition(position: Point) : Boolean = {
+    if (arena.contains(position)) {
+      if (level == 3 || position.distanceFrom(position_treasure, game_type) >= GameParameters.treasure_radius) {
+        return true
+      }
+    }
+    return false
+  }
   
   def smellPlayerGold(player : PlayerInfo): Int = {
     var gold_toSteal_double = 0.0
