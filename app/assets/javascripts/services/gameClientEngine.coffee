@@ -348,50 +348,50 @@ define () ->
 		# Get key press.
 		
 		keyPressed: (evt) ->
-			if evt.keyCode of map_keys
-				map_keys[evt.keyCode] = true 
+			if evt.keyCode of @map_keys
+				@map_keys[evt.keyCode] = true 
 				evt.preventDefault()
 			@action()
 			
 		keyReleased: (evt) ->
-			if evt.keyCode of map_keys
-				map_keys[evt.keyCode] = false 
+			if evt.keyCode of @map_keys
+				@map_keys[evt.keyCode] = false 
 				evt.preventDefault()
 			@action()
 		
 		action: ->
 			for buster, i in @busters when buster.uid == @player_id
 				
-				if map_keys[65]
+				if @map_keys[65]
 					@ws.send(JSON.stringify
 						event: "set_trap"
 					)
-				else if map_keys[83]
+				else if @map_keys[83]
 					@ws.send(JSON.stringify
 						event: "open_treasure"
 					)
-				else if map_keys[68]
+				else if @map_keys[68]
 					@ws.send(JSON.stringify
 						event: "hit_player"
 					)
 				
-				if map_keys[37] || map_keys[38] || map_keys[39] || map_keys[40]
+				if @map_keys[37] || @map_keys[38] || @map_keys[39] || @map_keys[40]
 					angle = 0
-					if map_keys[38] && map_keys[37]  # up-left
+					if @map_keys[38] && @map_keys[37]  # up-left
 						angle = 3 * Math.PI / 4
-					else if map_keys[40] && map_keys[37]  # down-left
+					else if @map_keys[40] && @map_keys[37]  # down-left
 						angle = - 3 * Math.PI / 4
-					else if map_keys[38] && map_keys[39]  # up-right
+					else if @map_keys[38] && @map_keys[39]  # up-right
 						angle = Math.PI / 4
-					else if map_keys[40] && map_keys[39]  # down-right
+					else if @map_keys[40] && @map_keys[39]  # down-right
 						angle = - Math.PI / 4
-					else if map_keys[38] # up
+					else if @map_keys[38] # up
 						angle = Math.PI / 2
-					else if map_keys[40] # down
+					else if @map_keys[40] # down
 						angle = - Math.PI / 2
-					else if map_keys[37] # left
+					else if @map_keys[37] # left
 						angle = Math.PI
-					else if map_keys[39] # right
+					else if @map_keys[39] # right
 						angle = 0
 					
 					@busters[i].longitude = @busters[i].longitude + @move * Math.sin( angle )
