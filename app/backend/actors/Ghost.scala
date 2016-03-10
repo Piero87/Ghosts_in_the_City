@@ -114,7 +114,15 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
     var gold_available = smellPlayerGold(player_info)
     var player_distance = ghostpos.distanceFrom(player_info.pos, game_type)
     
+    if (level == 2) {
+      logger.log("distanza giocatore: " + player_distance)
+    }
+    
     if (player_distance <= GameParameters.max_action_distance && gold_available > 0) {
+      
+      if (level == 2) {
+        logger.log("ATTACCO!")
+      }
       
       var now = System.currentTimeMillis()
       if (now >= last_attack + 1500 ) {
@@ -138,6 +146,8 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
       
       if (allowedPosition(new_position)) {
         updatePosition(new_position)
+      } else if (level == 2) {
+        logger.log("posizione non consentita! " + new_position)
       }
       
     }
