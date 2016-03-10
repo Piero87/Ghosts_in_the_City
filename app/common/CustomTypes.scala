@@ -37,9 +37,9 @@ sealed case class GameParameters(game_type: String){
   // **** TREASURES ****
                            
   val treasure_radius = if (game_type == GameType.REALITY) {
-                            ConfigFactory.load().getDouble("real_ghost_radius") 
+                            ConfigFactory.load().getDouble("real_treasure_radius") 
                         } else { 
-                            ConfigFactory.load().getDouble("web_ghost_radius")
+                            ConfigFactory.load().getDouble("web_treasure_radius")
                         }
   val min_treasure_gold = ConfigFactory.load().getInt("min_treasure_gold")
   val max_treasure_gold = ConfigFactory.load().getInt("max_treasure_gold")
