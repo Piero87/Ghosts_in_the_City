@@ -12,6 +12,15 @@ define () ->
 			
 			@debug = false;
 			
+			@map_keys = 
+				37 : false # Left
+				38 : false # Up
+				39 : false # Right
+				40 : false # Down
+				65 : false # A
+				83 : false # S
+				68 : false # D
+			
 			@gameLoop = null
 
 			@ws = websocket
@@ -23,8 +32,10 @@ define () ->
 			@emptyBack = new Image
 
 			@traps = []
-
+			
 			@callback_key = @whatKey.bind(this)
+			@callback_keydown = @keyPressed.bind(this)
+			@callback_keyup = @keyReleased.bind(this)
 
 			@sensible_area = new Image
 			@sensible_area.src = '/assets/images/Area.png'
@@ -89,15 +100,22 @@ define () ->
 			# Play the game until the until the game is over.
 			callback_interval = @doGameLoop.bind(this)
 			@gameLoop = setInterval(callback_interval, 60)
+			
 			# Add keyboard listener.
-			window.addEventListener 'keydown', @callback_key, true
+			# window.addEventListener 'keydown', @callback_key, true
+			window.addEventListener 'keydown', @callback_keydown, true
+			window.addEventListener 'keyup', @callback_keyup, true
 		
 		pauseGame: ->
 			console.log "GAME MAP - Pause Game!"
 			if (@gameLoop)
 				clearInterval(@gameLoop)
-				# Add keyboard listener.
-				window.removeEventListener 'keydown', @callback_key, true
+				
+				# Remove keyboard listener.
+				# window.removeEventListener 'keydown', @callback_key, true
+				window.removeEventListener 'keydown', @callback_keydown, true
+				window.removeEventListener 'keyup', @callback_keyup, true
+				
 				@resetCanvas()
 		
 		endGame: ->
@@ -328,6 +346,63 @@ define () ->
 				)
 		
 		# Get key press.
+		
+		keyPressed: (evt) ->
+			if e.keyCode of map_keys
+				map_keys[e.keyCode] = true 
+				evt.preventDefault()
+			@action()
+			
+		keyReleased: (evt) ->
+			if e.keyCode of map_keys
+				map_keys[e.keyCode] = false 
+				evt.preventDefault()
+			@action()
+		
+		action: ->
+			for buster, i in @busters when buster.uid == @player_id
+				
+				if map_keys[65]
+					@ws.send(JSON.stringify
+						event: "set_trap"
+					)
+				else if map_keys[83]
+					@ws.send(JSON.stringify
+						event: "open_treasure"
+					)
+				else if map_keys[68]
+					@ws.send(JSON.stringify
+						event: "hit_player"
+					)
+				
+				if map_keys[37] || map_keys[38] || map_keys[39] || map_keys[40]
+					angle = 0
+					if map_keys[38] && map_keys[37]  # up-left
+						angle = 3 * Math.PI / 4
+					else if map_keys[40] && map_keys[37]  # down-left
+						angle = - 3 * Math.PI / 4
+					else if map_keys[38] && map_keys[39]  # up-right
+						angle = Math.PI / 4
+					else if map_keys[40] && map_keys[39]  # down-right
+						angle = - Math.PI / 4
+					else if map_keys[38] # up
+						angle = Math.PI / 2
+					else if map_keys[40] # down
+						angle = - Math.PI / 2
+					else if map_keys[37] # left
+						angle = Math.PI
+					else if map_keys[39] # right
+						angle = 0
+					
+					@busters[i].longitude = @busters[i].longitude + @move * Math.sin( angle )
+					@busters[i].latitude = @busters[i].latitude + @move * Math.cos( angle )
+					
+					@ws.send(JSON.stringify
+						event: "update_player_position"
+						pos:
+							latitude: @busters[i].latitude
+							longitude: @busters[i].longitude
+					)
 		
 		whatKey: (evt) ->
 			for buster, i in @busters when buster.uid == @player_id
