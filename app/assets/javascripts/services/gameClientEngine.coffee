@@ -348,14 +348,14 @@ define () ->
 		# Get key press.
 		
 		keyPressed: (evt) ->
-			if e.keyCode of map_keys
-				map_keys[e.keyCode] = true 
+			if evt.keyCode of map_keys
+				map_keys[evt.keyCode] = true 
 				evt.preventDefault()
 			@action()
 			
 		keyReleased: (evt) ->
-			if e.keyCode of map_keys
-				map_keys[e.keyCode] = false 
+			if evt.keyCode of map_keys
+				map_keys[evt.keyCode] = false 
 				evt.preventDefault()
 			@action()
 		
