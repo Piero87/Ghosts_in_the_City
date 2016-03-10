@@ -248,10 +248,13 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
   
   def allowedPosition(position: Point): Boolean = {
     if (arena.contains(position)) {
-      if (level == 2) logger.log("point contained")
       if (level == 3 || position.distanceFrom(position_treasure, game_type) < GameParameters.treasure_radius) {
         return true
+      } else {
+        if (level == 2) logger.log("too far from treasure: " + position.distanceFrom(position_treasure, game_type))
       }
+    } else {
+      if (level == 2) logger.log("point contained")
     }
     return false
   }
