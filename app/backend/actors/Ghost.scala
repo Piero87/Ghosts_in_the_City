@@ -114,9 +114,6 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
     var gold_available = smellPlayerGold(player_info)
     var player_distance = ghostpos.distanceFrom(player_info.pos, game_type)
     
-    if (level == 2) {
-      logger.log("distanza giocatore: " + player_distance)
-    }
     
     if (player_distance <= GameParameters.max_action_distance && gold_available > 0) {
       

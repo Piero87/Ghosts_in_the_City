@@ -394,7 +394,11 @@ define () ->
 					else if @map_keys[39] # right
 						angle = 0
 					
-					@busters[i].longitude = @busters[i].longitude + @move * Math.sin( angle )
+					# nel calcolo della nuova longitudine, il "-" è dovuto al fatto che nel canvas si
+					# aumenta di latitudine andando verso il basso, quindi con segno opposto rispetto
+					# al calcolo del seno.
+					
+					@busters[i].longitude = @busters[i].longitude - @move * Math.sin( angle )
 					@busters[i].latitude = @busters[i].latitude + @move * Math.cos( angle )
 					
 					@ws.send(JSON.stringify
