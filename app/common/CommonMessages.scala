@@ -10,6 +10,7 @@ object StatusGame extends Enumeration {
    val STARTED = 1
    val PAUSED = 2
    val FINISHED = 3
+   val WITH_ADMIN = 4
 } 
 
 object Team extends Enumeration {
@@ -152,8 +153,7 @@ case object CheckPaused
 case class AdminLogin(name: String, password: String)
 case class LoginResult(result: Boolean)
 case object StartedGamesList
-
-
+case class UpdateInfo(game: Game, adminuid: String)
 
 // Json
 case class NewGameJSON(event: String, name: String, pos: Point, game_area_edge: Double, n_players: Int, game_type: String)

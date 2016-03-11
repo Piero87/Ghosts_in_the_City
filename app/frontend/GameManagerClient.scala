@@ -70,7 +70,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       }
     case JoinGame(game,player,ref) =>
       logger.log("JoinGame request, GameID: " + game_id + " (" + player.name + ")")
-      if (game_status == 0 && game_id == game.id) {
+      if ((game_status == StatusGame.WAITING && game_id == game.id) || (game_status == StatusGame.STARTED && game_id == game.id && player.name.equals("admin"))) {
         logger.log("JoinGame request ACCEPTED, GameID: " + game_id + " (" + player.name + ")")
         // We save the ClientConnection data that has sent the join request
         var p = player
@@ -132,6 +132,11 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       }
       future onFailure {
         case e: Exception => logger.log("LEAVE GAME ERROR: " + e.getMessage + " FROM " + sender.path)
+      }
+    
+    case UpdateInfo(game, adminuid) =>
+      clientsConnections.map {cc =>
+        if (cc._1.uid == adminuid) cc._2 forward UpdateInfo(game, adminuid)
       }
     
     case KillYourself => 

@@ -31,6 +31,11 @@ class GameManagerBackend () extends Actor {
   var previous_game_status = -1
   var game_type = GameType.UNKNOWN
   
+  // Admin info stored 
+  var admin_in_game = false
+  var admin_name = ""
+  var adminuid = ""
+  
   var paused_players:MutableList[Tuple2[String, Long]] = MutableList()
   var game_area = new Polygon(List())
   
@@ -106,11 +111,31 @@ class GameManagerBackend () extends Actor {
         }
       } else {
         //***Failure message
-        logger.log("GMB: non ci sono più posti per la partita, attaccati al cazzo")
+        logger.log("GMB: non ci sono più posti per la partita")
+        if(!admin_in_game && player.name.equals("admin")){
+          logger.log("GMB: è l'admin! non ce ne sono già altri quindi lo faccio entrare")
+          admin_in_game = true
+          admin_name = player.name
+          adminuid = player.uid
+          game_status = StatusGame.WITH_ADMIN
+          val tmp_g = ghosts.map(x => x._1)
+          val tmp_t = treasures.map(x => x._1)
+          val tmp_p = players.map(x => x._1)
+          players = players :+ Tuple2(player,null)
+          sender ! Game(game_id,game_name,game_n_players,game_status,game_type, tmp_p,tmp_g,tmp_t)
+        }
       }
     case ResumeGame(gameid: String, player: PlayerInfo, ref: ActorRef) =>
       logger.log("ResumeGame Request")
       paused_players = paused_players.filterNot(elm => elm._1 == player.uid)
+      // If we are in reality and a player return from a pause in the game we have to update this position data
+      // because of he could continue to walk during the pause
+      if(game_type == GameType.REALITY){
+        var player_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == player.uid) => i}).head
+        var u_tmp = players(player_index)._1
+        var player_info = new PlayerInfo(u_tmp.uid,u_tmp.name,u_tmp.team,player.pos,u_tmp.gold,u_tmp.keys)
+        players(player_index) = players(player_index).copy(_1 = player_info)
+      }
       // Svegliamo il giocatore che è appena tornato!
       val tmp_g = ghosts.map(x => x._1)
       val tmp_t = treasures.map(x => x._1)
@@ -130,7 +155,7 @@ class GameManagerBackend () extends Actor {
       val tmp_p = players.map(x => x._1)
       gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,game_type,tmp_p,tmp_g,tmp_t))
     case LeaveGame(p_uid) =>
-      logger.log("LeaveGame Request") 
+      logger.log("LeaveGame Request")
       players = players.filterNot(elm => elm._1.uid == p_uid)
       sender ! Success
      
@@ -146,7 +171,15 @@ class GameManagerBackend () extends Actor {
         val tmp_t = treasures.map(x => x._1)
         val tmp_p = players.map(x => x._1)
         // Ci sono ancora giocatori nella lista quindi aggiorna lo stato
-        gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,game_type,tmp_p,tmp_g,tmp_t))
+        if(game_status != StatusGame.WITH_ADMIN) gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,game_type,tmp_p,tmp_g,tmp_t))
+        
+        if(p_uid.equals(adminuid)){
+          logger.log("the admin has leaved this game")
+          game_status = StatusGame.STARTED
+          admin_in_game= false
+          admin_name = ""
+          adminuid = ""
+        }
       }
     case UpdatePosition(player) =>
       var player_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == player.uid) => i}).head
@@ -243,6 +276,13 @@ class GameManagerBackend () extends Actor {
       traps = traps :+ trap
       gameManagerClient ! BroadcastNewTrap(trap.getTrapInfo)
       gameManagerClient ! UpdatePlayerInfo(player_info)
+      if(admin_in_game){
+        val tmp_g = ghosts.map(x => x._1)
+        val tmp_t = treasures.map(x => x._1)
+        val tmp_p = players.map(x => x._1)
+        var g = new Game(game_id,game_name,game_n_players,game_status,game_type,tmp_p,tmp_g,tmp_t)
+        gameManagerClient ! UpdateInfo(g, adminuid)
+      }
       
     case RemoveTrap(uid) =>
       /* Una trappola è scattata 10 secondi fa e ora è tempo che venga rimossa */
@@ -335,6 +375,13 @@ class GameManagerBackend () extends Actor {
           }
           
           gameManagerClient ! UpdatePlayerInfo(player_info)
+          if(admin_in_game){
+            val tmp_g = ghosts.map(x => x._1)
+            val tmp_t = treasures.map(x => x._1)
+            val tmp_p = players.map(x => x._1)
+            var g = new Game(game_id,game_name,game_n_players,game_status,game_type,tmp_p,tmp_g,tmp_t)
+            gameManagerClient ! UpdateInfo(g, adminuid)
+          }
           
           var remaining_closed_treasures = treasures.filter(_._1.status == 0)
           
@@ -398,7 +445,7 @@ class GameManagerBackend () extends Actor {
         var gold_stolen = gold_stolen_double.toInt
         var gold_remain = u_tmp.gold - gold_stolen
         if (attack_type == MsgCodes.PARANORMAL_ATTACK){
-          //Mando al fantasmi il numero di soldi rubati
+          //Mando al fantasma il numero di soldi rubati
           origin ! gold_stolen
         } else {
           var attacker_index = (players.zipWithIndex.collect{case (g , i) if(g._1.uid == attacker_uid) => i}).head
@@ -418,6 +465,13 @@ class GameManagerBackend () extends Actor {
         players(attacked_index) = players(attacked_index).copy(_1 = attacked_info)
         gameManagerClient ! MessageCode(uid, attack_type,gold_stolen.toString())
         gameManagerClient ! UpdatePlayerInfo(attacked_info)
+        if(admin_in_game){
+          val tmp_g = ghosts.map(x => x._1)
+          val tmp_t = treasures.map(x => x._1)
+          val tmp_p = players.map(x => x._1)
+          var g = new Game(game_id,game_name,game_n_players,game_status,game_type,tmp_p,tmp_g,tmp_t)
+          gameManagerClient ! UpdateInfo(g, adminuid)
+        }
       }
     case Finish =>
       game_status = StatusGame.FINISHED

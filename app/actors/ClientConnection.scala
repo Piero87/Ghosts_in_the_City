@@ -40,6 +40,8 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
   var game_id = ""
   var team = Team.UNKNOWN
   
+  var isAdmin: Boolean = false  
+  
   val logger = new CustomLogger("ClientConnection")
   logger.log("Ciao giocatore chiamato " + name + "!")
   
@@ -115,6 +117,9 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
                      } 
                   }
                   var g_json = new GameJSON("game_ready",game)
+                  if(name.equals("admin")){
+                    g_json = new GameJSON("game_started",game)
+                  }
                   val json = Json.toJson(g_json)(CommonMessages.gameJSONWrites)
                   upstream ! json
               }
@@ -177,6 +182,9 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
               future.onSuccess {
                 case LoginResult(result) => 
                   logger.log("Login result received")
+                  if(result){
+                    isAdmin = true
+                  }
                   var l_json = new LoginResultJSON("login_result",result)
                   val json = Json.toJson(l_json)(CommonMessages.loginResultJSONWrites)
                   upstream ! json
@@ -199,12 +207,16 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
             case e: JsError => logger.log("STARTED GAMES LIST ERROR: " + e.toString() + " FROM " + sender.path)
           }
       }
-      
+    
     /*
      * Messages received from the server. 
      * They have to serialized into json message and send to the client
      * through the upstream actor.
      */
+    case UpdateInfo(game, adminuid) =>
+      var g_json = new GameJSON("update_info",game)
+      val json = Json.toJson(g_json)(CommonMessages.gameJSONWrites)
+      upstream ! json
     case GameStatusBroadcast(game: Game) =>
       var g_json = new GameJSON("game_status",game)
       val json = Json.toJson(g_json)(CommonMessages.gameJSONWrites)
@@ -251,9 +263,11 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
    * When the WebSocket has closed, Play will automatically stop the actor. 
    * That method handles this situation like it would be a network disruption and
    * notify that thing to the gameManagerClient.
+   * If an admin close is Client Connection the game will continue normally.
+   * 
    */
   override def postStop() = {
-    if (game_id != "") {
+    if (game_id != "" && isAdmin == false) {
       gameManagerClient ! PauseGame(uid)
     }
   }
