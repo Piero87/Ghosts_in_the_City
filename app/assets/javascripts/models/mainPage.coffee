@@ -518,9 +518,9 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 							$("#game-result-red").show()
 							$("#game-result-left").show()
 					else if (json.team == 0)
-						$("#game-result-blue").show()
-					else if (json.team == 1)
 						$("#game-result-red").show()
+					else if (json.team == 1)
+						$("#game-result-blue").show()
 						
 					
 		# Toggle the background music

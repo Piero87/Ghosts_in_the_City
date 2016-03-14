@@ -16,21 +16,37 @@ import scala.util.Random
 object Player {
 
   /**
-   * Actor Props 
+   * Factory for [[backend,actors.Player]] instances.
    */
   def props(uid: String, name: String, team: Int, GMbackend: ActorRef): Props = Props(new Player(uid, name, team, GMbackend))
   
 }
 
+/**
+ * Actor Player implementation class.
+ * It manages all the actions that a user client send to the application. 
+ * It also manage the race condition using the actor message queue
+ * that we could have during an attack from two or more ghosts
+ * 
+ * @constructor create a new actor with name, uid, GameManager backend actor.
+ * @param uid 
+ * @param name
+ * @param team Websocket 
+ * @param GMbackend GameManagerCackend 
+ */
 class Player(uid: String, name: String, team: Int, GMbackend: ActorRef) extends Actor{
   
   val logger = new CustomLogger("PlayerActor")
   
+  /**
+   * Receive method.
+   * It helds all the messages that could be sent to the Player actor from Ghost and GameManager Backend
+   */
   def receive = {
     case SetTrap(gold, pos) =>
       var origin = sender
       if (gold >= 100) {
-        //Puoi mettere la trappola
+        // You could set a trap! You have enough money
         var new_gold = gold - 100
         origin ! NewTrap(uid,new_gold, pos)
       } else {
@@ -60,6 +76,7 @@ class Player(uid: String, name: String, team: Int, GMbackend: ActorRef) extends 
       }
       GMbackend forward PlayerAttacked(uid, attacker_uid, attack_type, gold_perc_stolen, key_stolen)
       
+    // I've attacked another player  
     case AttackHim(victim) =>
       logger.log("Attack him")
       val rnd = new Random()

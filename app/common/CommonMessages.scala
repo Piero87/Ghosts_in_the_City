@@ -17,8 +17,9 @@ object Team extends Enumeration {
   type Team = Int
    val NO_ENOUGH_PLAYER = -2
    val UNKNOWN = -1
-   val BLUE = 0
-   val RED = 1
+   val RED = 0
+   val BLUE = 1
+
 }
 
 object GhostMood extends Enumeration {
