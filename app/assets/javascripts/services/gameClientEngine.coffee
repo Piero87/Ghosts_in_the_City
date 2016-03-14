@@ -30,8 +30,6 @@ define () ->
 			@ctx = undefined
 			# context
 			@emptyBack = new Image
-
-			@traps = []
 			
 			@callback_key = @whatKey.bind(this)
 			@callback_keydown = @keyPressed.bind(this)
@@ -63,6 +61,8 @@ define () ->
 			@treasure_close.src = '/assets/images/Treasure_close.png'
 			
 			# Trap
+			
+			@traps = []
 			
 			@trap_active = new Image
 			@trap_active.src = '/assets/images/Trap_active.png'
@@ -144,7 +144,7 @@ define () ->
 			@busters.push buster
 			buster_img = new Image
 			# buster
-			buster_img.src = '/assets/images/G' + @busters.length + '.png'
+			buster_img.src = '/assets/images/G' + (@busters.length % 4) + '.png'
 			@busters_images.push buster_img
 		
 		busterMove: (uid, latitude, longitude) ->
@@ -222,6 +222,22 @@ define () ->
 			treasure.longitude = longitude
 			# current buster position Y
 			@treasures.push treasure
+			
+		setTraps: (traps) ->
+			@traps = []
+			@addTrap(
+				trap.uid, trap.status, trap.pos.latitude, trap.pos.longitude
+			) for trap in traps
+		
+		addTrap: (uid, status, latitude, longitude) ->
+			trap = {}
+			trap.uid = uid
+			trap.status = status
+			trap.latitude = latitude
+			# current buster position X
+			trap.longitude = longitude
+			# current buster position Y
+			@traps.push trap
 		
 		doGameLoop: ->
 			

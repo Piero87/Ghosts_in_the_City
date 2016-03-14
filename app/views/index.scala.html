@@ -186,9 +186,10 @@
 		        		
 		        	</div>
 		        	<div align="right">
-		        		<a href="javascript: void(0);" class="ghostbuster-font font-small" data-bind="click: toggleDebug">debug mode:  <span data-bind="text: debug"></span></a>
+		        		<a href="javascript: void(0);" class="ghostbuster-font font-small" data-bind="if: game_type_web, click: toggleDebug">debug mode:  <span data-bind="text: debug"></span></a>
 		        	</div>
-	        		<div id="gameArenaContainer">	
+	        		<div id="gameArenaContainer">
+	        		<div id="mapContainer"></div>	
 		        	</div>
 		        	<div data-bind="visible: !admin()" class="ghostbuster-font" align="center" style="margin: 5px;">
 		        		<span class="gold-owned font-big">
@@ -373,8 +374,8 @@
 	        </div>
 	        <div data-bind="visible: gameended() && admin()" align="center">
 	        	<h1 class="ghostbuster-font font-huge">mission over</h1>
-	        	<h2 id="game-result-red" class="text-green font-huge ghostbuster-font" style="display:none;"> - Red team won! - </h2>
-	        	<h2 id="game-result-blue" class="text-red font-huge ghostbuster-font" style="display:none;"> - Blue team won! - </h2>
+	        	<h2 id="game-result-red" class="text-red font-huge ghostbuster-font" style="display:none;"> - Red team won! - </h2>
+	        	<h2 id="game-result-blue" class="text-blue font-huge ghostbuster-font" style="display:none;"> - Blue team won! - </h2>
 	        	<h2 id="game-result-draw" class="text-grey font-huge ghostbuster-font" style="display:none;">...It ended in a draw...</h2>
 	        	<h2 id="game-result-left" class="text-grey font-huge ghostbuster-font" style="display:none;"> Some moron has left the mission...</h2>
 	        	<hr>
@@ -423,10 +424,10 @@
 								    	
 							    </div>
 							</div>
-						</div>
-					</div>	
-				</div>
-				<button class="btn ghostbuster-font" data-bind="click: playAgain">Go Back to Home Page</button>
+							</div>
+						</div>	
+						<button class="btn ghostbuster-font" data-bind="click: playAgain">Go Back to Home Page</button>
+					</div>
 	        </div>
     	</div>
     	</div>
