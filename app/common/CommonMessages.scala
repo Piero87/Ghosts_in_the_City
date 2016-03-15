@@ -183,6 +183,9 @@ case class StartedGamesListRequestJSON(event: String)
     
 import play.api.libs.json._
 
+/**
+ * All message serializer
+ */
 object CommonMessages {
 
   implicit val pointReads = Json.reads[Point]
