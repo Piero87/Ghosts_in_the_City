@@ -266,8 +266,7 @@ class GameManagerBackend () extends Actor {
           val tmp_t = treasures.map(x => x._1)
           val tmp_p = players.map(x => x._1).filter(x => x.uid != adminuid)
           val tmp_tr = traps.map(x => x.getTrapInfo)
-          var resume_game_status = StatusGame.STARTED
-          gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,resume_game_status,game_type,tmp_p,tmp_g,tmp_t, tmp_tr))
+          gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,game_type,tmp_p,tmp_g,tmp_t, tmp_tr))
         }
         
       }
