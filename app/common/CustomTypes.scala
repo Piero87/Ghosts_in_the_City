@@ -68,7 +68,6 @@ sealed case class GameParameters(game_type: String){
                             } else { 
                                 ConfigFactory.load().getDouble("web_max_action_distance")
                             }
-  val player_vision_limit =  ConfigFactory.load().getDouble("player_vision_limit")
 }
 
 
