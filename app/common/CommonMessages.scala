@@ -111,11 +111,16 @@ case class HitPlayerRequest(player_uid: String)
 case class AttackHim(player: ActorRef)
 case class PlayerAttacked(uid: String, attacker_uid: String, attack_type: Int, gold_perc_stolen: Double, keys_stolen: Int)
 
-case class UpdateVisiblePlayerPosition(receiver_uid: String, player: PlayerInfo)
-case class UpdateVisibleGhostsPositions(receiver_uid: String, ghosts: MutableList[GhostInfo])
-case class newVisibleTrap(receiver_uid: String, trap: TrapInfo)
-case class removeVisibleTrap(receiver_uid: String, trap: TrapInfo)
-case class updateVisibleTreasure(receiver_uid: String, treasures: MutableList[TreasureInfo])
+case class UpdateVisiblePlayerPosition(receiver_uid: String, player: PlayerInfo) {val event = "update_player_position"}
+case class UpdateVisibleGhostsPositions(receiver_uid: String, ghosts: MutableList[GhostInfo]) {val event = "update_ghosts_positions"}
+case class NewVisibleTrap(receiver_uid: String, trap: TrapInfo) {val event = "new_trap"}
+case class ActivationVisibleTrap(receiver_uid: String, trap: TrapInfo) {val event = "active_trap"}
+case class RemoveVisibleTrap(receiver_uid: String, trap: TrapInfo) {val event = "remove_trap"}
+case class UpdateVisibleTreasures(receiver_uid: String, treasures: MutableList[TreasureInfo]) {val event = "update_treasures"}
+case class VisibleTreasures(receiver_uid: String, treasures: MutableList[TreasureInfo]) {val event = "visible_treasures"}
+case class VisibleGhosts(receiver_uid: String, ghosts: MutableList[GhostInfo]) {val event = "visible_ghosts"}
+case class VisibleTraps(receiver_uid: String, traps: MutableList[TrapInfo]) {val event = "visible_traps"}
+case class VisiblePlayers(receiver_uid: String, players: MutableList[PlayerInfo]) {val event = "visible_players"}
 
 // Treasure
 case class Open(pos_p: Point, keys: List[Key])
@@ -164,7 +169,7 @@ case class UpdateInfo(game: Game, adminuid: String)
 
 // Json
 case class NewGameJSON(event: String, name: String, pos: Point, game_area_edge: Double, n_players: Int, game_type: String)
-case class GameJSON(event: String, game: Game)
+case class GameJSON(event: String, game: Game) {val cacca = "culo"}
 case class GamesListResponseJSON(event: String, list: List[Game])
 case class GamesListRequestJSON(event: String, g_type: String)
 case class JoinGameJSON(event: String, game: Game, pos: Point)
@@ -277,5 +282,36 @@ object CommonMessages {
   
   implicit val startedGamesListRequestReads = Json.reads[StartedGamesListRequestJSON]
   implicit val startedGamesListRequestWrites = Json.writes[StartedGamesListRequestJSON]
+  
+  implicit val updateVisiblePlayerPositionReads = Json.reads[UpdateVisiblePlayerPosition]
+  implicit val updateVisiblePlayerPositionWrites = Json.writes[UpdateVisiblePlayerPosition]
+  
+  implicit val updateVisibleGhostsPositionsReads = Json.reads[UpdateVisibleGhostsPositions]
+  implicit val updateVisibleGhostsPositionsWrites = Json.writes[UpdateVisibleGhostsPositions]
+  
+  implicit val newVisibleTrapReads = Json.reads[NewVisibleTrap]
+  implicit val newVisibleTrapWrites = Json.writes[NewVisibleTrap]
+  
+  implicit val activationVisibleTrapReads = Json.reads[ActivationVisibleTrap]
+  implicit val activationVisibleTrapWrites = Json.writes[ActivationVisibleTrap]
+  
+  implicit val removeVisibleTrapReads = Json.reads[RemoveVisibleTrap]
+  implicit val removeVisibleTrapWrites = Json.writes[RemoveVisibleTrap]
+  
+  implicit val updateVisibleTreasuresReads = Json.reads[UpdateVisibleTreasures]
+  implicit val updateVisibleTreasuresWrites = Json.writes[UpdateVisibleTreasures]
+  
+  implicit val visibleTreasuresReads = Json.reads[VisibleTreasures]
+  implicit val visibleTreasuresWrites = Json.writes[VisibleTreasures]
+  
+  implicit val visibleGhostsReads = Json.reads[VisibleGhosts]
+  implicit val visibleGhostsWrites = Json.writes[VisibleGhosts]
+  
+  implicit val visibleTrapsReads = Json.reads[VisibleTraps]
+  implicit val visibleTrapsWrites = Json.writes[VisibleTraps]
+  
+  implicit val visiblePlayersReads = Json.reads[VisiblePlayers]
+  implicit val visiblePlayersWrites = Json.writes[VisiblePlayers]
+
   
 }

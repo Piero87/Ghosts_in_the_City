@@ -205,6 +205,15 @@ class GameManagerBackend () extends Actor {
         for (receiver <- players) {
           if (receiver._1.uid != player.uid && receiver._1.pos.distanceFrom(player.pos, game_type) <= game_params.player_vision_limit){
             gameManagerClient ! UpdateVisiblePlayerPosition(receiver._1.uid, player)
+          } else if (receiver._1.uid == player.uid) {
+            val visible_treasures = treasures.map(x => x._1).filter { treasure => receiver._1.pos.distanceFrom(treasure.pos, game_type) <= game_params.player_vision_limit }
+            gameManagerClient ! VisibleTreasures(receiver._1.uid, visible_treasures)
+            val visible_ghosts = ghosts.map(x => x._1).filter { ghost => receiver._1.pos.distanceFrom(ghost.pos, game_type) <= game_params.player_vision_limit }
+            gameManagerClient ! VisibleGhosts(receiver._1.uid, visible_ghosts)
+            val visible_traps = traps.map(x => x.getTrapInfo).filter { trap => receiver._1.pos.distanceFrom(trap.pos, game_type) <= game_params.player_vision_limit }
+            gameManagerClient ! VisibleTraps(receiver._1.uid, visible_traps)
+            val visible_players = players.map(x => x._1).filter { player => receiver._1.pos.distanceFrom(player.pos, game_type) <= game_params.player_vision_limit }
+            gameManagerClient ! VisiblePlayers(receiver._1.uid, visible_players)
           }
         }
       } else {
@@ -241,7 +250,15 @@ class GameManagerBackend () extends Actor {
           ghosts(ghost_index)._2 ! GhostTrapped(ghost_point)
           traps(i).status = TrapStatus.ACTIVE
           traps(i).trapped_ghost_uid = uid
-          gameManagerClient ! BroadcastTrapActivated(traps(i).getTrapInfo)
+          if (game_type == GameType.REALITY) {
+            for (receiver <- players) {
+              if (receiver._1.pos.distanceFrom(traps(i).pos, game_type) <= game_params.player_vision_limit) {
+                gameManagerClient ! ActivationVisibleTrap(receiver._1.uid, traps(i).getTrapInfo)
+              }
+            }
+          } else {
+            gameManagerClient ! BroadcastTrapActivated(traps(i).getTrapInfo)
+          }
           removeTrapScheduler(traps(i).uid)
         }
       }
@@ -306,7 +323,7 @@ class GameManagerBackend () extends Actor {
       if (game_type == GameType.REALITY) {
         for (receiver <- players) {
           if (receiver._1.pos.distanceFrom(trap.pos, game_type) <= game_params.player_vision_limit) {
-            gameManagerClient ! newVisibleTrap(receiver._1.uid, trap.getTrapInfo)
+            gameManagerClient ! NewVisibleTrap(receiver._1.uid, trap.getTrapInfo)
           }
         }
       } else {
@@ -328,7 +345,7 @@ class GameManagerBackend () extends Actor {
       if (game_type == GameType.REALITY) {
         for (receiver <- players) {
           if (receiver._1.pos.distanceFrom(traps(trap_index).pos, game_type) <= game_params.player_vision_limit) {
-            gameManagerClient ! removeVisibleTrap(receiver._1.uid, traps(trap_index).getTrapInfo)
+            gameManagerClient ! RemoveVisibleTrap(receiver._1.uid, traps(trap_index).getTrapInfo)
           }
         }
       } else {
@@ -410,7 +427,7 @@ class GameManagerBackend () extends Actor {
           if (game_type == GameType.REALITY) {
             for (receiver <- players) {
               val visible_treasures = tmp_t_info.filter {treasure => receiver._1.pos.distanceFrom(treasure.pos, game_type) <= game_params.player_vision_limit}
-              gameManagerClient ! updateVisibleTreasure(receiver._1.uid, visible_treasures)
+              gameManagerClient ! UpdateVisibleTreasures(receiver._1.uid, visible_treasures)
             }
           } else {
             gameManagerClient ! BroadcastUpdateTreasure(tmp_t_info)
@@ -476,7 +493,7 @@ class GameManagerBackend () extends Actor {
         if (game_type == GameType.REALITY) {
           for (receiver <- players) {
             val visible_treasures = tmp_t_info.filter {treasure => receiver._1.pos.distanceFrom(treasure.pos, game_type) <= game_params.player_vision_limit}
-            gameManagerClient ! updateVisibleTreasure(receiver._1.uid, visible_treasures)
+            gameManagerClient ! UpdateVisibleTreasures(receiver._1.uid, visible_treasures)
           }
         } else {
           gameManagerClient ! BroadcastUpdateTreasure(tmp_t_info)

@@ -196,6 +196,47 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       clientsConnections.map {cc =>
         cc._2 forward BroadcastVictoryResponse(team, players)
       }
-        
+      
+    // VIRTUAL REALITY GAME MESSAGES
+    case UpdateVisiblePlayerPosition(uid,player) =>
+      clientsConnections.map {cc =>
+        if (cc._1.uid == uid) cc._2 forward UpdateVisiblePlayerPosition(uid,player)
+      }
+    case UpdateVisibleGhostsPositions(uid,ghosts) =>
+      clientsConnections.map {cc =>
+        if (cc._1.uid == uid) cc._2 forward UpdateVisibleGhostsPositions(uid,ghosts)
+      }
+    case NewVisibleTrap(uid,trap) =>
+      clientsConnections.map {cc =>
+        if (cc._1.uid == uid) cc._2 forward NewVisibleTrap(uid,trap)
+      }
+    case ActivationVisibleTrap(uid,trap) =>
+      clientsConnections.map {cc =>
+        if (cc._1.uid == uid) cc._2 forward ActivationVisibleTrap(uid,trap)
+      }
+    case RemoveVisibleTrap(uid,trap) =>
+      clientsConnections.map {cc =>
+        if (cc._1.uid == uid) cc._2 forward RemoveVisibleTrap(uid,trap)
+      }
+    case UpdateVisibleTreasures(uid,treasures) =>
+      clientsConnections.map {cc =>
+        if (cc._1.uid == uid) cc._2 forward UpdateVisibleTreasures(uid,treasures)
+      }
+    case VisibleTreasures(uid,treasures) =>
+      clientsConnections.map {cc =>
+        if (cc._1.uid == uid) cc._2 forward VisibleTreasures(uid,treasures)
+      }
+    case VisibleGhosts(uid,ghosts) =>
+      clientsConnections.map {cc =>
+        if (cc._1.uid == uid) cc._2 forward VisibleGhosts(uid,ghosts)
+      }
+    case VisibleTraps(uid,traps) =>
+      clientsConnections.map {cc =>
+        if (cc._1.uid == uid) cc._2 forward VisibleTraps(uid,traps)
+      }
+    case VisiblePlayers(uid,players) =>
+      clientsConnections.map {cc =>
+        if (cc._1.uid == uid) cc._2 forward VisiblePlayers(uid,players)
+      }
   }
 }

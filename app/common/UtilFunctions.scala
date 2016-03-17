@@ -29,6 +29,14 @@ object UtilFunctions {
   private val MAX_ATTEMPTS = 100
   private val logger = new CustomLogger("UtilFunctions")
   
+  def metersToLatitudeDelta(meters: Double): Double = {
+    Math.toDegrees(meters/EARTH_RADIUS)
+  }
+  
+  def metersToLongitudeDelta(meters: Double, latitude_radiants: Double): Double = {
+    Math.toDegrees( (meters/EARTH_RADIUS) / Math.cos(latitude_radiants) )
+  }
+  
   /**
    * randomPositionInSpace method
    * It calculate a position(point with lat and lng) randomly in a given game area space

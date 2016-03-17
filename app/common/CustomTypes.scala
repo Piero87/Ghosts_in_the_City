@@ -13,7 +13,7 @@ import scala.util.Random
 sealed case class GameParameters(game_type: String){
   
   // **** GAME ARENA ****
-  
+ 
   val canvas_width = ConfigFactory.load().getDouble("canvas_width")
   val canvas_height = ConfigFactory.load().getDouble("canvas_height")
   val canvas_margin = if (game_type == GameType.REALITY) {
@@ -251,8 +251,7 @@ object Vertex {
    */
   def createVertexWithNewLat(p: Point, dist_meters: Double): Point = {
     
-    val r_earth = UtilFunctions.EARTH_RADIUS
-    val delta_lat = Math.toDegrees(dist_meters/r_earth)
+    val delta_lat = UtilFunctions.metersToLatitudeDelta(dist_meters)
     
     val new_lat = p.latitude + delta_lat
     return new Point(new_lat,p.longitude)
@@ -264,8 +263,7 @@ object Vertex {
    */
   def createVertexWithNewLong(p: Point, dist_meters: Double): Point = {
     
-    val r_earth = UtilFunctions.EARTH_RADIUS
-    val delta_lng = Math.toDegrees( (dist_meters/r_earth) / Math.cos(p.latitude_rad) )
+    val delta_lng = UtilFunctions.metersToLongitudeDelta(dist_meters, p.latitude_rad)
     
     val new_lng = p.longitude + delta_lng
     return new Point(p.latitude,new_lng)
@@ -277,9 +275,8 @@ object Vertex {
    */
   def createVertexWithNewLatLong(p: Point, dist_meters: Double): Point = {
     
-    val r_earth = UtilFunctions.EARTH_RADIUS
-    val delta_lat = Math.toDegrees(dist_meters/r_earth)
-    val delta_lng = Math.toDegrees( (dist_meters/r_earth) / Math.cos(p.latitude_rad) )
+    val delta_lat = UtilFunctions.metersToLatitudeDelta(dist_meters)
+    val delta_lng = UtilFunctions.metersToLongitudeDelta(dist_meters, p.latitude_rad)
     
     val new_lat = p.latitude + delta_lat
     val new_lng = p.longitude + delta_lng
