@@ -109,6 +109,12 @@ case class HitPlayerRequest(player_uid: String)
 case class AttackHim(player: ActorRef)
 case class PlayerAttacked(uid: String, attacker_uid: String, attack_type: Int, gold_perc_stolen: Double, keys_stolen: Int)
 
+case class UpdateVisiblePlayerPosition(receiver_uid: String, player: PlayerInfo)
+case class UpdateVisibleGhostsPositions(receiver_uid: String, ghosts: MutableList[GhostInfo])
+case class newVisibleTrap(receiver_uid: String, trap: TrapInfo)
+case class removeVisibleTrap(receiver_uid: String, trap: TrapInfo)
+case class updateVisibleTreasure(receiver_uid: String, treasures: MutableList[TreasureInfo])
+
 // Treasure
 case class Open(pos_p: Point, keys: List[Key])
 case class IncreaseGold(gold: Int)
