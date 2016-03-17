@@ -626,7 +626,7 @@ class GameManagerBackend () extends Actor {
         }
         
         for(i <- 1 to game_params.ghosts_per_treasure){
-          var ghost_postion : Point = UtilFunctions.randomPositionAroundPoint(treasure_position, game_params.treasure_radius, game_area)
+          var ghost_postion : Point = UtilFunctions.randomPositionAroundPoint(treasure_position, game_params.treasure_radius, game_area,game_type)
           logger.log("Ghost[" + i + "] position: ("+ ghost_postion.latitude +","+ ghost_postion.longitude +")")
           
           // Creazione dei due fantasmi a guardia dei tesori

@@ -29,6 +29,14 @@ object UtilFunctions {
   private val MAX_ATTEMPTS = 100
   private val logger = new CustomLogger("UtilFunctions")
   
+  def metersToLatitudeDelta(meters: Double): Double = {
+    Math.toDegrees(meters/EARTH_RADIUS)
+  }
+  
+  def metersToLongitudeDelta(meters: Double, latitude_radians: Double): Double = {
+    Math.toDegrees( (meters/EARTH_RADIUS) / Math.cos(latitude_radians) )
+  }
+  
   /**
    * randomPositionInSpace method
    * It calculate a position(point with lat and lng) randomly in a given game area space
@@ -88,12 +96,22 @@ object UtilFunctions {
    * @param radius
    * @param permitted_area
    */
-  def randomPositionAroundPoint(target_point: Point, radius: Double, permitted_area: Polygon) : Point = {
+  def randomPositionAroundPoint(target_point: Point, radius: Double, permitted_area: Polygon, game_type: String) : Point = {
     var attemps = 0
     val rnd = new Random()
     var point : Point = null
+    
+    var lat_delta = radius
+    var lng_delta = radius
+    
+    if (game_type == "reality") {
+      lat_delta = metersToLatitudeDelta(radius)
+      lng_delta = metersToLongitudeDelta(radius, target_point.latitude_rad)
+    }
+    
     do {
-      point = new Point(target_point.latitude + rnd.nextDouble() * radius, target_point.longitude + rnd.nextDouble() * radius)
+      point = new Point(target_point.latitude + rnd.nextDouble() * lat_delta, target_point.longitude + rnd.nextDouble() * lng_delta)
+      logger.log("randomPositionAroundPoint - attempt: " + attemps + ", point: " + point)
       attemps += 1
     } while (!permitted_area.contains(point) && attemps != MAX_ATTEMPTS)
     if (attemps == MAX_ATTEMPTS){
@@ -139,8 +157,8 @@ object UtilFunctions {
     
     var index = 0
     //inizializzo le dimensioni per lo spazio iniziale
-    var lat_start = 0
-    var lng_start = 0
+    var lat_start = area.getRectangleThatContainsPolygon().origin.latitude
+    var lng_start = area.getRectangleThatContainsPolygon().origin.longitude
     
     for(col <- 0 to columns - 1){
       for(row <- 0 to rows - 1){
