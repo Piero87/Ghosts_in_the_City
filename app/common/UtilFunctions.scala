@@ -33,8 +33,8 @@ object UtilFunctions {
     Math.toDegrees(meters/EARTH_RADIUS)
   }
   
-  def metersToLongitudeDelta(meters: Double, latitude_radiants: Double): Double = {
-    Math.toDegrees( (meters/EARTH_RADIUS) / Math.cos(latitude_radiants) )
+  def metersToLongitudeDelta(meters: Double, latitude_radians: Double): Double = {
+    Math.toDegrees( (meters/EARTH_RADIUS) / Math.cos(latitude_radians) )
   }
   
   /**
@@ -95,13 +95,24 @@ object UtilFunctions {
    * @param target_point
    * @param radius
    * @param permitted_area
+   * @param game_type
    */
-  def randomPositionAroundPoint(target_point: Point, radius: Double, permitted_area: Polygon) : Point = {
+  def randomPositionAroundPoint(target_point: Point, radius: Double, permitted_area: Polygon, game_type: String) : Point = {
     var attemps = 0
     val rnd = new Random()
     var point : Point = null
+    
+    var lat_delta = radius
+    var lng_delta = radius
+    
+    if (game_type == "reality") {
+      lat_delta = metersToLatitudeDelta(radius)
+      lng_delta = metersToLongitudeDelta(radius, target_point.latitude_rad)
+    }
+    
     do {
-      point = new Point(target_point.latitude + rnd.nextDouble() * radius, target_point.longitude + rnd.nextDouble() * radius)
+      point = new Point(target_point.latitude + rnd.nextDouble() * lat_delta, target_point.longitude + rnd.nextDouble() * lng_delta)
+      logger.log("randomPositionAroundPoint - attempt: " + attemps + ", point: " + point)
       attemps += 1
     } while (!permitted_area.contains(point) && attemps != MAX_ATTEMPTS)
     if (attemps == MAX_ATTEMPTS){
