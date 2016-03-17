@@ -4,7 +4,7 @@
 # This class handles most of the player interactions with the buttons/menus/forms on the page, as well as manages
 # the WebSocket connection.	It delegates to other classes to manage everything else.
 #
-define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
+define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngine, Map) ->
 	class MainPageModel
 		constructor: () ->
 			
@@ -46,7 +46,11 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			@gameplayersmissing = ko.observable()
 			@game_team_RED = ko.observableArray()
 			@game_team_BLUE = ko.observableArray()
+			@game_type_web = ko.observable(true)
+			
+			# Game arenas(map could be used only if user is an admin)
 			@game_client_engine = null
+			@map = null
 			
 			# Interval to send a lot of request for available games
 			@interval = null
@@ -255,7 +259,12 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					if (json.team == -1)
 						$("#game-result-draw").show()
 					else if (json.team == -2)
-						$("#game-result-won").show()
+						if(@game_team_BLUE().length > @game_team_RED().length)
+							$("#game-result-blue").show()
+							$("#game-result-left").show()
+						else
+							$("#game-result-red").show()
+							$("#game-result-left").show()
 					else if (json.team == player_team)
 						$("#game-result-won").show()
 					else 
@@ -270,6 +279,11 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			
 			# When the websocket opens
 			@adminws.onopen = (event) =>
+				
+				# Initialize the two possible game arena
+				@game_client_engine = new GameClientEngine(@adminuid(), @adminws)
+				@map = new Map(@adminws)
+				
 				@connecting(null)
 				# Send login data to the server
 				console.log("Admin try to login")
@@ -285,8 +299,12 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 				@disconnected(true)
 				@connected(false)
 				@closing = false
-				@playername()
 				localStorage.removeItem("admin")
+				localStorage.removeItem("gameid")
+				
+				# Destroy everything and clean it all up.
+				@map.destroy() if @map
+				@map = null
 				
 			# Handle the stream
 			@adminws.onmessage = (event) =>
@@ -296,6 +314,7 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					if(json.result)
 						@connecting(null)
 						@connected(true)
+						
 						$("#ghostbusters-song").get(0).play()
 						# Setting the interval for refresh games list
 						callback = @startedGamesList.bind(this)
@@ -323,6 +342,186 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 							@gameslist.push(game)
 					else
 						@gamesavailable(false)
+				
+				else if json.event == "game_started"
+					# Stop sending game list request
+					if (@interval)
+						clearInterval(@interval)
+						@interval = null
+				
+					# Save all game data
+					@gameid(json.game.id)
+					localStorage.setItem("gameid", @gameid())
+					@setGameName(json.game.name)
+					@gamemaxplayers(json.game.n_players)
+					
+					console.log(json)
+					@refreshPlayerList(json)
+					@gamename(json.game.name)
+					
+					# Update status variables
+					@gameready(false)
+					@gamestarted(true)
+					@gameended(false)
+					
+					@game_client_engine = new GameClientEngine(@adminuid(), @adminws) if (@game_client_engine == null)
+					@map = new Map(@adminws) if (@map == null)
+					
+					$("#game-result-won").hide()
+					$("#game-result-lost").hide()
+					$("#game-result-draw").hide()
+					
+					
+					#Initialize game arena
+					if(json.game.g_type == "web")
+						@game_type_web(true)
+						@game_client_engine.setBusters(json.game.players)
+						@game_client_engine.setGhosts(json.game.ghosts)
+						@game_client_engine.setTreasures(json.game.treasures)
+						@game_client_engine.setTraps(json.game.traps)
+						@game_client_engine.startGame()
+					else if(json.game.g_type == "reality")
+						@game_type_web(false)
+						# Initialize map
+						@map.setView([json.game.players[0].latitude, json.game.players[0].longitude], 17)
+						@map.setBusterMarkers(json.game.players)
+						@map.setGhostMarkers(json.game.ghosts)
+						@map.setTreasuresMarkers(json.game.treasures)
+						@map.setTraps(json.game.traps)
+						
+				else if json.event == "game_status"
+					# {event: "game_status", game: {id: [Int], name: [String], n_players: [Int], players [Array of String], status: [Int]}}
+					@changeGameStatus(json.game.status)
+					switch json.game.status
+						when 1 # game started
+							
+							@setGameName(json.game.name)
+							
+							console.log(json)
+							console.log('Fight!')
+							@refreshPlayerList(json)
+							@gamename(json.game.name)
+							
+							if @game_type_web()
+								@game_client_engine.setBusters(json.game.players)
+								@game_client_engine.setGhosts(json.game.ghosts)
+								@game_client_engine.setTreasures(json.game.treasures)
+								@game_client_engine.setTraps(json.game.traps)
+								@game_client_engine.startGame()
+							else
+								@map.setView([json.game.players[0].latitude, json.game.players[0].longitude], 17)  
+								@map.setBusterMarkers(json.game.players)
+								@map.setGhostMarkers(json.game.ghosts)
+								@map.setTreasuresMarkers(json.game.players)
+								@map.setTreasuresMarkers(json.game.treasures)
+								@map.startGame()
+								
+							@refreshPlayersList(json)
+							
+						when 2 # game paused
+							console.log('Hold on!')
+							if @game_type_web()
+								@game_client_engine.pauseGame()
+							else
+								@map.pauseGame()
+								
+						when 3 # game ended
+							console.log('Game Over!')
+							@gamename("")
+							localStorage.removeItem("gameid")
+							if @game_type_web()
+								@game_client_engine.endGame()
+								@game_client_engine = null
+							else
+								@map.endGame()
+								@map = null
+						
+				else if json.event == "update_player_position"
+					if @gamestarted()
+						if @game_type_web()
+							@game_client_engine.busterMove(json.player.uid, json.player.pos.latitude, json.player.pos.longitude)
+						else
+							@map.updateBusterMarkers(json.player.uid, json.player.pos.latitude, json.player.pos.longitude)
+						
+				else if json.event == "update_info"
+					if @gamestarted()
+						@refreshPlayerList(json)
+						
+				else if json.event == "update_ghosts_positions"
+					if @gamestarted()
+						if @game_type_web()
+							@game_client_engine.ghostMove(ghost.uid, ghost.mood, ghost.pos.latitude, ghost.pos.longitude) for ghost in json.ghosts
+						else
+							@map.updateGhostMarkers(ghost.uid, ghost.level, ghost.mood, ghost.pos.latitude, ghost.pos.longitude) for ghost in json.ghosts
+				
+				else if json.event == "update_treasures"
+					console.log("Tesoro aperto!")
+					console.log(json.treasures)
+					if @gamestarted()
+						if @game_type_web()
+							@game_client_engine.changeTreasureStatus(treasure.uid, treasure.status) for treasure in json.treasures
+						else
+							@map.updateTreasureMarkers(treasure.uid, treasure.status) for treasure in json.treasures
+				
+				else if json.event == "new_trap"
+					if @gamestarted()
+						if @game_type_web()
+							@game_client_engine.newTrap(json.trap.uid, json.trap.pos.latitude, json.trap.pos.longitude)
+						else
+							@map.setTrapMarker(json.trap.uid, json.trap.pos.latitude, json.trap.pos.longitude)
+				
+				else if json.event == "active_trap"
+					if @gamestarted()
+						$("#trap-activated").get(0).play()
+						if @game_type_web()
+							@game_client_engine.activeTrap(json.trap.uid) if (json.trap.status == 1)
+						else
+							@map.updateActiveTrapMarker(json.trap.uid) if (json.trap.status == 1)
+						console.log "Trappola attivata!"
+							# console.log json.trap
+				
+				else if json.event == "remove_trap"
+					if @gamestarted()
+						if @game_type_web()
+							@game_client_engine.removeTrap(json.trap.uid)
+						else
+							@map.removeTrapMarker(json.trap.uid)
+						console.log "Trappola rimossa!"
+						# console.log json.trap
+						
+				else if json.event == "game_results"
+					# "team" [0,1,-1] : winning team
+					# "players" [list of player_info] : players of the game
+					player_team = -1
+					
+					@game_team_RED.removeAll()
+					@game_team_BLUE.removeAll()
+					if json.players.length > 0
+						i = 0
+						for player in json.players
+							i = i + 1
+							player.index = i
+							if (player.uid == @playeruid())
+								player_team = player.team
+							if (player.team == 0)
+								@game_team_RED.push(player)
+							else if (player.team == 1)
+								@game_team_BLUE.push(player)
+								
+					if (json.team == -1)
+						$("#game-result-draw").show()
+					else if (json.team == -2)
+						if(@game_team_BLUE().length > @game_team_RED().length)
+							$("#game-result-blue").show()
+							$("#game-result-left").show()
+						else
+							$("#game-result-red").show()
+							$("#game-result-left").show()
+					else if (json.team == 0)
+						$("#game-result-red").show()
+					else if (json.team == 1)
+						$("#game-result-blue").show()
+						
 					
 		# Toggle the background music
 		toggleMusic: ->
@@ -441,6 +640,9 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			@ws.send(JSON.stringify
 				event: "resume_game"
 				game_id: @gameid()
+				pos:
+					latitude: parseInt( 0, 10 )
+					longitude: parseInt( 0, 10 )
 			)
 		
 		# Disconnect the ws
@@ -531,10 +733,11 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 			@gametime(hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2))
 		
 		refreshPlayerList: (json) ->
-			# Compute missing players
-			@gamemaxplayers(json.game.n_players)
-			playersmissing = json.game.n_players - json.game.players.length
-			@gameplayersmissing(playersmissing)
+			# Compute missing players only if is not admin
+			if(!@admin())
+				@gamemaxplayers(json.game.n_players)
+				playersmissing = json.game.n_players - json.game.players.length
+				@gameplayersmissing(playersmissing)
 			@game_team_RED.removeAll()
 			@game_team_BLUE.removeAll()
 			if json.game.players.length > 0
@@ -625,4 +828,3 @@ define ["knockout", "gps", "gameClientEngine"], (ko, Gps, GameClientEngine) ->
 					
 			
 	return MainPageModel
-

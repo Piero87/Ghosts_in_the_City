@@ -78,18 +78,27 @@
         
         <div data-bind="visible: connected" align="center">
         	<div data-bind="visible: (!gameready() && !gamestarted() && !gamepaused() && !gameended())" align="center" >
-	        	<div class="ghostbuster-font" align="center">
-	        	It's a gloomy day in the Big Apple, the ghosts have taken possession of the city and they robbed all the gold reserves. 
+	        	<div data-bind="visible: !admin()">
+	        		<div class="ghostbuster-font" align="center">
+	        		It's a gloomy day in the Big Apple, the ghosts have taken possession of the city and they robbed all the gold reserves. 
+	        		<br>
+	        		Your job is to challenge them, and recover all the stolen gold!
+	        		<br><br>
+	        		Be careful, other Ghostbusters have joined the mission, do not let that these pusillanimous take the spotlight from you.
+	        		<br><br> 
+	        		Lead your team to overwhelm all the ghosts, leaving them without a penny!</div>
+	        		<h2 class="ghostbuster-font">Can you be the hero the city needs?</h2>
+	        		<div align="center" class="font-small ghostbuster-font">certainly you are not the one it deserves</div>
+	        		<div align="center" class="font-small ghostbuster-font">(not in a positive way)</div>
+	        	</div>
+	     		<div data-bind="visible: admin()">
+	     			<div class="ghostbuster-font" align="center">
+	     			Welcome admin, you're the supreme master user who has the power to overwatch a started game, but you're also the one who through his magic can take possession of a ghost (one of those free from the bond which keeps it in the treasure protection) and fight the young buster who are trying to recover all the gold .
+	     			</div>
+	     		</div>
+	        	
 	        	<br>
-	        	Your job is to challenge them, and recover all the stolen gold!
-	        	<br><br>
-	        	Be careful, other Ghostbusters have joined the mission, do not let that these pusillanimous take the spotlight from you.
-	        	<br><br> 
-	        	Lead your team to overwhelm all the ghosts, leaving them without a penny!</div>
-	        	<h2 class="ghostbuster-font">Can you be the hero the city needs?</h2>
-	        	<div align="center" class="font-small ghostbuster-font">certainly you are not the one it deserves</div>
-	        	<div align="center" class="font-small ghostbuster-font">(not in a positive way)</div>
-	        	<br>
+	        	
 	        	<div class="bordered" style="max-width: 500px;">
 	        		<div data-bind="visible: !admin()" class="container">
 	        			<form>
@@ -98,6 +107,9 @@
 	        					<button class="btn ghostbuster-font font-big" data-bind="click: newGame">Start new Mission</button>
 	        				</fieldset>
 	        			</form>
+	        		</div>
+	        		<div data-bind="visible: admin()" class="container">
+	        			<p class="ghostbuster-font font-big">Looking for some games already started...</p>
 	        		</div>
 	        		<hr>
 	        		<div class="container" data-bind="visible: gamesavailable">
@@ -174,11 +186,12 @@
 		        		
 		        	</div>
 		        	<div align="right">
-		        		<a href="javascript: void(0);" class="ghostbuster-font font-small" data-bind="click: toggleDebug">debug mode:  <span data-bind="text: debug"></span></a>
+		        		<a href="javascript: void(0);" class="ghostbuster-font font-small" data-bind="if: game_type_web, click: toggleDebug">debug mode:  <span data-bind="text: debug"></span></a>
 		        	</div>
-	        		<div id="gameArenaContainer">	
+	        		<div id="gameArenaContainer">
+	        		<div id="mapContainer"></div>	
 		        	</div>
-		        	<div class="ghostbuster-font" align="center" style="margin: 5px;">
+		        	<div data-bind="visible: !admin()" class="ghostbuster-font" align="center" style="margin: 5px;">
 		        		<span class="gold-owned font-big">
 		        			gold owned: <b><span data-bind="text: playergold"></span></b> $
 		        		</span>
@@ -187,7 +200,7 @@
 		        		</span>
 		        	</div>
 		        	<hr>
-		        	<div class="font-medium">
+		        	<div data-bind="visible: !admin()" class="font-medium">
 		        		<span class="key">←</span>
 		        		<span class="key">↑</span>
 		        		<span class="key">↓</span>
@@ -195,7 +208,7 @@
 		        		&nbsp;
 		        		<span class="ghostbuster-font">: movements</span>
 		        		&nbsp;-&nbsp;
-		        		<span class="key">A</span>
+		        		<span  class="key">A</span>
 		        		&nbsp;
 		        		<span class="ghostbuster-font">: set trap ($ 100)</span>
 		        		&nbsp;-&nbsp;
@@ -207,8 +220,20 @@
 		        		&nbsp;
 		        		<span class="ghostbuster-font">: hit player</span>
 		        	</div>
+		        	<div data-bind="visible: admin()" class="font-medium">
+		        		<span class="key">←</span>
+		        		<span class="key">↑</span>
+		        		<span class="key">↓</span>
+		        		<span class="key">→</span>
+		        		&nbsp;
+		        		<span class="ghostbuster-font">: movements</span>
+		        		&nbsp;-&nbsp;
+		        		<span class="key">D</span>
+		        		&nbsp;
+		        		<span class="ghostbuster-font">: hit player</span>
+		        	</div>
 		        	<hr>
-	        		<div class="row">
+	        		<div data-bind="visible: !admin()" class="row">
 		        		<div class="col-sm-6">
 		        			<div class="ghostbuster-font font-big" align="center" style="color: red !important;">Team RED</div>
 			        		<div data-bind="foreach: game_team_RED">
@@ -244,6 +269,52 @@
 							</div>
 						</div>
 					</div>
+					<div data-bind="visible: admin()" class="row">
+		        		<div class="col-sm-6">
+		        			<div class="ghostbuster-font font-big" align="center" style="color: red !important;">Team RED</div>
+			        		<div data-bind="foreach: game_team_RED">
+							    <div class="row" style="margin-bottom: 10px;">
+							    	<span class="col-xs-4" align="right">
+							    		<img width="48px" height="48px" alt="Buster Icon" data-bind="attr:{src: '/assets/images/G' + $data.index + '.png'}"/>
+							    	</span>
+						    		<span class="col-xs-4 ghostbuster-font font-big line-with-icon" align="left"> 
+							    	  	<span>
+							    			<span data-bind="text: name"></span>
+							    	  	</span>
+							    	</span>
+							    	<span class="col-xs-4 ghostbuster-font font-small line-with-icon" align="left"> 
+							    	  	<span>
+							    			<span class="gold-owned font-small">Gold:</span><span class="font-small" data-bind="text: gold"></span>
+							    			<span class="keys-owned font-small">Keys:</span><span class="font-small" data-bind="text: keys.length"></span>
+							    	  	</span>
+							    	</span>
+								    	
+							    </div>
+							</div>
+						</div>
+						<div class="col-sm-6">
+							<div class="ghostbuster-font font-big" align="center" style="color: blue !important;">Team BLUE</div>
+			        		<div data-bind="foreach: game_team_BLUE">
+							    <div class="row" style="margin-bottom: 10px;">
+							    	<span class="col-xs-4" align="right">
+							    		<img width="48px" height="48px" alt="Buster Icon" data-bind="attr:{src: '/assets/images/G' + $data.index + '.png'}"/>
+							    	</span>
+						    		<span class="col-xs-4 ghostbuster-font font-big line-with-icon" align="left"> 
+							    	  	<span>
+							    			<span data-bind="text: name"></span>
+							    	  	</span>					    	  	
+							    	</span>
+							    	<span class="col-xs-4 ghostbuster-font font-small line-with-icon" align="left"> 
+							    	  	<span>
+							    			<span class="gold-owned font-small">Gold:</span><span class="font-small" data-bind="text: gold"></span>
+							    			<span class="keys-owned font-small">Keys:</span><span class="font-small" data-bind="text: keys.length"></span>
+							    	  	</span>				    	  	
+							    	</span>
+								    	
+							    </div>
+							</div>
+						</div>
+					</div>
 					<hr>
 					<button class="btn ghostbuster-font" data-bind="click: leaveGame">Leave Mission</button>
 				</div>
@@ -253,12 +324,12 @@
 	        	<h1 class="ghostbuster-font font-huge">mission paused</h1>
 	        	<div class="ghostbuster-font font-medium">get ready!</div>
 	        </div>
-	        <div data-bind="visible: gameended" align="center">
+	        <div data-bind="visible: gameended() && !admin()" align="center">
 	        	<h1 class="ghostbuster-font font-huge">mission over</h1>
 	        	<h2 id="game-result-won" class="text-green font-huge ghostbuster-font" style="display:none;"> - Your team won! - </h2>
 	        	<h2 id="game-result-lost" class="text-red font-huge ghostbuster-font" style="display:none;">Looooooser!</h2>
 	        	<h2 id="game-result-draw" class="text-grey font-huge ghostbuster-font" style="display:none;">Uhm...It ended in a draw...</h2>
-	        	<h2 id="game-result-draw" class="text-grey font-huge ghostbuster-font" style="display:none;"> Some moron has left the mission...</h2>
+	        	<h2 id="game-result-left" class="text-grey font-huge ghostbuster-font" style="display:none;"> Some moron has left the mission...</h2>
 	        	<hr>
 	        	<h1 class="ghostbuster-font font-medium">Ghostbusters:</h1>
 	        	<div class="row">
@@ -301,6 +372,64 @@
 				</div>
 				<button class="btn ghostbuster-font" data-bind="click: playAgain">Go Back to Home Page</button>
 	        </div>
+	        <div data-bind="visible: gameended() && admin()" align="center">
+	        	<h1 class="ghostbuster-font font-huge">mission over</h1>
+	        	<h2 id="game-result-red" class="text-red font-huge ghostbuster-font" style="display:none;"> - Red team won! - </h2>
+	        	<h2 id="game-result-blue" class="text-blue font-huge ghostbuster-font" style="display:none;"> - Blue team won! - </h2>
+	        	<h2 id="game-result-draw" class="text-grey font-huge ghostbuster-font" style="display:none;">...It ended in a draw...</h2>
+	        	<h2 id="game-result-left" class="text-grey font-huge ghostbuster-font" style="display:none;"> Some moron has left the mission...</h2>
+	        	<hr>
+	        	<h1 class="ghostbuster-font font-medium">Ghostbusters:</h1>
+	        	<div class="row">
+	        		<div class="col-sm-6">
+		        		<div class="ghostbuster-font font-big" align="center" style="color: red !important;">Team RED</div>
+			        		<div data-bind="foreach: game_team_RED">
+							    <div class="row" style="margin-bottom: 10px;">
+							    	<span class="col-xs-4" align="right">
+							    		<img width="48px" height="48px" alt="Buster Icon" data-bind="attr:{src: '/assets/images/G' + $data.index + '.png'}"/>
+							    	</span>
+						    		<span class="col-xs-4 ghostbuster-font font-big line-with-icon" align="left"> 
+							    	  	<span>
+							    			<span data-bind="text: name"></span>
+							    	  	</span>
+							    	</span>
+							    	<span class="col-xs-4 ghostbuster-font font-small line-with-icon" align="left"> 
+							    	  	<span>
+							    			<span class="gold-owned font-small">Gold:</span><span class="font-small" data-bind="text: gold"></span>
+							    			<span class="keys-owned font-small">Keys:</span><span class="font-small" data-bind="text: keys.length"></span>
+							    	  	</span>
+							    	</span>
+								    	
+							    </div>
+							</div>
+						</div>
+						<div class="col-sm-6">
+							<div class="ghostbuster-font font-big" align="center" style="color: blue !important;">Team BLUE</div>
+			        		<div data-bind="foreach: game_team_BLUE">
+							    <div class="row" style="margin-bottom: 10px;">
+							    	<span class="col-xs-4" align="right">
+							    		<img width="48px" height="48px" alt="Buster Icon" data-bind="attr:{src: '/assets/images/G' + $data.index + '.png'}"/>
+							    	</span>
+						    		<span class="col-xs-4 ghostbuster-font font-big line-with-icon" align="left"> 
+							    	  	<span>
+							    			<span data-bind="text: name"></span>
+							    	  	</span>					    	  	
+							    	</span>
+							    	<span class="col-xs-4 ghostbuster-font font-small line-with-icon" align="left"> 
+							    	  	<span>
+							    			<span class="gold-owned font-small">Gold:</span><span class="font-small" data-bind="text: gold"></span>
+							    			<span class="keys-owned font-small">Keys:</span><span class="font-small" data-bind="text: keys.length"></span>
+							    	  	</span>				    	  	
+							    	</span>
+								    	
+							    </div>
+							</div>
+							</div>
+						</div>	
+						<button class="btn ghostbuster-font" data-bind="click: playAgain">Go Back to Home Page</button>
+					</div>
+	        </div>
+    	</div>
     	</div>
     	<script type="text/javascript">
 	    	(function() {

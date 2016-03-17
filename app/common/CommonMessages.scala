@@ -10,14 +10,16 @@ object StatusGame extends Enumeration {
    val STARTED = 1
    val PAUSED = 2
    val FINISHED = 3
+   val WITH_ADMIN = 4
 } 
 
 object Team extends Enumeration {
   type Team = Int
    val NO_ENOUGH_PLAYER = -2
    val UNKNOWN = -1
-   val BLUE = 0
-   val RED = 1
+   val RED = 0
+   val BLUE = 1
+
 }
 
 object GhostMood extends Enumeration {
@@ -143,7 +145,7 @@ case class GameHandler(game: Game, ref: ActorRef = null)
 case class LeaveGame(uid: String)
 case class PauseGame(uid: String)
 case class NewGame(name: String, n_players: Int, player: PlayerInfo, game_area_edge: Double, game_type: String, ref: ActorRef = null)
-case class Game(id: String, name: String, n_players: Int, status: Int, g_type: String, players: MutableList[PlayerInfo], ghosts: MutableList[GhostInfo], treasures: MutableList[TreasureInfo])
+case class Game(id: String, name: String, n_players: Int, status: Int, g_type: String, players: MutableList[PlayerInfo], ghosts: MutableList[GhostInfo], treasures: MutableList[TreasureInfo], traps: MutableList[TrapInfo])
 case class GamesList(list: List[Game])
 case class GamesListFiltered(game_type: String)
 case object GameStatus
@@ -158,8 +160,7 @@ case object CheckPaused
 case class AdminLogin(name: String, password: String)
 case class LoginResult(result: Boolean)
 case object StartedGamesList
-
-
+case class UpdateInfo(game: Game, adminuid: String)
 
 // Json
 case class NewGameJSON(event: String, name: String, pos: Point, game_area_edge: Double, n_players: Int, game_type: String)
@@ -188,6 +189,9 @@ case class StartedGamesListRequestJSON(event: String)
     
 import play.api.libs.json._
 
+/**
+ * All message serializer
+ */
 object CommonMessages {
 
   implicit val pointReads = Json.reads[Point]
@@ -207,6 +211,9 @@ object CommonMessages {
   
   implicit val treasureInfoReads = Json.reads[TreasureInfo]
   implicit val treasureInfoWrites = Json.writes[TreasureInfo]
+  
+  implicit val trapReads = Json.reads[TrapInfo]
+  implicit val trapWrites = Json.writes[TrapInfo]
   
   implicit val gameReads = Json.reads[Game]
   implicit val gameWrites = Json.writes[Game]
@@ -237,9 +244,6 @@ object CommonMessages {
   
   implicit val broadcastGhostsPositionReads = Json.reads[BroadcastGhostsPositionsJSON]
   implicit val broadcastGhostsPositionWrites = Json.writes[BroadcastGhostsPositionsJSON]
-  
-  implicit val trapReads = Json.reads[TrapInfo]
-  implicit val trapWrites = Json.writes[TrapInfo]
   
   implicit val setTrapReads = Json.reads[SetTrapJSON]
   implicit val setTrapWrites = Json.writes[SetTrapJSON]

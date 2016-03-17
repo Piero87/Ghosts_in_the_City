@@ -4,6 +4,9 @@ import scala.util.Random
 import com.typesafe.config.ConfigFactory
 import play.api.Logger
 
+/**
+ * Custom logger.
+ */
 class CustomLogger (o: String) {
   var origin = o
   def log(msg: String) {
@@ -15,6 +18,10 @@ class CustomLogger (o: String) {
   }
 }
 
+/**
+ * Util function object.
+ * It contains most of the function used during the creation of a game 
+ */
 object UtilFunctions {
   
   val EARTH_RADIUS = 6371010; // metres
@@ -22,6 +29,14 @@ object UtilFunctions {
   private val MAX_ATTEMPTS = 100
   private val logger = new CustomLogger("UtilFunctions")
   
+  /**
+   * randomPositionInSpace method
+   * It calculate a position(point with lat and lng) randomly in a given game area space
+   * 
+   * @param rect_space
+   * @param permitted_area
+   * @param margin
+   */
   def randomPositionInSpace(rect_space: Rectangle, permitted_area: Polygon, margin: Double): Point = {
     logger.log("Space: " + rect_space)
     var attemps = 0
@@ -64,6 +79,15 @@ object UtilFunctions {
   }
   */
   
+  /**
+   * randomPositionAroundPoint method
+   * It calculate a position(point with lat and lng) randomly around a given target point.
+   * It will used to position a ghost who guard a treasure.
+   * 
+   * @param target_point
+   * @param radius
+   * @param permitted_area
+   */
   def randomPositionAroundPoint(target_point: Point, radius: Double, permitted_area: Polygon) : Point = {
     var attemps = 0
     val rnd = new Random()
@@ -80,7 +104,13 @@ object UtilFunctions {
     return point
   }
   
-  
+  /**
+   * createSpaces method.
+   * It divides the game area in rectangular spaces
+   *
+   * @param number
+   * @param area 
+   */
   def createSpaces(number : Int, area: Polygon): Array[Rectangle] = {
     
     var nro_spaces = 0

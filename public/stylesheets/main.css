@@ -39,6 +39,23 @@
  	margin-left: -400px;
 }
 
+#map {
+	width: 1000px;
+	height: 500px;
+}
+
+.custom-red .leaflet-popup-tip,
+.custom-red .leaflet-popup-content-wrapper {
+    background: #FF00004;
+    color: #000000;
+}
+
+.custom-blue .leaflet-popup-tip,
+.custom-blue .leaflet-popup-content-wrapper {
+    background: #0000FF;
+    color: #ffffff;
+}
+
 .round-corner {
 	border-radius: 5px;
 }
@@ -77,6 +94,10 @@
 
 .text-red {
 	color: red !important;
+}
+
+.text-green {
+	color: blue !important;
 }
 
 .text-green {

@@ -10,9 +10,9 @@ require.config {
     bootstrap: "../lib/bootstrap/js/bootstrap"
     jquery: "../lib/jquery/jquery"
     knockout: "../lib/knockout/knockout"
-    map: "./map/map"
-    marker: "./map/marker"
-    markerRenderer: "./map/markerRenderer"
+    map: "./controlcenter/map"
+    marker: "./controlcenter/marker"
+    markerRenderer: "./controlcenter/markerRenderer"
     leaflet: "../lib/leaflet/leaflet"
   }
   shim: {

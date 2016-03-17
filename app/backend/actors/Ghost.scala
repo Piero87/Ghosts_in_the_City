@@ -20,9 +20,29 @@ object Ghost{
    */
   case object UpdateGhostPosition
   
+  /**
+   * Factory for [[backend,actors.Ghost]] instances.
+   */
   def props(uid: String, arena: Polygon, position: Point, level: Int, treasure: ActorRef, position_treasure: Point, t_uid: String, game_type: String) = Props(new Ghost(uid, arena,position, level, treasure,position_treasure, t_uid, game_type))
 }
 
+/**
+ * Actor Player implementation class.
+ * Represent the ghost game entity that will hunt the busters and protect the treasure.
+ * It could walk arounf randomly, attack a player or return to his treasure if a trap take 
+ * it out from his guard range.
+ * 
+ * @constructor create a new actor with uid, area, position, level, Treasure actor, position_treasure, t_uid, game_type.
+ * @param uid 
+ * @param area Game arena
+ * @param position 
+ * @param level
+ * @param treasure
+ * @param treasure position
+ * @param t_uid treasure uid
+ * @param game_type
+ * 
+ */
 class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure: ActorRef, position_treasure: Point, t_uid: String, game_type: String) extends Actor {
   
   import context._
@@ -44,6 +64,11 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
   logger.log("Arena: " + arena)
   var update_pos_scheduler : Cancellable = null
   
+  /**
+   * Receive method.
+   * It helds all the messages received
+   * 
+   */
   def receive = {
     case GhostStart => 
       GMbackend = sender
@@ -51,8 +76,8 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
     case UpdateGhostPosition => 
       if(ghostpos.distanceFrom(position_treasure, game_type) < treasure_radius || level == 3){
        mood = GhostMood.CALM
-        // Ciclo di vita del fantasma: chiedo al GMBackend le posizioni dei player, calcolo la distanza da ciascuno di essi 
-        // se rientra nel range di azione attacco altrimenti mi muovo random
+        // Lifecycle: ask to GMBackend all player positions, calculate all player distance from him, if that distance is  
+        // in ghost range it will attack the player otherwise it walk randomly
         val future = GMbackend ? PlayersInfo
         future.onSuccess { 
           case Players(players) => 
@@ -97,6 +122,7 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
       update_pos_scheduler.cancel()
     case GhostTrapped(point) =>
       logger.log("Oh no, I'm trapped [" + uid + "]")
+      // I go into the trap -> my position is the same as the trap position
       mood = GhostMood.TRAPPED
       ghostpos = point
       update_pos_scheduler.cancel()
@@ -109,6 +135,11 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
       update_pos_scheduler = system.scheduler.schedule(0 millis, 500 millis, self, UpdateGhostPosition)
   }
   
+  /**
+   * Attack player method.
+   * We check if the ghost could attack directly(is really near the player), if not it will move toward the player.
+   * 
+   */
   def attackPlayer(player_info: PlayerInfo, player_actor : ActorRef) = {
     
     var gold_available = smellPlayerGold(player_info)
@@ -144,6 +175,11 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
     }
   }
   
+  /**
+   * Return to treasure method.
+   * The ghost will move back inside the treasure guard range
+   * 
+   */
   def returnToTreasure = {
     /*
     var ghost_move : Int = chooseNextMovement(position_treasure)
@@ -158,6 +194,11 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
     args.foreach(println)
   }
   
+  /**
+   * Random move method.
+   * We calculate randomply the new ghost position.
+   * 
+   */
   def random_move() = {
     
     var new_position = ghostpos.randomStep(GameParameters.ghost_step, game_type)
@@ -237,6 +278,12 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
   }
   */
   
+  /**
+   * Allowed position method
+   * Check if the game area contains the position passed as parameter
+   * 
+   * @param position
+   */
   def allowedPosition(position: Point): Boolean = {
     if (arena.contains(position)) {
       if (level == 3 || position.distanceFrom(position_treasure, game_type) < GameParameters.treasure_radius) {
@@ -246,11 +293,23 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
     return false
   }
   
+  /**
+   * Update position method
+   * Save ghost position and tell it to the GameManagerBackend actor.
+   * 
+   * @param position
+   */
   def updatePosition(position: Point) = {
     ghostpos = position
     GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
   }
   
+  /**
+   * Smell player gold method
+   * Calculate the player tastiness
+   * 
+   * @param player 
+   */
   def smellPlayerGold(player : PlayerInfo): Int = {
     var gold_toSteal_double = 0.0
     gold_toSteal_double = player.gold * GameParameters.ghost_hunger(level)

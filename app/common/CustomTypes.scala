@@ -4,6 +4,12 @@ import scala.collection.mutable
 import com.typesafe.config.ConfigFactory
 import scala.util.Random
 
+/**
+ * GameParameters class.
+ * It contains all game parameters depending of game type
+ * 
+ * @param game_type
+ */
 sealed case class GameParameters(game_type: String){
   
   // **** GAME ARENA ****
@@ -71,7 +77,13 @@ sealed case class GameParameters(game_type: String){
 class PointOutOfPolygonException(message: String = null, cause: Throwable = null) extends RuntimeException(message, cause)
 
 // Geometric and Spacial types
-
+/**
+ * Point class.
+ * Represent a single geometric point with a latitude and a longitute
+ * 
+ * @param latitude
+ * @param longitude
+ */
 sealed case class Point(latitude: Double, longitude: Double){
   
   // latitude == x
@@ -98,6 +110,14 @@ sealed case class Point(latitude: Double, longitude: Double){
     R * c;
   }
   
+  /**
+   * Distance from method.
+   * It calculate the distance between two point. 
+   * If game type is web it calculate the pixels between two point otherwise the meters
+   * 
+   * @param p Second point
+   * @param game_type
+   */
   def distanceFrom(p: Point, game_type: String): Double = {
     if (game_type == GameType.REALITY) {
       return metersFrom(p)
@@ -147,6 +167,14 @@ sealed case class Point(latitude: Double, longitude: Double){
     
   }
   
+  /**
+   * Step Towards method.
+   * Ghost will move toward to a player.
+   * 
+   * @param p
+   * @param length
+   * @param game_type
+   */
   def stepTowards(p: Point, length: Double, game_type: String): Point = {
     
     if (game_type == GameType.REALITY) {
@@ -157,6 +185,13 @@ sealed case class Point(latitude: Double, longitude: Double){
     
   }
   
+  /**
+   * Random step method.
+   * Ghost will move randomly.
+   * 
+   * @param length
+   * @param game_type
+   */
   def randomStep(length: Double, game_type: String): Point = {
     
     val rnd = new Random()
@@ -170,6 +205,13 @@ sealed case class Point(latitude: Double, longitude: Double){
     
   }
   
+  /**
+   * Convert to reality method.
+   * It will convert a canvas point(pixels) into real point(latitude, longitude)
+   * 
+   * @param canvas
+   * @param reality
+   */
   def convertToReality(canvas: Rectangle, reality: Rectangle) : Point = {
     // w_canvas : lat_canvas = w_reality : lat_reality
     var reality_lat = (latitude * reality.width) / canvas.width
@@ -178,6 +220,13 @@ sealed case class Point(latitude: Double, longitude: Double){
     new Point(reality_lat, reality_lng)
   }
   
+  /**
+   * Convert to canvas method.
+   * It will convert a real point(latitude, longitude) into canvas point(pixels)
+   * 
+   * @param canvas
+   * @param reality
+   */
   def convertToCanvas(canvas: Rectangle, reality: Rectangle) : Point = {
     // w_canvas : lat_canvas = w_reality : lat_reality
     var canvas_lat = (latitude * reality.width) / canvas.width
@@ -188,8 +237,18 @@ sealed case class Point(latitude: Double, longitude: Double){
   
 }
 
+/**
+ * Vertex object.
+ * Represent a single vertex of the game area made from a point and adding a distance in meters from it
+ * 
+ * @param p Point
+ * @param dist_meters
+ */
 object Vertex {
   
+  /**
+   * createVertexWithNewLat method
+   */
   def createVertexWithNewLat(p: Point, dist_meters: Double): Point = {
     
     val r_earth = UtilFunctions.EARTH_RADIUS
@@ -200,6 +259,9 @@ object Vertex {
     
   }
   
+  /**
+   * createVertexWithNewLong method
+   */
   def createVertexWithNewLong(p: Point, dist_meters: Double): Point = {
     
     val r_earth = UtilFunctions.EARTH_RADIUS
@@ -210,6 +272,9 @@ object Vertex {
     
   }
   
+  /**
+   * createVertexWithNewLatLong method
+   */
   def createVertexWithNewLatLong(p: Point, dist_meters: Double): Point = {
     
     val r_earth = UtilFunctions.EARTH_RADIUS
@@ -224,6 +289,13 @@ object Vertex {
   
 }
 
+/**
+ * Rectangle class.
+ * 
+ * @param origin
+ * @param width
+ * @param height
+ */
 sealed case class Rectangle(origin: Point, width: Double, height: Double){
   
   val TopLeftCorner = origin
@@ -242,8 +314,19 @@ sealed case class Rectangle(origin: Point, width: Double, height: Double){
   
 }
 
+/**
+ * Polygon class.
+ * 
+ * @param vertex
+ */
 sealed case class Polygon(vertex: List[Point]){
   
+  /**
+   * Contains method.
+   * Check if a point is contained into the polygon
+   * 
+   * @param point
+   */
   def contains(point: Point): Boolean = {
     val vertex_closed = vertex :+ vertex.head
     val n_vertex = vertex_closed.length
@@ -263,6 +346,10 @@ sealed case class Polygon(vertex: List[Point]){
     contained
   }
   
+  /**
+   * getRectangleThatContainsPolygon method.
+   * 
+   */
   def getRectangleThatContainsPolygon(): Rectangle = {
     
     val latitudes = vertex.map { x => x.latitude }

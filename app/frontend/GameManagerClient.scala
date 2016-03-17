@@ -70,7 +70,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       }
     case JoinGame(game,player,ref) =>
       logger.log("JoinGame request, GameID: " + game_id + " (" + player.name + ")")
-      if (game_status == 0 && game_id == game.id) {
+      if ((game_status == StatusGame.WAITING && game_id == game.id) || (game_status == StatusGame.STARTED && game_id == game.id && player.name.equals("admin"))) {
         logger.log("JoinGame request ACCEPTED, GameID: " + game_id + " (" + player.name + ")")
         // We save the ClientConnection data that has sent the join request
         var p = player
@@ -78,11 +78,11 @@ class GameManagerClient (backend: ActorRef) extends Actor {
         val origin = sender
         val future = gameManagerBackend ? JoinGame(game,player)
         future.onSuccess { 
-          case Game(id,name,n_players, status,game_type,players,ghosts,treasures) => 
+          case Game(id,name,n_players, status,game_type,players,ghosts,treasures, traps) => 
             logger.log("GameManagerBackend path: "+sender.path)
             // If the join has success add the ClientConnection actor to the others
             clientsConnections = clientsConnections :+ Tuple2(p,ccref)
-            var g = new Game(id,name,n_players,status,game_type,players,ghosts,treasures)
+            var g = new Game(id,name,n_players,status,game_type,players,ghosts,treasures, traps)
             origin ! GameHandler(g,self)
         }
         future onFailure {
@@ -97,7 +97,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
         val origin = sender
         val future = gameManagerBackend ? ResumeGame(gameid,player,ref)
         future.onSuccess { 
-          case Game(id,name,n_players, status,game_type,players,ghosts,treasures) => 
+          case Game(id,name,n_players, status,game_type,players,ghosts,treasures, traps) => 
             for (i <- 0 to clientsConnections.size-1) {
               if (clientsConnections(i)._1.uid == player.uid) {
                 // When a player resume a game after a connection trouble we update the ClientConnection actor
@@ -105,7 +105,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
                 clientsConnections(i) = clientsConnections(i).copy(_2 = ref)
               }
             }
-            var g = new Game(id,name,n_players,status,game_type,players,ghosts,treasures)
+            var g = new Game(id,name,n_players,status,game_type,players,ghosts,treasures, traps)
             origin ! GameHandler(g,self)
         }
         future onFailure {
@@ -134,11 +134,16 @@ class GameManagerClient (backend: ActorRef) extends Actor {
         case e: Exception => logger.log("LEAVE GAME ERROR: " + e.getMessage + " FROM " + sender.path)
       }
     
+    case UpdateInfo(game, adminuid) =>
+      clientsConnections.map {cc =>
+        if (cc._1.uid == adminuid) cc._2 forward UpdateInfo(game, adminuid)
+      }
+    
     case KillYourself => 
        logger.log("Goodbye cruel cluster!")
        game_status = StatusGame.FINISHED
        if (clientsConnections.size > 0) {
-         var g = new Game(game_id,game_name,game_n_players,game_status,game_type,MutableList(),MutableList(),MutableList())
+         var g = new Game(game_id,game_name,game_n_players,game_status,game_type,MutableList(),MutableList(),MutableList(), MutableList())
          self ! GameStatusBroadcast(g)
        }
        sender ! KillMyself
