@@ -39,6 +39,7 @@ object UtilFunctions {
    */
   def randomPositionInSpace(rect_space: Rectangle, permitted_area: Polygon, margin: Double): Point = {
     logger.log("Space: " + rect_space)
+    logger.log("Permitted area: "+permitted_area);
     var attemps = 0
     val rnd = new Random()
     var point : Point = null
