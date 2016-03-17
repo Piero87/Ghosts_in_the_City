@@ -1,6 +1,6 @@
 define () ->
 	class GameClientEngine
-		constructor: (id_player, websocket) ->
+		constructor: (id_player, websocket, admin) ->
 
 			@space_width = $("#conf_space_width").val()
 			@space_height = $("#conf_space_height").val()
@@ -24,6 +24,7 @@ define () ->
 			@gameLoop = null
 
 			@ws = websocket
+			@admin = admin
 			@player_id = id_player
 
 			# canvas
@@ -31,9 +32,12 @@ define () ->
 			# context
 			@emptyBack = new Image
 			
-			@callback_key = @whatKey.bind(this)
+			#@callback_key = @whatKey.bind(this)
 			@callback_keydown = @keyPressed.bind(this)
 			@callback_keyup = @keyReleased.bind(this)
+			@callback_click = @canvasClicked.bind(this)
+			@ghost_manual_mode = false
+			@ghost_poss_uid = ""
 
 			@sensible_area = new Image
 			@sensible_area.src = '/assets/images/Area.png'
@@ -105,6 +109,8 @@ define () ->
 			# window.addEventListener 'keydown', @callback_key, true
 			window.addEventListener 'keydown', @callback_keydown, true
 			window.addEventListener 'keyup', @callback_keyup, true
+			if @admin == true 
+				@canvas.addEventListener 'click', @callback_click, true
 		
 		pauseGame: ->
 			console.log "GAME MAP - Pause Game!"
@@ -115,6 +121,8 @@ define () ->
 				# window.removeEventListener 'keydown', @callback_key, true
 				window.removeEventListener 'keydown', @callback_keydown, true
 				window.removeEventListener 'keyup', @callback_keyup, true
+				if @admin == true 
+					@canvas.removeEventListener 'click', @callback_click, true
 				
 				@resetCanvas()
 		
@@ -374,55 +382,136 @@ define () ->
 				@map_keys[evt.keyCode] = false 
 				evt.preventDefault()
 			@action()
+			
+		canvasClicked: (evt) ->
+			
+			click_x = ""
+			click_y = ""
+			if evt.pageX or evt.pageY
+				click_x = evt.pageX
+				click_y = evt.pageY
+			else
+				click_x = evt.clientX + document.body.scrollLeft + document.documentElement.scrollLeft
+				click_y = evt.clientY + document.body.scrollTop + document.documentElement.scrollTop
+			
+			click_x -= @canvas.offsetLeft
+			click_y -= @canvas.offsetTop
+			
+			console.log("click_x: " + click_x + " click_y: " + click_y)
+			
+			for ghost, i in @ghosts
+				ghost_clicked = false
+				@ghost_clicked_uid = ""
+				if(click_x < (@ghosts[i].latitude + (@icon_size / 2)) && click_x > (@ghosts[i].latitude - (@icon_size / 2)) && click_y < (@ghosts[i].longitude + (@icon_size / 2)) && click_y > (@ghosts[i].longitude - (@icon_size / 2)))
+					ghost_clicked = true
+					console.log("ghost clicked true")
+					@ghost_clicked_uid = @ghosts[i].uid
+					break
+			if(ghost_clicked == true) 
+				if(@ghost_poss_uid == @ghost_clicked_uid || @ghost_poss_uid = "")
+					if @ghost_manual_mode == true
+						ghost_manual = false
+						@ghost_poss_uid = ""
+						# Tell the server to restart the ghost
+						@ws.send(JSON.stringify
+							event: "ghost_normal_mode"
+							ghost_uid: @ghost_clicked_uid
+						)
+				else
+					@ghost_manual_mode = true
+					@ghost_poss_uid = @ghost_clicked_uid
+					# Second click on the same ghost ell the server to restart the ghost
+					@ws.send(JSON.stringify
+						event: "ghost_manual_mode"
+						ghost_uid: @ghost_clicked_uid
+					)
+				
 		
 		action: ->
-			for buster, i in @busters when buster.uid == @player_id
-				
-				if @map_keys[65]
-					@ws.send(JSON.stringify
-						event: "set_trap"
-					)
-				else if @map_keys[83]
-					@ws.send(JSON.stringify
-						event: "open_treasure"
-					)
-				else if @map_keys[68]
-					@ws.send(JSON.stringify
-						event: "hit_player"
-					)
-				
-				if @map_keys[37] || @map_keys[38] || @map_keys[39] || @map_keys[40]
-					angle = 0
-					if @map_keys[38] && @map_keys[37]  # up-left
-						angle = 3 * Math.PI / 4
-					else if @map_keys[40] && @map_keys[37]  # down-left
-						angle = - 3 * Math.PI / 4
-					else if @map_keys[38] && @map_keys[39]  # up-right
-						angle = Math.PI / 4
-					else if @map_keys[40] && @map_keys[39]  # down-right
-						angle = - Math.PI / 4
-					else if @map_keys[38] # up
-						angle = Math.PI / 2
-					else if @map_keys[40] # down
-						angle = - Math.PI / 2
-					else if @map_keys[37] # left
-						angle = Math.PI
-					else if @map_keys[39] # right
+			if(@ghost_manual_mode != true)
+				for buster, i in @busters when buster.uid == @player_id
+					
+					if @map_keys[65]
+						@ws.send(JSON.stringify
+							event: "set_trap"
+						)
+					else if @map_keys[83]
+						@ws.send(JSON.stringify
+							event: "open_treasure"
+						)
+					else if @map_keys[68]
+						@ws.send(JSON.stringify
+							event: "hit_player"
+						)
+					
+					if @map_keys[37] || @map_keys[38] || @map_keys[39] || @map_keys[40]
 						angle = 0
+						if @map_keys[38] && @map_keys[37]  # up-left
+							angle = 3 * Math.PI / 4
+						else if @map_keys[40] && @map_keys[37]  # down-left
+							angle = - 3 * Math.PI / 4
+						else if @map_keys[38] && @map_keys[39]  # up-right
+							angle = Math.PI / 4
+						else if @map_keys[40] && @map_keys[39]  # down-right
+							angle = - Math.PI / 4
+						else if @map_keys[38] # up
+							angle = Math.PI / 2
+						else if @map_keys[40] # down
+							angle = - Math.PI / 2
+						else if @map_keys[37] # left
+							angle = Math.PI
+						else if @map_keys[39] # right
+							angle = 0
+						
+						# nel calcolo della nuova longitudine, il "-" è dovuto al fatto che nel canvas si
+						# aumenta di latitudine andando verso il basso, quindi con segno opposto rispetto
+						# al calcolo del seno.
+						
+						@busters[i].longitude = @busters[i].longitude - @move * Math.sin( angle )
+						@busters[i].latitude = @busters[i].latitude + @move * Math.cos( angle )
+						
+						@ws.send(JSON.stringify
+							event: "update_player_position"
+							pos:
+								latitude: @busters[i].latitude
+								longitude: @busters[i].longitude
+						)
+			else
+				for ghost, i in @ghosts when ghost.uid == @ghost_clicked_uid
 					
-					# nel calcolo della nuova longitudine, il "-" è dovuto al fatto che nel canvas si
-					# aumenta di latitudine andando verso il basso, quindi con segno opposto rispetto
-					# al calcolo del seno.
+					if @map_keys[68]
+						@ws.send(JSON.stringify
+							event: "ghost_hit_player"
+						)
 					
-					@busters[i].longitude = @busters[i].longitude - @move * Math.sin( angle )
-					@busters[i].latitude = @busters[i].latitude + @move * Math.cos( angle )
-					
-					@ws.send(JSON.stringify
-						event: "update_player_position"
-						pos:
-							latitude: @busters[i].latitude
-							longitude: @busters[i].longitude
-					)
+					if @map_keys[37] || @map_keys[38] || @map_keys[39] || @map_keys[40]
+						angle = 0
+						if @map_keys[38] && @map_keys[37]  # up-left
+							angle = 3 * Math.PI / 4
+						else if @map_keys[40] && @map_keys[37]  # down-left
+							angle = - 3 * Math.PI / 4
+						else if @map_keys[38] && @map_keys[39]  # up-right
+							angle = Math.PI / 4
+						else if @map_keys[40] && @map_keys[39]  # down-right
+							angle = - Math.PI / 4
+						else if @map_keys[38] # up
+							angle = Math.PI / 2
+						else if @map_keys[40] # down
+							angle = - Math.PI / 2
+						else if @map_keys[37] # left
+							angle = Math.PI
+						else if @map_keys[39] # right
+							angle = 0
+						
+						@ghosts[i].longitude = @ghosts[i].longitude - @move * Math.sin( angle )
+						@ghosts[i].latitude = @ghosts[i].latitude + @move * Math.cos( angle )
+						
+						@ws.send(JSON.stringify
+							event: "update_player_position"
+							pos:
+								latitude: @ghosts[i].latitude
+								longitude: @ghosts[i].longitude
+						)
 		
 		whatKey: (evt) ->
 			for buster, i in @busters when buster.uid == @player_id

@@ -36,6 +36,10 @@ class GameManagerBackend () extends Actor {
   var admin_name = ""
   var adminuid = ""
   
+  // Ghost possessed by admin info
+  var isGhostPossessed = false
+  var ghostPoss_uid = ""
+  
   var paused_players:MutableList[Tuple2[String, Long]] = MutableList()
   var game_area = new Polygon(List())
   
@@ -181,6 +185,10 @@ class GameManagerBackend () extends Actor {
           admin_in_game = false
           admin_name = ""
           adminuid = ""
+          if(isGhostPossessed){
+             var ghost = ghosts.filter(_._1.uid == ghostPoss_uid).head
+             ghost._2 ! GhostStart
+          }
         }
         
         val tmp_g = ghosts.map(x => x._1)
@@ -499,6 +507,29 @@ class GameManagerBackend () extends Actor {
       future onFailure {
         case e: Exception => logger.log("******GAME MANAGER BACKEND KILL ERROR ******")
       }
+      
+    // **************** Admin stuff ****************
+    case GhostNormalMode(ghost_uid) =>
+      var ghost = ghosts.filter(_._1.uid == ghost_uid).head
+      isGhostPossessed = false
+      ghostPoss_uid = ""
+      ghost._2 ! GhostStart
+      
+    case GhostManualMode(ghost_uid) =>
+      logger.log("ghost manual mode")
+      var ghost = ghosts.filter(_._1.uid == ghost_uid).head
+      // Set to angry the ghost mood for all manual mode time
+      var ghost_possessed_index = (ghosts.zipWithIndex.collect{case (g , i) if(g._1.uid == ghost_uid) => i}).head
+      var ghost_info = new GhostInfo(ghosts(ghost_possessed_index)._1.uid,ghosts(ghost_possessed_index)._1.level,GhostMood.ANGRY,ghosts(ghost_possessed_index)._1.pos)
+      ghosts(ghost_possessed_index) = ghosts(ghost_possessed_index).copy(_1 = ghost_info)
+      isGhostPossessed = true
+      ghostPoss_uid = ghost_uid
+      ghost._2 ! GhostPause
+      //gameManagerClient ! MessageCode(adminuid, MsgCodes.GHOST_POSSESSED,"")
+      
+      
+    // **********************************************
+    
   }
   
   //Metodo per stampare il contenuto delle liste

@@ -12,17 +12,16 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 			@sounds = ko.observable()
 			@debug = ko.observable()
 			
+			# Admin data
 			@adminName = ko.observable()
 			@adminPwd = ko.observable()
 			@admin = ko.observable(false)
 			@adminuid = ko.observable()
-			@adminpwd = ""
 			@notlogged = ko.observable(false)
 			
 			@music("on")
 			@sounds("on")
 			@debug("off")
-			
 			
 			# Player data
 			@playername = ko.observable()
@@ -89,7 +88,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 				@connected(true)
 				$("#ghostbusters-song").get(0).play()
 				
-				@game_client_engine = new GameClientEngine(@playeruid(), @ws)
+				@game_client_engine = new GameClientEngine(@playeruid(), @ws, @admin())
 				
 				if localStorage.gameid
 					@gameid(localStorage.gameid)
@@ -152,7 +151,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 					@setGameName(json.game.name)
 					@gamemaxplayers(json.game.n_players)
 					
-					@game_client_engine = new GameClientEngine(@playeruid(), @ws) if (@game_client_engine == null)
+					@game_client_engine = new GameClientEngine(@playeruid(), @ws, @admin()) if (@game_client_engine == null)
 					
 					$("#game-result-won").hide()
 					$("#game-result-lost").hide()
@@ -281,7 +280,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 			@adminws.onopen = (event) =>
 				
 				# Initialize the two possible game arena
-				@game_client_engine = new GameClientEngine(@adminuid(), @adminws)
+				@game_client_engine = new GameClientEngine(@adminuid(), @adminws, @admin())
 				@map = new Map(@adminws)
 				
 				@connecting(null)
@@ -295,16 +294,22 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 				
 			# When the websocket closes
 			@adminws.onclose = (event) =>
-				# Destroy everything and clean all
-				@disconnected(true)
-				@connected(false)
-				@closing = false
-				localStorage.removeItem("admin")
-				localStorage.removeItem("gameid")
-				
-				# Destroy everything and clean it all up.
-				@map.destroy() if @map
-				@map = null
+				if (!event.wasClean && ! self.closing)
+					@connected(false)
+					@connect()
+					@connecting("Reconnecting ...")
+				else
+					# Destroy everything and clean all
+					@disconnected(true)
+					@connected(false)
+					@closing = false
+					localStorage.removeItem("admin")
+					localStorage.removeItem("adminuid")
+					localStorage.removeItem("gameid")
+					
+					# Destroy everything and clean it all up.
+					@map.destroy() if @map
+					@map = null
 				
 			# Handle the stream
 			@adminws.onmessage = (event) =>
@@ -324,6 +329,10 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 						@connected(false)
 						@connecting(null)
 						@notlogged(true)
+						
+						# Destroy everything and clean it all up.
+						@map.destroy() if @map
+						@map = null
 						
 				else if json.event == "games_list"
 					#console.log('Games list received!')
@@ -364,7 +373,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 					@gamestarted(true)
 					@gameended(false)
 					
-					@game_client_engine = new GameClientEngine(@adminuid(), @adminws) if (@game_client_engine == null)
+					@game_client_engine = new GameClientEngine(@adminuid(), @adminws, @admin()) if (@game_client_engine == null)
 					@map = new Map(@adminws) if (@map == null)
 					
 					$("#game-result-won").hide()
@@ -388,6 +397,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 						@map.setGhostMarkers(json.game.ghosts)
 						@map.setTreasuresMarkers(json.game.treasures)
 						@map.setTraps(json.game.traps)
+						@map.startGame()
 						
 				else if json.event == "game_status"
 					# {event: "game_status", game: {id: [Int], name: [String], n_players: [Int], players [Array of String], status: [Int]}}
@@ -580,8 +590,9 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 			
 		# Admin clicked connect
 		submitAdminData: ->
-			@adminuid(@generateUID())
 			@playername(@adminName())
+			@adminuid(@generateUID())
+			localStorage.setItem("adminuid", @adminuid())
 			localStorage.setItem("admin", @adminName())
 			if(@notlogged() == true)
 				@notlogged(false)
@@ -660,10 +671,15 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 		# Leave Game
 		leaveGame: ->
 			@clearGameData()
-			@ws.send(JSON.stringify
-				event: "leave_game"
-			)
-		
+			if(@admin() != true)
+				@ws.send(JSON.stringify
+					event: "leave_game"
+				)
+			else
+				@adminws.send(JSON.stringify
+					event: "leave_game"
+				)
+				
 		playAgain: ->
 			@clearGameData()
 			window.location.reload(true)
@@ -676,8 +692,12 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 			@game_team_RED.removeAll()
 			@game_team_BLUE.removeAll()
 			
-			callback = @gamesList.bind(this)
-			@interval = setInterval(callback, 1000)
+			if(@admin())
+				callback = @startedGamesList.bind(this)
+				@interval = setInterval(callback, 1000)
+			else
+				callback = @gamesList.bind(this)
+				@interval = setInterval(callback, 1000)
 		
 		changeGameStatus: (s) ->
 			status = s
