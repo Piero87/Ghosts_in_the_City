@@ -140,8 +140,8 @@ object UtilFunctions {
     
     var index = 0
     //inizializzo le dimensioni per lo spazio iniziale
-    var lat_start = 0
-    var lng_start = 0
+    var lat_start = area.getRectangleThatContainsPolygon().origin.latitude;
+    var lng_start = area.getRectangleThatContainsPolygon().origin.longitude;
     
     for(col <- 0 to columns - 1){
       for(row <- 0 to rows - 1){
