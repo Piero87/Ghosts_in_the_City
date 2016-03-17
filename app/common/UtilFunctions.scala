@@ -29,6 +29,14 @@ object UtilFunctions {
   private val MAX_ATTEMPTS = 100
   private val logger = new CustomLogger("UtilFunctions")
   
+  def metersToLatitudeDelta(meters: Double): Double = {
+    Math.toDegrees(meters/EARTH_RADIUS)
+  }
+  
+  def metersToLongitudeDelta(meters: Double, latitude_radiants: Double): Double = {
+    Math.toDegrees( (meters/EARTH_RADIUS) / Math.cos(latitude_radiants) )
+  }
+  
   /**
    * randomPositionInSpace method
    * It calculate a position(point with lat and lng) randomly in a given game area space
@@ -39,7 +47,6 @@ object UtilFunctions {
    */
   def randomPositionInSpace(rect_space: Rectangle, permitted_area: Polygon, margin: Double): Point = {
     logger.log("Space: " + rect_space)
-    logger.log("Permitted area: "+permitted_area);
     var attemps = 0
     val rnd = new Random()
     var point : Point = null
@@ -140,8 +147,8 @@ object UtilFunctions {
     
     var index = 0
     //inizializzo le dimensioni per lo spazio iniziale
-    var lat_start = area.getRectangleThatContainsPolygon().origin.latitude;
-    var lng_start = area.getRectangleThatContainsPolygon().origin.longitude;
+    var lat_start = area.getRectangleThatContainsPolygon().origin.latitude
+    var lng_start = area.getRectangleThatContainsPolygon().origin.longitude
     
     for(col <- 0 to columns - 1){
       for(row <- 0 to rows - 1){
