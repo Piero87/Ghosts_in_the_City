@@ -13,7 +13,7 @@ import scala.util.Random
 sealed case class GameParameters(game_type: String){
   
   // **** GAME ARENA ****
-  
+ 
   val canvas_width = ConfigFactory.load().getDouble("canvas_width")
   val canvas_height = ConfigFactory.load().getDouble("canvas_height")
   val canvas_margin = if (game_type == GameType.REALITY) {
@@ -68,6 +68,7 @@ sealed case class GameParameters(game_type: String){
                             } else { 
                                 ConfigFactory.load().getDouble("web_max_action_distance")
                             }
+  val player_vision_limit =  ConfigFactory.load().getDouble("player_vision_limit")
 }
 
 

@@ -209,11 +209,36 @@ class GameManagerBackend () extends Actor {
       }
       var player_info = new PlayerInfo(u_tmp.uid,u_tmp.name,u_tmp.team,player.pos,u_tmp.gold,u_tmp.keys)
       players(player_index) = players(player_index).copy(_1 = player_info)
-      sender ! BroadcastUpdatePosition(player)
+      if (game_type == GameType.REALITY) {
+        for (receiver <- players) {
+          if (receiver._1.uid != player.uid && receiver._1.pos.distanceFrom(player.pos, game_type) <= game_params.player_vision_limit){
+            gameManagerClient ! UpdateVisiblePlayerPosition(receiver._1.uid, player)
+          } else if (receiver._1.uid == player.uid) {
+            val visible_treasures = treasures.map(x => x._1).filter { treasure => receiver._1.pos.distanceFrom(treasure.pos, game_type) <= game_params.player_vision_limit }
+            gameManagerClient ! VisibleTreasures(receiver._1.uid, visible_treasures)
+            val visible_ghosts = ghosts.map(x => x._1).filter { ghost => receiver._1.pos.distanceFrom(ghost.pos, game_type) <= game_params.player_vision_limit }
+            gameManagerClient ! VisibleGhosts(receiver._1.uid, visible_ghosts)
+            val visible_traps = traps.map(x => x.getTrapInfo).filter { trap => receiver._1.pos.distanceFrom(trap.pos, game_type) <= game_params.player_vision_limit }
+            gameManagerClient ! VisibleTraps(receiver._1.uid, visible_traps)
+            val visible_players = players.map(x => x._1).filter { player => receiver._1.pos.distanceFrom(player.pos, game_type) <= game_params.player_vision_limit }
+            gameManagerClient ! VisiblePlayers(receiver._1.uid, visible_players)
+          }
+        }
+      } else {
+        gameManagerClient ! BroadcastUpdatePosition(player)
+      }
+      
     case UpdateGhostsPositions =>
       //Logger.info("UpdateGhostsPositionsBroadcast")
-      val tmp_g = ghosts.map(x => x._1)
-      gameManagerClient ! BroadcastGhostsPositions(tmp_g)
+      val ghosts_info_list = ghosts.map(x => x._1)
+      if (game_type == GameType.REALITY) {
+        for (receiver <- players) {
+          val visible_ghosts_info_list = ghosts_info_list.filter {ghost => receiver._1.pos.distanceFrom(ghost.pos, game_type) <= game_params.player_vision_limit}
+          gameManagerClient ! UpdateVisibleGhostsPositions(receiver._1.uid, visible_ghosts_info_list)
+        }
+      } else {
+        gameManagerClient ! BroadcastGhostsPositions(ghosts_info_list)
+      }
       context.system.scheduler.scheduleOnce(500 millis, self, UpdateGhostsPositions)
     
     case GhostPositionUpdate(uid, point,mood) =>
@@ -233,7 +258,15 @@ class GameManagerBackend () extends Actor {
           ghosts(ghost_index)._2 ! GhostTrapped(ghost_point)
           traps(i).status = TrapStatus.ACTIVE
           traps(i).trapped_ghost_uid = uid
-          gameManagerClient ! BroadcastTrapActivated(traps(i).getTrapInfo)
+          if (game_type == GameType.REALITY) {
+            for (receiver <- players) {
+              if (receiver._1.pos.distanceFrom(traps(i).pos, game_type) <= game_params.player_vision_limit) {
+                gameManagerClient ! ActivationVisibleTrap(receiver._1.uid, traps(i).getTrapInfo)
+              }
+            }
+          } else {
+            gameManagerClient ! BroadcastTrapActivated(traps(i).getTrapInfo)
+          }
           removeTrapScheduler(traps(i).uid)
         }
       }
@@ -294,7 +327,16 @@ class GameManagerBackend () extends Actor {
       players(player_index) = players(player_index).copy(_1 = player_info)
       var trap = new Trap(pos)
       traps = traps :+ trap
-      gameManagerClient ! BroadcastNewTrap(trap.getTrapInfo)
+      
+      if (game_type == GameType.REALITY) {
+        for (receiver <- players) {
+          if (receiver._1.pos.distanceFrom(trap.pos, game_type) <= game_params.player_vision_limit) {
+            gameManagerClient ! NewVisibleTrap(receiver._1.uid, trap.getTrapInfo)
+          }
+        }
+      } else {
+        gameManagerClient ! BroadcastNewTrap(trap.getTrapInfo)
+      }
       gameManagerClient ! UpdatePlayerInfo(player_info)
       if(admin_in_game){
         val tmp_g = ghosts.map(x => x._1)
@@ -308,7 +350,15 @@ class GameManagerBackend () extends Actor {
     case RemoveTrap(uid) =>
       /* Una trappola è scattata 10 secondi fa e ora è tempo che venga rimossa */
       var trap_index = (traps.zipWithIndex.collect{case (t, t_i) if(t.uid == uid) => t_i}).head
-      gameManagerClient ! BroadcastRemoveTrap(traps(trap_index).getTrapInfo)
+      if (game_type == GameType.REALITY) {
+        for (receiver <- players) {
+          if (receiver._1.pos.distanceFrom(traps(trap_index).pos, game_type) <= game_params.player_vision_limit) {
+            gameManagerClient ! RemoveVisibleTrap(receiver._1.uid, traps(trap_index).getTrapInfo)
+          }
+        }
+      } else {
+        gameManagerClient ! BroadcastRemoveTrap(traps(trap_index).getTrapInfo)
+      }
       /* Liberiramo il fantasma intrappolato */
       var ghost_index = (ghosts.zipWithIndex.collect{case (g , i) if(g._1.uid == traps(trap_index).trapped_ghost_uid) => i}).head
       var g = new GhostInfo(ghosts(ghost_index)._1.uid,ghosts(ghost_index)._1.level,GhostMood.CALM,ghosts(ghost_index)._1.pos)
@@ -382,7 +432,14 @@ class GameManagerBackend () extends Actor {
           var player_info = new PlayerInfo(u_tmp.uid,u_tmp.name,u_tmp.team,u_tmp.pos,u_tmp.gold+gold_tmp,List.concat(player_keys,keys_tmp))
           players(player_index) = players(player_index).copy(_1 = player_info)
           val tmp_t_info = treasures.map(x => x._1)
-          gameManagerClient ! BroadcastUpdateTreasure(tmp_t_info)
+          if (game_type == GameType.REALITY) {
+            for (receiver <- players) {
+              val visible_treasures = tmp_t_info.filter {treasure => receiver._1.pos.distanceFrom(treasure.pos, game_type) <= game_params.player_vision_limit}
+              gameManagerClient ! UpdateVisibleTreasures(receiver._1.uid, visible_treasures)
+            }
+          } else {
+            gameManagerClient ! BroadcastUpdateTreasure(tmp_t_info)
+          }
           if (gold_found_message && key_found_message)
           {
             logger.log("New Message! code: " + MsgCodes.K_G_FOUND + " option: " + gold_tmp.toString() + " to: " + uid_p + " game_id:" + game_id)
@@ -441,7 +498,14 @@ class GameManagerBackend () extends Actor {
         var t_info = new TreasureInfo(t_tmp.uid,0,t_tmp.pos)
         treasures(t_index) = treasures(t_index).copy(_1 = t_info)
         val tmp_t_info = treasures.map(x => x._1)
-        gameManagerClient ! BroadcastUpdateTreasure(tmp_t_info)
+        if (game_type == GameType.REALITY) {
+          for (receiver <- players) {
+            val visible_treasures = tmp_t_info.filter {treasure => receiver._1.pos.distanceFrom(treasure.pos, game_type) <= game_params.player_vision_limit}
+            gameManagerClient ! UpdateVisibleTreasures(receiver._1.uid, visible_treasures)
+          }
+        } else {
+          gameManagerClient ! BroadcastUpdateTreasure(tmp_t_info)
+        }
       }
     case HitPlayerRequest(uid) => 
       /* Il GMB ha ricevuto la richiesta del client di attaccare un altro giocatore,
