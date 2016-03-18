@@ -230,11 +230,13 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
            }
          case "ghost_hit_player" =>
            logger.log("Admin ghost hit player request received")
-           val updatePosGhostRequest: JsResult[StartedGamesListRequestJSON] = msg.validate[StartedGamesListRequestJSON](CommonMessages.startedGamesListRequestReads)
-            updatePosGhostRequest match {
-               case s: JsSuccess[StartedGamesListRequestJSON] =>
+           val ghostHitPlayerRequest: JsResult[GhostHitPlayerRequestJSON] = msg.validate[GhostHitPlayerRequestJSON](CommonMessages.ghostHitPlayerRequestReads)
+            ghostHitPlayerRequest match {
+               case s: JsSuccess[GhostHitPlayerRequestJSON] =>
+                 var ghost_uid = s.get.ghost_uid
+                 gameManagerClient ! GhostHitPlayerRequest(ghost_uid)
                case e: JsError => 
-              logger.log("ADMIN LOGIN ERROR: " + e.toString() + " FROM " + sender.path)
+              logger.log("GHOST HIT PLAYER ERROR: " + e.toString() + " FROM " + sender.path)
            }
          case "update_posghost_position" =>
            logger.log("Admin new ghost pos request received")

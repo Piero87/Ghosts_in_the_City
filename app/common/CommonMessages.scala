@@ -157,7 +157,7 @@ case object StartedGamesList
 case class UpdateInfo(game: Game, adminuid: String)
 case class GhostNormalMode(ghost_uid: String)
 case class GhostManualMode(ghost_uid: String)
-
+case class GhostHitPlayerRequest(ghost_uid: String)
 
 // Json
 case class NewGameJSON(event: String, name: String, pos: Point, game_area_edge: Double, n_players: Int, game_type: String)
@@ -185,6 +185,7 @@ case class LoginResultJSON(event: String, result: Boolean)
 case class StartedGamesListRequestJSON(event: String)
 case class GhostNormalModeRequestJSON(event: String, ghost_uid: String)
 case class GhostManualModeRequestJSON(event: String, ghost_uid: String)
+case class GhostHitPlayerRequestJSON(event: String, ghost_uid: String)
     
 import play.api.libs.json._
 
@@ -284,5 +285,7 @@ object CommonMessages {
   implicit val ghostManualModeRequestReads = Json.reads[GhostManualModeRequestJSON]
   implicit val ghostManualModeRequestWrites = Json.writes[GhostManualModeRequestJSON]
   
+  implicit val ghostHitPlayerRequestReads = Json.reads[GhostHitPlayerRequestJSON]
+  implicit val ghostHitPlayerRequestWrites = Json.writes[GhostHitPlayerRequestJSON]
   
 }

@@ -205,6 +205,10 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       logger.log("ghost manual mode")
       gameManagerBackend ! GhostManualMode(ghost_uid)
       
+    case GhostHitPlayerRequest(ghost_uid) =>
+      logger.log("ghost hit player")
+      gameManagerBackend ! GhostHitPlayerRequest(ghost_uid)
+      
     // **********************************************
     
         

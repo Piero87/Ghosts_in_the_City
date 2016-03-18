@@ -9,10 +9,12 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			# the map itself
 			@map = Leaflet.map("mapContainer")
 			new Leaflet.TileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-				minZoom: 17
+				minZoom: 1
 				maxZoom: 20
 				attribution: "Map data © OpenStreetMap contributors"
 			).addTo(@map)
+			
+			@map.setView([0,0], 2)
 			
 			# The websocket
 			@ws = ws
