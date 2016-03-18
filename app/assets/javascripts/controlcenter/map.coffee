@@ -14,7 +14,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				attribution: "Map data © OpenStreetMap contributors"
 			).addTo(@map)
 			
-			@map.setView([0,0], 2)
+			#@map.setView([0,0], 2)
 			
 			# The websocket
 			@ws = ws
@@ -132,8 +132,8 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				68 : false # D
 			
 		# Init Map with one player position and right zoom 
-		initMap: (lat, lon) ->
-			@map.setView([lat, lon], 18)
+		initMap: (lat, lon, zoom) ->
+			@map.setView([lat, lon], zoom)
 			
 		# Start Game	
 		startGame: () ->
