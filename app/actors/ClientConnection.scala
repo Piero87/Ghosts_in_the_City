@@ -58,6 +58,9 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
     case msg: JsValue =>
       //logger.log(msg.toString() + " (" + name + ")")
       ((__ \ "event").read[String]).reads(msg) map {
+        case "ping" =>
+          val json = Json.toJson(Map("event" -> "pong"))
+          upstream ! json
         case "new_game" =>
           val newGameResult: JsResult[NewGameJSON] = msg.validate[NewGameJSON](CommonMessages.newGameReads)
           newGameResult match {
