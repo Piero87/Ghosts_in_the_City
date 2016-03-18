@@ -59,6 +59,7 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
       //logger.log(msg.toString() + " (" + name + ")")
       ((__ \ "event").read[String]).reads(msg) map {
         case "ping" =>
+          logger.log("pong!")
           val json = Json.toJson(Map("event" -> "pong"))
           upstream ! json
         case "new_game" =>
