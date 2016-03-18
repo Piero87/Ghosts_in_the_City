@@ -337,17 +337,17 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			@ghost_possessed = ""
 			@ws.send(JSON.stringify
 				event: "ghost_normal_mode"
-				ghostuid: @ghost_possessed
+				ghost_uid: @ghost_possessed
 			)
 				
 		ghostManualMode: (uid) ->
-			# Second click on the same ghost ell the server to restart the ghost
-			@ghost_possessed = uid
-			
-			@ws.send(JSON.stringify
-				event: "ghost_manual_mode"
-				ghostuid: @ghost_possessed
-			)
+			if (@ghost_possessed == "")	
+				@ghost_possessed = uid
+				
+				@ws.send(JSON.stringify
+					event: "ghost_manual_mode"
+					ghost_uid: @ghost_possessed
+				)
 			
 		action: ->
 			for marker, i in @g_markers when marker.uid == @ghost_possessed
@@ -392,6 +392,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 					
 					@ws.send(JSON.stringify
 						event: "update_posghost_position"
+						ghost_uid: @ghost_possessed
 						pos:
 							latitude: new_lat
 							longitude: new_lng

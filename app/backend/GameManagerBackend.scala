@@ -591,7 +591,31 @@ class GameManagerBackend () extends Actor {
       ghost._2 ! GhostPause
       //gameManagerClient ! MessageCode(adminuid, MsgCodes.GHOST_POSSESSED,"")
       
+    case GhostHitPlayerRequest(ghost_uid) => 
+      var ghost = ghosts.filter(_._1.uid == ghost_uid).head
+      var ghostpos = ghost._1.pos
+      logger.log("Ghost hit player request")
+      // Look if ther is a player near ghost, if so we attack the nearest one
+      var sensor_distance = ghost._1.level * game_params.ghost_radius
+      var target_player_actor : ActorRef = null
+      for (player <- players){
+        var player_distance = ghostpos.distanceFrom(player._1.pos, game_type)
+        if(player_distance < sensor_distance && player_distance <= game_params.max_action_distance){
+          sensor_distance = player_distance
+          target_player_actor = player._2
+        }
+      }
+      if(target_player_actor != null){
+        ghost._2 ! AttackThatPlayer(target_player_actor)
+      }
       
+    case UpdatePosGhostPosition(ghost_uid, ghost_pos) =>
+      var ghost_index = (ghosts.zipWithIndex.collect{case (g , i) if(g._1.uid == ghost_uid) => i}).head
+      var ghost_point = ghost_pos
+      var g = new GhostInfo(ghosts(ghost_index)._1.uid,ghosts(ghost_index)._1.level,ghosts(ghost_index)._1.mood,ghost_point)
+      ghosts(ghost_index) = ghosts(ghost_index).copy(_1 = g)
+      ghosts(ghost_index)._2 ! UpdatePosGhostPosition(ghost_uid, ghost_pos)
+    
     // **********************************************
     
   }

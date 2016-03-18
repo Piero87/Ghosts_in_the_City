@@ -507,7 +507,8 @@ define () ->
 						@ghosts[i].latitude = @ghosts[i].latitude + @move * Math.cos( angle )
 						
 						@ws.send(JSON.stringify
-							event: "update_player_position"
+							event: "update_posghost_position"
+							ghost_uid: @ghosts[i].uid
 							pos:
 								latitude: @ghosts[i].latitude
 								longitude: @ghosts[i].longitude

@@ -209,6 +209,10 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       logger.log("ghost hit player")
       gameManagerBackend ! GhostHitPlayerRequest(ghost_uid)
       
+    case UpdatePosGhostPosition(ghost_uid, ghost_pos) =>
+      logger.log("ghost possessed update position")
+      gameManagerBackend ! UpdatePosGhostPosition(ghost_uid, ghost_pos)
+      
     // **********************************************
     
     // VIRTUAL REALITY GAME MESSAGES
