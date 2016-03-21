@@ -213,9 +213,11 @@ class GameManagerBackend () extends Actor {
       players(player_index) = players(player_index).copy(_1 = player_info)
       if (game_type == GameType.REALITY) {
         for (receiver <- players) {
-          if (receiver._1.uid != player.uid && receiver._1.pos.distanceFrom(player.pos, game_type) <= game_params.player_vision_limit){
-            gameManagerClient ! UpdateVisiblePlayerPosition(receiver._1.uid, player)
-          } else if (receiver._1.uid == player.uid) {
+          if (receiver._1.uid != player.uid){
+            if (receiver._1.pos.distanceFrom(player.pos, game_type) <= game_params.player_vision_limit) {
+              gameManagerClient ! UpdateVisiblePlayerPosition(receiver._1.uid, player)
+            }
+          } else {
             val visible_treasures = treasures.map(x => x._1).filter { treasure => receiver._1.pos.distanceFrom(treasure.pos, game_type) <= game_params.player_vision_limit }
             gameManagerClient ! VisibleTreasures(receiver._1.uid, visible_treasures)
             val visible_ghosts = ghosts.map(x => x._1).filter { ghost => receiver._1.pos.distanceFrom(ghost.pos, game_type) <= game_params.player_vision_limit }
