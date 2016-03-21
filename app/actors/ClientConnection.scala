@@ -209,6 +209,50 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
               }
             case e: JsError => logger.log("STARTED GAMES LIST ERROR: " + e.toString() + " FROM " + sender.path)
           }
+           
+         // **************** Admin stuff ****************
+         case "ghost_normal_mode" =>
+           logger.log("Admin ghost normal mode request received")
+           val ghostNormalModeRequest: JsResult[GhostNormalModeRequestJSON] = msg.validate[GhostNormalModeRequestJSON](CommonMessages.ghostNormalModeRequestReads)
+            ghostNormalModeRequest match {
+               case s: JsSuccess[GhostNormalModeRequestJSON] =>
+                 var ghost_uid = s.get.ghost_uid
+                 gameManagerClient ! GhostNormalMode(ghost_uid)
+               case e: JsError => 
+                 logger.log("GHOST NORMAL MODE ERROR: " + e.toString() + " FROM " + sender.path)
+           }
+         case "ghost_manual_mode" =>
+           logger.log("Admin ghost manual mode request received")
+           val ghostManualModeRequest: JsResult[GhostManualModeRequestJSON] = msg.validate[GhostManualModeRequestJSON](CommonMessages.ghostManualModeRequestReads)
+            ghostManualModeRequest match {
+               case s: JsSuccess[GhostManualModeRequestJSON] =>
+                 var ghost_uid = s.get.ghost_uid
+                 gameManagerClient ! GhostManualMode(ghost_uid)
+               case e: JsError => 
+                logger.log("GHOST MANUAL MODE ERROR: " + e.toString() + " FROM " + sender.path)
+           }
+         case "ghost_hit_player" =>
+           logger.log("Admin ghost hit player request received")
+           val ghostHitPlayerRequest: JsResult[GhostHitPlayerRequestJSON] = msg.validate[GhostHitPlayerRequestJSON](CommonMessages.ghostHitPlayerRequestReads)
+            ghostHitPlayerRequest match {
+               case s: JsSuccess[GhostHitPlayerRequestJSON] =>
+                 var ghost_uid = s.get.ghost_uid
+                 gameManagerClient ! GhostHitPlayerRequest(ghost_uid)
+               case e: JsError => 
+              logger.log("GHOST HIT PLAYER ERROR: " + e.toString() + " FROM " + sender.path)
+           }
+         case "update_posghost_position" =>
+           logger.log("Admin new ghost pos request received")
+           val updatePosGhostRequest: JsResult[GhostUpdatePositionJSON] = msg.validate[GhostUpdatePositionJSON](CommonMessages.updateGhostPositionReads)
+            updatePosGhostRequest match {
+               case s: JsSuccess[GhostUpdatePositionJSON] =>
+                 var ghost_uid = s.get.ghost_uid
+                 var ghost_pos = s.get.pos
+                 gameManagerClient ! UpdatePosGhostPosition(ghost_uid, ghost_pos)
+               case e: JsError => 
+              logger.log("UPDATE GHOST POSITION ERROR: " + e.toString() + " FROM " + sender.path)
+           }
+         // ***********************************************
       }
     
     /*
@@ -302,6 +346,8 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
   override def postStop() = {
     if (game_id != "" && isAdmin == false) {
       gameManagerClient ! PauseGame(uid)
+    }else if (game_id != "" && isAdmin == true) {
+      gameManagerClient ! LeaveGame(uid)
     }
   }
 }

@@ -9,13 +9,20 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			# the map itself
 			@map = Leaflet.map("mapContainer")
 			new Leaflet.TileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-				minZoom: 17
+				minZoom: 1
 				maxZoom: 20
 				attribution: "Map data © OpenStreetMap contributors"
 			).addTo(@map)
 			
+			#@map.setView([0,0], 2)
+			
 			# The websocket
 			@ws = ws
+			
+			@ghost_possessed = ""
+			
+			@earth_rad = 6371010
+			@move = 1
 			
 			# Ghosts icons
 			# LEVEL 1
@@ -112,18 +119,21 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 					32
 				])
 			
+			# Listeners	
+			@callback_keydown = @keyPressed.bind(this)
+			@callback_keyup = @keyReleased.bind(this)
+			@ghost_manual_mode = false
+			
 			@map_keys = 
 				37 : false # Left
 				38 : false # Up
 				39 : false # Right
 				40 : false # Down
-				65 : false # A
-				83 : false # S
 				68 : false # D
 			
 		# Init Map with one player position and right zoom 
-		initMap: (lat, lon) ->
-			@map.setView([lat, lon], 18)
+		initMap: (lat, lon, zoom) ->
+			@map.setView([lat, lon], zoom)
 			
 		# Start Game	
 		startGame: () ->
@@ -158,6 +168,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			
 		addBusterMarker: (uid, name, team, lat, lng) ->
 			type = "buster"
+			level= ""
 			# Buster icon
 			b_icon = L.icon(
 				iconUrl: '/assets/images/G' + (@b_markers.length % 4) + '.png'
@@ -169,7 +180,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 					0
 					-15
 				])
-			marker = new Marker(@map,type, uid, name, team, lat , lng)
+			marker = new Marker(@map,type, uid, name, team, level, lat , lng)
 			marker.setIcon(b_icon)
 			@b_markers.push marker
 		
@@ -206,7 +217,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 					g_icon = @g3_angry()
 				else 
 					g_icon = @g3_scared()
-			marker = new Marker(@map,type, uid, name, team, lat, lng)
+			marker = new Marker(@map,type, uid, name, team, level, lat, lng)
 			marker.setIcon(g_icon)
 			@g_markers.push marker
 		
@@ -217,17 +228,18 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				treasure.uid, treasure.status, treasure.pos.latitude, treasure.pos.longitude
 			) for treasure in treasures
 			
-		addTreasure: (uid, status, lat, lng) ->
+		addTreasureMarker: (uid, status, lat, lng) ->
 			type = "treasure"
 			name = ""
 			team = ""
+			level = ""
 			t_icon = ""
 			if(status == 0)
 			# Treasure closed
 				t_icon = @t_closed()
 			else
 				t_icon = @t_open()
-			marker = new Marker(@map,type, uid, name, team, lat , lng)
+			marker = new Marker(@map,type, uid, name, team, level, lat , lng)
 			marker.setIcon(t_icon)
 			@t_markers.push marker
 		
@@ -242,17 +254,18 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			# The treasures markers on the map
 			@addTrapMarker(uid, 0, lat, lng)
 			
-		addTreasure: (uid, status, lat, lng) ->
+		addTrapMarker: (uid, status, lat, lng) ->
 			type = "trap"
 			name = ""
 			team = ""
+			level = ""
 			trap_icon = ""
 			if(status == 0)
 			# Trap idle
 				trap_icon = @trap_idle()
 			else
 				trap_icon = @trap_active()
-			marker = new Marker(@map,type, uid, name, team, lat , lng)
+			marker = new Marker(@map,type, uid, name, team, level lat , lng)
 			marker.setIcon(trap_icon)
 			@traps_markers.push marker
 		
@@ -304,5 +317,85 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				else
 					t_icon = @t_open()
 				marker.setIcon(t_icon)
+		
+		# Get key press
+		keyPressed: (evt) ->
+			if evt.keyCode of @map_keys
+				@map_keys[evt.keyCode] = true 
+				evt.preventDefault()
+			@action()
+			
+		# Get key released	
+		keyReleased: (evt) ->
+			if evt.keyCode of @map_keys
+				@map_keys[evt.keyCode] = false 
+				evt.preventDefault()
+			@action()
+			
+		ghostNormalMode: (uid) ->
+			# Tell the server to restart the ghost
+			@ghost_possessed = ""
+			@ws.send(JSON.stringify
+				event: "ghost_normal_mode"
+				ghost_uid: @ghost_possessed
+			)
 				
+		ghostManualMode: (uid) ->
+			if (@ghost_possessed == "")	
+				@ghost_possessed = uid
+				
+				@ws.send(JSON.stringify
+					event: "ghost_manual_mode"
+					ghost_uid: @ghost_possessed
+				)
+			
+		action: ->
+			for marker, i in @g_markers when marker.uid == @ghost_possessed
+				
+				if @map_keys[68]
+					@ws.send(JSON.stringify
+						event: "ghost_hit_player"
+					)
+				
+				if @map_keys[37] || @map_keys[38] || @map_keys[39] || @map_keys[40]
+					angle = 0
+					if @map_keys[38] && @map_keys[37]  # up-left
+						angle = 3 * Math.PI / 4
+					else if @map_keys[40] && @map_keys[37]  # down-left
+						angle = - 3 * Math.PI / 4
+					else if @map_keys[38] && @map_keys[39]  # up-right
+						angle = Math.PI / 4
+					else if @map_keys[40] && @map_keys[39]  # down-right
+						angle = - Math.PI / 4
+					else if @map_keys[38] # up
+						angle = Math.PI / 2
+					else if @map_keys[40] # down
+						angle = - Math.PI / 2
+					else if @map_keys[37] # left
+						angle = Math.PI
+					else if @map_keys[39] # right
+						angle = 0
+					
+					latitude = marker[i].getLatLng().latitude
+					longitude = marker[i].getLatLng().longitude
+					
+					lat_rad = latitude * Math.PI / 180
+					lng_rad = longitude * Math.PI / 180
+					
+					delta_lat = (@move * Math.cos( angle ) / @earth_rad) * 180 / Math.PI
+					delta_lng = ((@move * Math.cos( angle ) / @earth_rad) / Math.cos(lat_rad)) * 180 / Math.PI
+					
+					new_lat = latitude + delta_lat
+					new_lng = longitude + delta_lng
+					
+					marker[i].setLatLng([new_lat, new_lng])
+					
+					@ws.send(JSON.stringify
+						event: "update_posghost_position"
+						ghost_uid: @ghost_possessed
+						pos:
+							latitude: new_lat
+							longitude: new_lng
+					)
+					
 	return Map

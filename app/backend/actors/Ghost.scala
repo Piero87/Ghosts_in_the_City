@@ -133,6 +133,22 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
         mood = GhostMood.TRAPPED
       }
       update_pos_scheduler = system.scheduler.schedule(0 millis, 500 millis, self, UpdateGhostPosition)
+    
+    // Admin messages
+    case AttackThatPlayer(target_player_actor) =>
+      var now = System.currentTimeMillis()
+      if (now >= last_attack + 1500 ) {
+        last_attack = now
+        val future = target_player_actor ? IAttackYou(uid, MsgCodes.PARANORMAL_ATTACK, GameParameters.ghost_hunger(level), 0)
+        val result = Await.result(future, timeout.duration).asInstanceOf[Int]
+        if(result > 0){
+          treasure ! IncreaseGold(result)
+        }
+      }
+      
+    case UpdatePosGhostPosition(ghost_uid, ghost_pos) =>
+      // Update the ghost position 
+      ghostpos = ghost_pos
   }
   
   /**

@@ -133,12 +133,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       future onFailure {
         case e: Exception => logger.log("LEAVE GAME ERROR: " + e.getMessage + " FROM " + sender.path)
       }
-    
-    case UpdateInfo(game, adminuid) =>
-      clientsConnections.map {cc =>
-        if (cc._1.uid == adminuid) cc._2 forward UpdateInfo(game, adminuid)
-      }
-    
+      
     case KillYourself => 
        logger.log("Goodbye cruel cluster!")
        game_status = StatusGame.FINISHED
@@ -197,6 +192,29 @@ class GameManagerClient (backend: ActorRef) extends Actor {
         cc._2 forward BroadcastVictoryResponse(team, players)
       }
       
+    // **************** Admin stuff ****************
+    case UpdateInfo(game, adminuid) =>
+      clientsConnections.map {cc =>
+        if (cc._1.uid == adminuid) cc._2 forward UpdateInfo(game, adminuid)
+      }
+      
+    case GhostNormalMode(ghost_uid) =>
+      gameManagerBackend ! GhostNormalMode(ghost_uid)
+      
+    case GhostManualMode(ghost_uid) =>
+      logger.log("ghost manual mode")
+      gameManagerBackend ! GhostManualMode(ghost_uid)
+      
+    case GhostHitPlayerRequest(ghost_uid) =>
+      logger.log("ghost hit player")
+      gameManagerBackend ! GhostHitPlayerRequest(ghost_uid)
+      
+    case UpdatePosGhostPosition(ghost_uid, ghost_pos) =>
+      logger.log("ghost possessed update position")
+      gameManagerBackend ! UpdatePosGhostPosition(ghost_uid, ghost_pos)
+      
+    // **********************************************
+    
     // VIRTUAL REALITY GAME MESSAGES
     case UpdateVisiblePlayerPosition(uid,player) =>
       clientsConnections.map {cc =>

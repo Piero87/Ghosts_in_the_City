@@ -166,6 +166,11 @@ case class AdminLogin(name: String, password: String)
 case class LoginResult(result: Boolean)
 case object StartedGamesList
 case class UpdateInfo(game: Game, adminuid: String)
+case class GhostNormalMode(ghost_uid: String)
+case class GhostManualMode(ghost_uid: String)
+case class GhostHitPlayerRequest(ghost_uid: String)
+case class AttackThatPlayer(target_player: ActorRef)
+case class UpdatePosGhostPosition(ghost_uid: String, pos: Point)
 
 // Json
 case class NewGameJSON(event: String, name: String, pos: Point, game_area_edge: Double, n_players: Int, game_type: String)
@@ -191,6 +196,10 @@ case class VictoryResponseJSON(event: String, team: Int, players: List[PlayerInf
 case class AdminLoginJSON(event: String, name: String, password: String)
 case class LoginResultJSON(event: String, result: Boolean)
 case class StartedGamesListRequestJSON(event: String)
+case class GhostNormalModeRequestJSON(event: String, ghost_uid: String)
+case class GhostManualModeRequestJSON(event: String, ghost_uid: String)
+case class GhostHitPlayerRequestJSON(event: String, ghost_uid: String)
+case class GhostUpdatePositionJSON(event: String, ghost_uid: String, pos: Point)
     
 import play.api.libs.json._
 
@@ -274,6 +283,7 @@ object CommonMessages {
   implicit val victoryResponseJSONReads = Json.reads[VictoryResponseJSON]
   implicit val victoryResponseJSONWrites = Json.writes[VictoryResponseJSON]
   
+  // ****************** Admin JSON ******************
   implicit val adminLoginJSONReads = Json.reads[AdminLoginJSON]
   implicit val adminLoginJSONWrites = Json.writes[AdminLoginJSON]
   
@@ -283,8 +293,22 @@ object CommonMessages {
   implicit val startedGamesListRequestReads = Json.reads[StartedGamesListRequestJSON]
   implicit val startedGamesListRequestWrites = Json.writes[StartedGamesListRequestJSON]
   
+  implicit val ghostNormalModeRequestReads = Json.reads[GhostNormalModeRequestJSON]
+  implicit val ghostNormalModeRequestWrites = Json.writes[GhostNormalModeRequestJSON]
+  
+  implicit val ghostManualModeRequestReads = Json.reads[GhostManualModeRequestJSON]
+  implicit val ghostManualModeRequestWrites = Json.writes[GhostManualModeRequestJSON]
+  
+  implicit val ghostHitPlayerRequestReads = Json.reads[GhostHitPlayerRequestJSON]
+  implicit val ghostHitPlayerRequestWrites = Json.writes[GhostHitPlayerRequestJSON]
+
   implicit val updateVisiblePlayerPositionReads = Json.reads[UpdateVisiblePlayerPosition]
   implicit val updateVisiblePlayerPositionWrites = Json.writes[UpdateVisiblePlayerPosition]
+  
+  implicit val updateGhostPositionReads = Json.reads[GhostUpdatePositionJSON]
+  implicit val updateGhostPositionWrites = Json.writes[GhostUpdatePositionJSON]
+  
+  // **************************************************
   
   implicit val updateVisibleGhostsPositionsReads = Json.reads[UpdateVisibleGhostsPositions]
   implicit val updateVisibleGhostsPositionsWrites = Json.writes[UpdateVisibleGhostsPositions]
@@ -312,6 +336,5 @@ object CommonMessages {
   
   implicit val visiblePlayersReads = Json.reads[VisiblePlayers]
   implicit val visiblePlayersWrites = Json.writes[VisiblePlayers]
-
   
 }
