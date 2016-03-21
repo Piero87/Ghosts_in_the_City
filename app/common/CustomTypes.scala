@@ -318,6 +318,8 @@ sealed case class Rectangle(origin: Point, width: Double, height: Double){
  */
 sealed case class Polygon(vertex: List[Point]){
   
+  val origin = vertex.head;
+  
   /**
    * Contains method.
    * Check if a point is contained into the polygon
