@@ -5,7 +5,12 @@
 define ["marker", "leaflet"], (Marker, Leaflet) ->
 
 	class Map
-		constructor: (ws) ->
+		constructor: (ws, lat, lng, zoom) ->
+			
+			@lat = lat
+			@lng = lng
+			@zoom = zoom
+			
 			# the map itself
 			@map = Leaflet.map("mapContainer")
 			new Leaflet.TileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -14,7 +19,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				attribution: "Map data © OpenStreetMap contributors"
 			).addTo(@map)
 			
-			@map.setView([0,0], 2)
+			@map.setView([@lat,@lng], @zoom)
 			
 			# The websocket
 			@ws = ws

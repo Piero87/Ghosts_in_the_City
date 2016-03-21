@@ -374,7 +374,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 					@gameended(false)
 					
 					@game_client_engine = new GameClientEngine(@adminuid(), @adminws, @admin()) if (@game_client_engine == null)
-					@map = new Map(@adminws) if (@map == null)
+					
 					
 					$("#game-result-won").hide()
 					$("#game-result-lost").hide()
@@ -393,11 +393,12 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 						@game_type_web(false)
 						# Initialize map
 						console.log("json.game.players[0].pos.latitude: " + json.game.players[0].pos.latitude, " json.game.players[0].pos.longitude: " +  json.game.players[0].pos.longitude)
-						@map.initMap([json.game.players[0].pos.latitude, json.game.players[0].pos.longitude], 17)
-						@map.setBusterMarkers(json.game.players)
-						@map.setGhostMarkers(json.game.ghosts)
-						@map.setTreasuresMarkers(json.game.treasures)
-						@map.setTraps(json.game.traps)
+						@map = new Map(@adminws, json.game.players[0].pos.latitude, json.game.players[0].pos.longitude, 17) if (@map == null)
+						#@map.initMap([json.game.players[0].pos.latitude, json.game.players[0].pos.longitude], 17)
+						#@map.setBusterMarkers(json.game.players)
+						#@map.setGhostMarkers(json.game.ghosts)
+						#@map.setTreasuresMarkers(json.game.treasures)
+						#@map.setTraps(json.game.traps)
 						@map.startGame()
 						
 				else if json.event == "game_status"
@@ -421,11 +422,12 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 								@game_client_engine.startGame()
 							else
 								console.log("json.game.players[0].pos.latitude: " + json.game.players[0].pos.latitude, " json.game.players[0].pos.longitude: " +  json.game.players[0].pos.longitude)
-								@map.initMap([json.game.players[0].pos.latitude, json.game.players[0].pos.longitude], 17)
-								@map.setBusterMarkers(json.game.players)
-								@map.setGhostMarkers(json.game.ghosts)
-								@map.setTrapMarkers(json.game.traps)
-								@map.setTreasuresMarkers(json.game.treasures)
+								#@map.initMap([json.game.players[0].pos.latitude, json.game.players[0].pos.longitude], 17)
+								@map = new Map(@adminws, json.game.players[0].pos.latitude, json.game.players[0].pos.longitude, 17) if (@map == null)
+								#@map.setBusterMarkers(json.game.players)
+								#@map.setGhostMarkers(json.game.ghosts)
+								#@map.setTrapMarkers(json.game.traps)
+								#@map.setTreasuresMarkers(json.game.treasures)
 								@map.startGame()
 								
 							@refreshPlayersList(json)
@@ -435,7 +437,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 							if @game_type_web()
 								@game_client_engine.pauseGame()
 							else
-								@map.pauseGame()
+								#@map.pauseGame()
 								
 						when 3 # game ended
 							console.log('Game Over!')
@@ -445,15 +447,15 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 								@game_client_engine.endGame()
 								@game_client_engine = null
 							else
-								@map.endGame()
-								@map = null
+								#@map.endGame()
+								#@map = null
 						
 				else if json.event == "update_player_position"
 					if @gamestarted()
 						if @game_type_web()
 							@game_client_engine.busterMove(json.player.uid, json.player.pos.latitude, json.player.pos.longitude)
 						else
-							@map.updateBusterMarkers(json.player.uid, json.player.pos.latitude, json.player.pos.longitude)
+							#@map.updateBusterMarkers(json.player.uid, json.player.pos.latitude, json.player.pos.longitude)
 						
 				else if json.event == "update_info"
 					if @gamestarted()
@@ -464,7 +466,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 						if @game_type_web()
 							@game_client_engine.ghostMove(ghost.uid, ghost.mood, ghost.pos.latitude, ghost.pos.longitude) for ghost in json.ghosts
 						else
-							@map.updateGhostMarkers(ghost.uid, ghost.level, ghost.mood, ghost.pos.latitude, ghost.pos.longitude) for ghost in json.ghosts
+							#@map.updateGhostMarkers(ghost.uid, ghost.level, ghost.mood, ghost.pos.latitude, ghost.pos.longitude) for ghost in json.ghosts
 				
 				else if json.event == "update_treasures"
 					console.log("Tesoro aperto!")
@@ -473,14 +475,14 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 						if @game_type_web()
 							@game_client_engine.changeTreasureStatus(treasure.uid, treasure.status) for treasure in json.treasures
 						else
-							@map.updateTreasureMarkers(treasure.uid, treasure.status) for treasure in json.treasures
+							#@map.updateTreasureMarkers(treasure.uid, treasure.status) for treasure in json.treasures
 				
 				else if json.event == "new_trap"
 					if @gamestarted()
 						if @game_type_web()
 							@game_client_engine.newTrap(json.trap.uid, json.trap.pos.latitude, json.trap.pos.longitude)
 						else
-							@map.setTrapMarker(json.trap.uid, json.trap.pos.latitude, json.trap.pos.longitude)
+							#@map.setTrapMarker(json.trap.uid, json.trap.pos.latitude, json.trap.pos.longitude)
 				
 				else if json.event == "active_trap"
 					if @gamestarted()
@@ -488,7 +490,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 						if @game_type_web()
 							@game_client_engine.activeTrap(json.trap.uid) if (json.trap.status == 1)
 						else
-							@map.updateActiveTrapMarker(json.trap.uid) if (json.trap.status == 1)
+							#@map.updateActiveTrapMarker(json.trap.uid) if (json.trap.status == 1)
 						console.log "Trappola attivata!"
 							# console.log json.trap
 				
@@ -497,7 +499,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 						if @game_type_web()
 							@game_client_engine.removeTrap(json.trap.uid)
 						else
-							@map.removeTrapMarker(json.trap.uid)
+							#@map.removeTrapMarker(json.trap.uid)
 						console.log "Trappola rimossa!"
 						# console.log json.trap
 						
