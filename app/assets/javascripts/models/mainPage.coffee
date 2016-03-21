@@ -279,9 +279,8 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 			# When the websocket opens
 			@adminws.onopen = (event) =>
 				
-				# Initialize the two possible game arena
+				# Initialize the canvas game arena
 				@game_client_engine = new GameClientEngine(@adminuid(), @adminws, @admin())
-				@map = new Map(@adminws)
 				
 				@connecting(null)
 				# Send login data to the server
