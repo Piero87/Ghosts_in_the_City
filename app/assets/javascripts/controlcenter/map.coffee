@@ -5,7 +5,7 @@
 define ["marker", "leaflet"], (Marker, Leaflet) ->
 
 	class Map
-		constructor: (ws, lat, lng, zoom) ->
+		constructor: (ws) ->
 			
 			@lat = lat
 			@lng = lng
@@ -19,11 +19,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				attribution: "Map data © OpenStreetMap contributors"
 			).addTo(@map)
 			
-			try
-				@map.setView([lat,lng], zoom)
-			catch e
-				console.log(e)
-				@map.setView([0,0], zoom)
+			@map.setView([0,0], 2)
 			
 			# The websocket
 			@ws = ws

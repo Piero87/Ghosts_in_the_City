@@ -373,7 +373,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 					@gameended(false)
 					
 					@game_client_engine = new GameClientEngine(@adminuid(), @adminws, @admin()) if (@game_client_engine == null)
-					
+					@map = new Map(@adminws) if (@map == null)
 					
 					$("#game-result-won").hide()
 					$("#game-result-lost").hide()
@@ -392,7 +392,6 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 						@game_type_web(false)
 						# Initialize map
 						console.log("json.game.players[0].pos.latitude: " + json.game.players[0].pos.latitude, " json.game.players[0].pos.longitude: " +  json.game.players[0].pos.longitude)
-						@map = new Map(@adminws, json.game.players[0].pos.latitude, json.game.players[0].pos.longitude, 17)
 						#@map.initMap([json.game.players[0].pos.latitude, json.game.players[0].pos.longitude], 17)
 						#@map.setBusterMarkers(json.game.players)
 						#@map.setGhostMarkers(json.game.ghosts)
@@ -422,7 +421,6 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 							else
 								console.log("json.game.players[0].pos.latitude: " + json.game.players[0].pos.latitude, " json.game.players[0].pos.longitude: " +  json.game.players[0].pos.longitude)
 								#@map.initMap([json.game.players[0].pos.latitude, json.game.players[0].pos.longitude], 17)
-								@map = new Map(@adminws, json.game.players[0].pos.latitude, json.game.players[0].pos.longitude, 17)
 								#@map.setBusterMarkers(json.game.players)
 								#@map.setGhostMarkers(json.game.ghosts)
 								#@map.setTrapMarkers(json.game.traps)
