@@ -174,7 +174,8 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
          case "open_treasure" =>
            gameManagerClient ! OpenTreasureRequest(uid)
            
-         // Messages from admin client
+           
+         // **************** Admin stuff ****************
          case "admin_login" =>
            val adminLoginResult: JsResult[AdminLoginJSON] = msg.validate[AdminLoginJSON](CommonMessages.adminLoginJSONReads)
            adminLoginResult match {
@@ -203,14 +204,15 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
               val future = frontendManager ? StartedGamesList
               future.onSuccess {
                 case GamesList(list) =>
-                var games_list_json = new GamesListResponseJSON("games_list",list)
-                val json = Json.toJson(games_list_json)(CommonMessages.gamesListResponseWrites)
-                upstream ! json
+                  if(!list.isEmpty){
+                    var games_list_json = new GamesListResponseJSON("games_list",list)
+                    val json = Json.toJson(games_list_json)(CommonMessages.gamesListResponseWrites)
+                    upstream ! json
+                  }
               }
             case e: JsError => logger.log("STARTED GAMES LIST ERROR: " + e.toString() + " FROM " + sender.path)
           }
            
-         // **************** Admin stuff ****************
          case "ghost_normal_mode" =>
            logger.log("Admin ghost normal mode request received")
            val ghostNormalModeRequest: JsResult[GhostNormalModeRequestJSON] = msg.validate[GhostNormalModeRequestJSON](CommonMessages.ghostNormalModeRequestReads)
