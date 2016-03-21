@@ -305,34 +305,44 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
       val json = Json.toJson(g_json)(CommonMessages.victoryResponseJSONWrites)
       upstream ! json
     case UpdateVisiblePlayerPosition(uid,player) =>
-      val json = Json.toJson(UpdateVisiblePlayerPosition(uid,player))(CommonMessages.updateVisiblePlayerPositionWrites)
+      var g_json = new UpdateVisiblePlayerPositionJSON("update_player_position",uid,player)
+      val json = Json.toJson(g_json)(CommonMessages.updateVisiblePlayerPositionWrites)
       upstream ! json
     case UpdateVisibleGhostsPositions(uid,ghosts) =>
-      val json = Json.toJson(UpdateVisibleGhostsPositions(uid,ghosts))(CommonMessages.updateVisibleGhostsPositionsWrites)
+      var g_json = new UpdateVisibleGhostsPositionsJSON("update_ghosts_positions",uid,ghosts)
+      val json = Json.toJson(g_json)(CommonMessages.updateVisibleGhostsPositionsWrites)
       upstream ! json
     case NewVisibleTrap(uid,trap) =>
-      val json = Json.toJson(NewVisibleTrap(uid,trap))(CommonMessages.newVisibleTrapWrites)
+      var g_json = new NewVisibleTrapJSON("new_trap",uid,trap)
+      val json = Json.toJson(g_json)(CommonMessages.newVisibleTrapWrites)
       upstream ! json
     case ActivationVisibleTrap(uid,trap) =>
-      val json = Json.toJson(ActivationVisibleTrap(uid,trap))(CommonMessages.activationVisibleTrapWrites)
+      var g_json = new ActivationVisibleTrapJSON("active_trap",uid,trap)
+      val json = Json.toJson(g_json)(CommonMessages.activationVisibleTrapWrites)
       upstream ! json
     case RemoveVisibleTrap(uid,trap) =>
-      val json = Json.toJson(RemoveVisibleTrap(uid,trap))(CommonMessages.removeVisibleTrapWrites)
+      var g_json = new RemoveVisibleTrapJSON("remove_trap",uid,trap)
+      val json = Json.toJson(g_json)(CommonMessages.removeVisibleTrapWrites)
       upstream ! json
     case UpdateVisibleTreasures(uid,treasures) =>
-      val json = Json.toJson(UpdateVisibleTreasures(uid,treasures))(CommonMessages.updateVisibleTreasuresWrites)
+      var g_json = new UpdateVisibleTreasuresJSON("update_treasures",uid,treasures)
+      val json = Json.toJson(g_json)(CommonMessages.updateVisibleTreasuresWrites)
       upstream ! json
     case VisibleTreasures(uid,treasures) =>
-      val json = Json.toJson(VisibleTreasures(uid,treasures))(CommonMessages.visibleTreasuresWrites)
+      var g_json = new VisibleTreasuresJSON("visible_treasures",uid,treasures)
+      val json = Json.toJson(g_json)(CommonMessages.visibleTreasuresWrites)
       upstream ! json
     case VisibleGhosts(uid,ghosts) =>
-      val json = Json.toJson(VisibleGhosts(uid,ghosts))(CommonMessages.visibleGhostsWrites)
+      var g_json = new VisibleGhostsJSON("visible_ghosts",uid,ghosts)
+      val json = Json.toJson(g_json)(CommonMessages.visibleGhostsWrites)
       upstream ! json
     case VisibleTraps(uid,traps) =>
-      val json = Json.toJson(VisibleTraps(uid,traps))(CommonMessages.visibleTrapsWrites)
+      var g_json = new VisibleTrapsJSON("visible_traps",uid,traps)
+      val json = Json.toJson(g_json)(CommonMessages.visibleTrapsWrites)
       upstream ! json
     case VisiblePlayers(uid,players) =>
-      val json = Json.toJson(VisiblePlayers(uid,players))(CommonMessages.visiblePlayersWrites)
+      var g_json = new VisiblePlayersJSON("visible_players",uid,players)
+      val json = Json.toJson(g_json)(CommonMessages.visiblePlayersWrites)
       upstream ! json
   }
   

@@ -358,6 +358,7 @@ sealed case class Polygon(vertex: List[Point]){
     val max_lng = longitudes.reduceLeft(_ max _)
     
     new Rectangle(new Point(min_lat, min_lng), (max_lat - min_lat), (max_lng - min_lng))
+    
   }
   
 }

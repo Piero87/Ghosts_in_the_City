@@ -111,16 +111,27 @@ case class HitPlayerRequest(player_uid: String)
 case class AttackHim(player: ActorRef)
 case class PlayerAttacked(uid: String, attacker_uid: String, attack_type: Int, gold_perc_stolen: Double, keys_stolen: Int)
 
-case class UpdateVisiblePlayerPosition(receiver_uid: String, player: PlayerInfo) {val event = "update_player_position"}
-case class UpdateVisibleGhostsPositions(receiver_uid: String, ghosts: MutableList[GhostInfo]) {val event = "update_ghosts_positions"}
-case class NewVisibleTrap(receiver_uid: String, trap: TrapInfo) {val event = "new_trap"}
-case class ActivationVisibleTrap(receiver_uid: String, trap: TrapInfo) {val event = "active_trap"}
-case class RemoveVisibleTrap(receiver_uid: String, trap: TrapInfo) {val event = "remove_trap"}
-case class UpdateVisibleTreasures(receiver_uid: String, treasures: MutableList[TreasureInfo]) {val event = "update_treasures"}
-case class VisibleTreasures(receiver_uid: String, treasures: MutableList[TreasureInfo]) {val event = "visible_treasures"}
-case class VisibleGhosts(receiver_uid: String, ghosts: MutableList[GhostInfo]) {val event = "visible_ghosts"}
-case class VisibleTraps(receiver_uid: String, traps: MutableList[TrapInfo]) {val event = "visible_traps"}
-case class VisiblePlayers(receiver_uid: String, players: MutableList[PlayerInfo]) {val event = "visible_players"}
+case class UpdateVisiblePlayerPosition(receiver_uid: String, player: PlayerInfo)
+case class UpdateVisibleGhostsPositions(receiver_uid: String, ghosts: MutableList[GhostInfo])
+case class NewVisibleTrap(receiver_uid: String, trap: TrapInfo)
+case class ActivationVisibleTrap(receiver_uid: String, trap: TrapInfo)
+case class RemoveVisibleTrap(receiver_uid: String, trap: TrapInfo)
+case class UpdateVisibleTreasures(receiver_uid: String, treasures: MutableList[TreasureInfo])
+case class VisibleTreasures(receiver_uid: String, treasures: MutableList[TreasureInfo])
+case class VisibleGhosts(receiver_uid: String, ghosts: MutableList[GhostInfo])
+case class VisibleTraps(receiver_uid: String, traps: MutableList[TrapInfo])
+case class VisiblePlayers(receiver_uid: String, players: MutableList[PlayerInfo])
+
+case class UpdateVisiblePlayerPositionJSON(event: String, receiver_uid: String, player: PlayerInfo)
+case class UpdateVisibleGhostsPositionsJSON(event: String, receiver_uid: String, ghosts: MutableList[GhostInfo])
+case class NewVisibleTrapJSON(event: String, receiver_uid: String, trap: TrapInfo)
+case class ActivationVisibleTrapJSON(event: String, receiver_uid: String, trap: TrapInfo)
+case class RemoveVisibleTrapJSON(event: String, receiver_uid: String, trap: TrapInfo)
+case class UpdateVisibleTreasuresJSON(event: String, receiver_uid: String, treasures: MutableList[TreasureInfo])
+case class VisibleTreasuresJSON(event: String, receiver_uid: String, treasures: MutableList[TreasureInfo])
+case class VisibleGhostsJSON(event: String, receiver_uid: String, ghosts: MutableList[GhostInfo])
+case class VisibleTrapsJSON(event: String, receiver_uid: String, traps: MutableList[TrapInfo])
+case class VisiblePlayersJSON(event: String, receiver_uid: String, players: MutableList[PlayerInfo])
 
 // Treasure
 case class Open(pos_p: Point, keys: List[Key])
@@ -302,39 +313,39 @@ object CommonMessages {
   implicit val ghostHitPlayerRequestReads = Json.reads[GhostHitPlayerRequestJSON]
   implicit val ghostHitPlayerRequestWrites = Json.writes[GhostHitPlayerRequestJSON]
 
-  implicit val updateVisiblePlayerPositionReads = Json.reads[UpdateVisiblePlayerPosition]
-  implicit val updateVisiblePlayerPositionWrites = Json.writes[UpdateVisiblePlayerPosition]
-  
   implicit val updateGhostPositionReads = Json.reads[GhostUpdatePositionJSON]
   implicit val updateGhostPositionWrites = Json.writes[GhostUpdatePositionJSON]
   
   // **************************************************
   
-  implicit val updateVisibleGhostsPositionsReads = Json.reads[UpdateVisibleGhostsPositions]
-  implicit val updateVisibleGhostsPositionsWrites = Json.writes[UpdateVisibleGhostsPositions]
+  implicit val updateVisiblePlayerPositionReads = Json.reads[UpdateVisiblePlayerPositionJSON]
+  implicit val updateVisiblePlayerPositionWrites = Json.writes[UpdateVisiblePlayerPositionJSON]
   
-  implicit val newVisibleTrapReads = Json.reads[NewVisibleTrap]
-  implicit val newVisibleTrapWrites = Json.writes[NewVisibleTrap]
+  implicit val updateVisibleGhostsPositionsReads = Json.reads[UpdateVisibleGhostsPositionsJSON]
+  implicit val updateVisibleGhostsPositionsWrites = Json.writes[UpdateVisibleGhostsPositionsJSON]
   
-  implicit val activationVisibleTrapReads = Json.reads[ActivationVisibleTrap]
-  implicit val activationVisibleTrapWrites = Json.writes[ActivationVisibleTrap]
+  implicit val newVisibleTrapReads = Json.reads[NewVisibleTrapJSON]
+  implicit val newVisibleTrapWrites = Json.writes[NewVisibleTrapJSON]
   
-  implicit val removeVisibleTrapReads = Json.reads[RemoveVisibleTrap]
-  implicit val removeVisibleTrapWrites = Json.writes[RemoveVisibleTrap]
+  implicit val activationVisibleTrapReads = Json.reads[ActivationVisibleTrapJSON]
+  implicit val activationVisibleTrapWrites = Json.writes[ActivationVisibleTrapJSON]
   
-  implicit val updateVisibleTreasuresReads = Json.reads[UpdateVisibleTreasures]
-  implicit val updateVisibleTreasuresWrites = Json.writes[UpdateVisibleTreasures]
+  implicit val removeVisibleTrapReads = Json.reads[RemoveVisibleTrapJSON]
+  implicit val removeVisibleTrapWrites = Json.writes[RemoveVisibleTrapJSON]
   
-  implicit val visibleTreasuresReads = Json.reads[VisibleTreasures]
-  implicit val visibleTreasuresWrites = Json.writes[VisibleTreasures]
+  implicit val updateVisibleTreasuresReads = Json.reads[UpdateVisibleTreasuresJSON]
+  implicit val updateVisibleTreasuresWrites = Json.writes[UpdateVisibleTreasuresJSON]
   
-  implicit val visibleGhostsReads = Json.reads[VisibleGhosts]
-  implicit val visibleGhostsWrites = Json.writes[VisibleGhosts]
+  implicit val visibleTreasuresReads = Json.reads[VisibleTreasuresJSON]
+  implicit val visibleTreasuresWrites = Json.writes[VisibleTreasuresJSON]
   
-  implicit val visibleTrapsReads = Json.reads[VisibleTraps]
-  implicit val visibleTrapsWrites = Json.writes[VisibleTraps]
+  implicit val visibleGhostsReads = Json.reads[VisibleGhostsJSON]
+  implicit val visibleGhostsWrites = Json.writes[VisibleGhostsJSON]
   
-  implicit val visiblePlayersReads = Json.reads[VisiblePlayers]
-  implicit val visiblePlayersWrites = Json.writes[VisiblePlayers]
+  implicit val visibleTrapsReads = Json.reads[VisibleTrapsJSON]
+  implicit val visibleTrapsWrites = Json.writes[VisibleTrapsJSON]
+  
+  implicit val visiblePlayersReads = Json.reads[VisiblePlayersJSON]
+  implicit val visiblePlayersWrites = Json.writes[VisiblePlayersJSON]
   
 }
