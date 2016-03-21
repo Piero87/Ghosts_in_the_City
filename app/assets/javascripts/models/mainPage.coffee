@@ -49,7 +49,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 			
 			# Game arenas(map could be used only if user is an admin)
 			@game_client_engine = null
-			@map = null
+			#@map = null
 			
 			# Interval to send a lot of request for available games
 			@interval = null
