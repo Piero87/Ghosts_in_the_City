@@ -482,6 +482,7 @@ define () ->
 					if @map_keys[68]
 						@ws.send(JSON.stringify
 							event: "ghost_hit_player"
+							ghost_uid: @ghost_clicked_uid
 						)
 					
 					if @map_keys[37] || @map_keys[38] || @map_keys[39] || @map_keys[40]

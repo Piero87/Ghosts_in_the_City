@@ -188,8 +188,8 @@
 		        	<div align="right">
 		        		<a href="javascript: void(0);" class="ghostbuster-font font-small" data-bind="if: game_type_web, click: toggleDebug">debug mode:  <span data-bind="text: debug"></span></a>
 		        	</div>
-	        		<div id="gameArenaContainer"></div>
-		        	<div class="col-md-12" id="mapContainer"></div>
+	        		<div data-bind="visible: game_type_web()" id="gameArenaContainer"></div>
+		        	<div data-bind="visible: !game_type_web()" class="col-md-12" id="mapContainer"></div>
 		        	<div data-bind="visible: !admin()" class="ghostbuster-font" align="center" style="margin: 5px;">
 		        		<span class="gold-owned font-big">
 		        			gold owned: <b><span data-bind="text: playergold"></span></b> $

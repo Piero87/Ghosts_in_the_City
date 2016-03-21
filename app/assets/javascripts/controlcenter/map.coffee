@@ -355,6 +355,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				if @map_keys[68]
 					@ws.send(JSON.stringify
 						event: "ghost_hit_player"
+						ghost_uid: @ghost_possessed
 					)
 				
 				if @map_keys[37] || @map_keys[38] || @map_keys[39] || @map_keys[40]
