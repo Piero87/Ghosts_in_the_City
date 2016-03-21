@@ -14,7 +14,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				attribution: "Map data © OpenStreetMap contributors"
 			).addTo(@map)
 			
-			#@map.setView([0,0], 2)
+			@map.setView([0,0], 2)
 			
 			# The websocket
 			@ws = ws
