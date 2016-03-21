@@ -108,6 +108,7 @@ class GameManagerBackend () extends Actor {
         sender ! Game(game_id,game_name,game_n_players,game_status,game_type, tmp_p,tmp_g,tmp_t, tmp_tr)
         // Ora mandiamo il messaggio di update game status a tutti i giocatori (***Dobbiamo evitare di mandarlo a quello che si è
         // appena Joinato?
+        // Qui non va filtrato nulla per la partita in AR dato che ancora la partita non è iniziata
         gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,game_type,tmp_p,tmp_g,tmp_t, tmp_tr))
         if(players.size == game_n_players){
           newGame()
@@ -159,6 +160,7 @@ class GameManagerBackend () extends Actor {
       val tmp_t = treasures.map(x => x._1)
       val tmp_p = players.map(x => x._1)
       val tmp_tr = traps.map(x => x.getTrapInfo)
+      // Qui non dobbiamo filtrare per la partita in AR dato che andiamo in pausa
       gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,game_type,tmp_p,tmp_g,tmp_t, tmp_tr))
     case LeaveGame(p_uid) =>
       logger.log("LeaveGame Request")
@@ -212,7 +214,7 @@ class GameManagerBackend () extends Actor {
             gameManagerClient ! VisibleGhosts(receiver._1.uid, visible_ghosts)
             val visible_traps = traps.map(x => x.getTrapInfo).filter { trap => receiver._1.pos.distanceFrom(trap.pos, game_type) <= game_params.player_vision_limit }
             gameManagerClient ! VisibleTraps(receiver._1.uid, visible_traps)
-            val visible_players = players.map(x => x._1).filter { player => receiver._1.pos.distanceFrom(player.pos, game_type) <= game_params.player_vision_limit }
+            val visible_players = players.map(x => x._1).filter { player => receiver._1.pos.distanceFrom(player.pos, game_type) <= game_params.player_vision_limit && receiver._1.uid != player.uid}
             gameManagerClient ! VisiblePlayers(receiver._1.uid, visible_players)
           }
         }
