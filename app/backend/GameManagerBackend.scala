@@ -635,7 +635,7 @@ class GameManagerBackend () extends Actor {
     try {
       var spaces = UtilFunctions.createSpaces(n_treasures_and_ghosts, game_area)
       for (s <- spaces) {
-        logger.log("spaces: " + spaces)
+        logger.log("spaces: " + s)
       }
       var margin = 0.0
       //logger.log(game_type)
