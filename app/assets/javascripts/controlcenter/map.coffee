@@ -140,8 +140,8 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				68 : false # D
 			
 		# Init Map with one player position and right zoom 
-		#initMap: (lat, lon, zoom) ->
-			#@map.setView([lat, lon], zoom)
+		initMap: (lat, lon, zoom) ->
+			@map.setView([lat, lon], zoom)
 			
 		# Start Game	
 		startGame: () ->
