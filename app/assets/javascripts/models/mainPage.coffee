@@ -392,13 +392,13 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 						@game_type_web(false)
 						# Initialize map
 						console.log("json.game.players[0].pos.latitude: " + json.game.players[0].pos.latitude, " json.game.players[0].pos.longitude: " +  json.game.players[0].pos.longitude)
-						@map = new Map(@adminws, json.game.players[0].pos.latitude, json.game.players[0].pos.longitude, 17) if (@map == null)
+						@map = new Map(@adminws, json.game.players[0].pos.latitude, json.game.players[0].pos.longitude, 17)
 						#@map.initMap([json.game.players[0].pos.latitude, json.game.players[0].pos.longitude], 17)
 						#@map.setBusterMarkers(json.game.players)
 						#@map.setGhostMarkers(json.game.ghosts)
 						#@map.setTreasuresMarkers(json.game.treasures)
 						#@map.setTraps(json.game.traps)
-						#@map.startGame()
+						@map.startGame()
 						
 				else if json.event == "game_status"
 					# {event: "game_status", game: {id: [Int], name: [String], n_players: [Int], players [Array of String], status: [Int]}}
@@ -422,12 +422,12 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 							else
 								console.log("json.game.players[0].pos.latitude: " + json.game.players[0].pos.latitude, " json.game.players[0].pos.longitude: " +  json.game.players[0].pos.longitude)
 								#@map.initMap([json.game.players[0].pos.latitude, json.game.players[0].pos.longitude], 17)
-								@map = new Map(@adminws, json.game.players[0].pos.latitude, json.game.players[0].pos.longitude, 17) if (@map == null)
+								@map = new Map(@adminws, json.game.players[0].pos.latitude, json.game.players[0].pos.longitude, 17)
 								#@map.setBusterMarkers(json.game.players)
 								#@map.setGhostMarkers(json.game.ghosts)
 								#@map.setTrapMarkers(json.game.traps)
 								#@map.setTreasuresMarkers(json.game.treasures)
-								#@map.startGame()
+								@map.startGame()
 								
 							@refreshPlayersList(json)
 							
