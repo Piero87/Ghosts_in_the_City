@@ -398,7 +398,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 						#@map.setGhostMarkers(json.game.ghosts)
 						#@map.setTreasuresMarkers(json.game.treasures)
 						#@map.setTraps(json.game.traps)
-						@map.startGame()
+						#@map.startGame()
 						
 				else if json.event == "game_status"
 					# {event: "game_status", game: {id: [Int], name: [String], n_players: [Int], players [Array of String], status: [Int]}}
@@ -427,7 +427,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 								#@map.setGhostMarkers(json.game.ghosts)
 								#@map.setTrapMarkers(json.game.traps)
 								#@map.setTreasuresMarkers(json.game.treasures)
-								@map.startGame()
+								#@map.startGame()
 								
 							@refreshPlayersList(json)
 							
@@ -685,7 +685,8 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 				
 		playAgain: ->
 			@clearGameData()
-			window.location.reload(true)
+			if(!@admin())
+				window.location.reload(true)
 		
 		clearGameData: ->
 			@changeGameStatus(-1)
