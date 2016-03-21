@@ -22,6 +22,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			try
 				@map.setView([lat,lng], zoom)
 			catch e
+				console.log(e)
 				@map.setView([0,0], zoom)
 			
 			# The websocket
