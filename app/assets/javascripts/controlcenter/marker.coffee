@@ -29,9 +29,9 @@ define ["leaflet"], (Leaflet) ->
 				when "buster" # Buster
 					@marker = new Leaflet.Marker(latlng)
 					if (@team == "red")
-						@marker.bindPopup(@name(), @customOptionsRed())
+						@marker.bindPopup(@name, @customOptionsRed())
 					else
-						@marker.bindPopup(@name(), @customOptionsBlue())
+						@marker.bindPopup(@name, @customOptionsBlue())
 					@marker.addTo(@map)
 				
 				when "ghost" # Ghost
