@@ -29,9 +29,9 @@ define ["leaflet"], (Leaflet) ->
 			switch t
 				when "buster" # Buster
 					#if (@team == "red")
-						@marker = new Leaflet.Marker(latlng, {icon: markericon}).bindPopup(@name, @customOptionsRed).addTo(@map)
+						@marker = new Leaflet.Marker(latlng, {icon: @markericon}).bindPopup(@name, @customOptionsRed).addTo(@map)
 					#else
-						@marker = new Leaflet.Marker(latlng, {icon: markericon}).bindPopup(@name, @customOptionsBlue).addTo(@map)
+						@marker = new Leaflet.Marker(latlng, {icon: @markericon}).bindPopup(@name, @customOptionsBlue).addTo(@map)
 				
 				when "ghost" # Ghost
 					# Check the level and the mood of the ghost
