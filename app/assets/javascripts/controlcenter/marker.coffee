@@ -32,22 +32,22 @@ define ["leaflet"], (Leaflet) ->
 						@marker.bindPopup(@name(), @customOptionsRed())
 					else
 						@marker.bindPopup(@name(), @customOptionsBlue())
-					@marker.addTo(map)
+					@marker.addTo(@map)
 				
 				when "ghost" # Ghost
 					# Check the level and the mood of the ghost
 					@marker = new Leaflet.Marker(latlng)
 					if level == 3 
 						@marker.on 'click', onClick
-					@marker.addTo(map)
+					@marker.addTo(@map)
 				
 				when "treasure" # Treasure
 					@marker = new Leaflet.Marker(latlng)
-					@marker.addTo(map)
+					@marker.addTo(@map)
 				
 				when "trap" # Trap
 					@marker = new Leaflet.Marker(latlng)
-					@marker.addTo(map)
+					@marker.addTo(@map)
 					
 		# Update buster marker position with the given latLng coordinates
 		update: (lat, lng) ->
