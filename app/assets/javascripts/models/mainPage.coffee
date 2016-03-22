@@ -392,7 +392,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 						@game_type_web(false)
 						# Initialize map
 						console.log("json.game.players[0].pos.latitude: " + json.game.players[0].pos.latitude, " json.game.players[0].pos.longitude: " +  json.game.players[0].pos.longitude)
-						@map.initMap(json.game.players[0].pos.latitude, json.game.players[0].pos.longitude, 17)
+						#@map.initMap(json.game.players[0].pos.latitude, json.game.players[0].pos.longitude, 17)
 						@map.setBusterMarkers(json.game.players)
 						#@map.setGhostMarkers(json.game.ghosts)
 						#@map.setTreasuresMarkers(json.game.treasures)
@@ -420,7 +420,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 								@game_client_engine.startGame()
 							else
 								console.log("json.game.players[0].pos.latitude: " + json.game.players[0].pos.latitude, " json.game.players[0].pos.longitude: " +  json.game.players[0].pos.longitude)
-								@map.initMap(json.game.players[0].pos.latitude, json.game.players[0].pos.longitude, 17)
+								#@map.initMap(json.game.players[0].pos.latitude, json.game.players[0].pos.longitude, 17)
 								@map.setBusterMarkers(json.game.players)
 								#@map.setGhostMarkers(json.game.ghosts)
 								#@map.setTrapMarkers(json.game.traps)
