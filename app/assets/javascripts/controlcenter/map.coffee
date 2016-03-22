@@ -253,7 +253,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				trap.uid, trap.status, trap.pos.latitude, trap.pos.longitude
 			) for trap in traps
 			
-		setTrapMarker: (uid, lat, lng)  ->
+		setTrapsMarker: (uid, lat, lng)  ->
 			# The treasures markers on the map
 			@addTrapMarker(uid, 0, lat, lng)
 			

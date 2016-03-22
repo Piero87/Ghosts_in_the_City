@@ -424,7 +424,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 								@map.initMap(json.game.players[0].pos.latitude, json.game.players[0].pos.longitude, 17)
 								@map.setBusterMarkers(json.game.players)
 								@map.setGhostMarkers(json.game.ghosts)
-								@map.setTrapMarkers(json.game.traps)
+								@map.setTrapsMarkers(json.game.traps)
 								@map.setTreasuresMarkers(json.game.treasures)
 								@map.startGame()
 								
