@@ -186,7 +186,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 					-15
 				])
 			marker = new Marker(@map,type, uid, name, team, level, lat , lng)
-			marker.setIcon(b_icon)
+			marker.setMarkerIcon(b_icon)
 			@b_markers.push marker
 		
 		setGhostMarkers: (ghosts) ->

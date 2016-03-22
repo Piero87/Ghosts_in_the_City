@@ -54,7 +54,7 @@ define ["leaflet"], (Leaflet) ->
 			@marker.setLatLng(latlng)
 			
 		#Set icon
-		setIcon: (icon) ->
+		setMarkerIcon: (icon) ->
 			@marker.setIcon(icon)
 	
 		# Remove the marker from the map
