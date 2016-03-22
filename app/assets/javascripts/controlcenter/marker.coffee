@@ -27,12 +27,10 @@ define ["leaflet"], (Leaflet) ->
 			t = type
 			switch t
 				when "buster" # Buster
-					@marker = new Leaflet.Marker(latlng)
 					#if (@team == "red")
-						#@marker.bindPopup(@name, @customOptionsRed)
+						@marker = new Leaflet.Marker(latlng).bindPopup(@name, @customOptionsRed).addTo(@map)
 					#else
-						#@marker.bindPopup(@name, @customOptionsBlue)
-					@marker.addTo(@map)
+						@marker = new Leaflet.Marker(latlng).bindPopup(@name, @customOptionsBlue).addTo(@map)
 				
 				when "ghost" # Ghost
 					# Check the level and the mood of the ghost
@@ -54,6 +52,10 @@ define ["leaflet"], (Leaflet) ->
 			# Update the position
 			latlng = new Leaflet.LatLng(lat, lng)
 			@marker.setLatLng(latlng)
+			
+		#Set icon
+		setIcon: (icon) ->
+			@marker.setIcon(icon)
 	
 		# Remove the marker from the map
 		remove: () ->

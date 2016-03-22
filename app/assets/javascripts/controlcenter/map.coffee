@@ -31,21 +31,21 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			
 			# Ghosts icons
 			# LEVEL 1
-			@g1 = L.icon(
+			@g1 = Leaflet.icon(
 				iconUrl: '/assets/images/Ghost_L1_left.png'
 				iconSize: [
 					32
 					32
 				])
 				
-			@g1_angry = L.icon(
+			@g1_angry = Leaflet.icon(
 				iconUrl: '/assets/images/Ghost_L1_Angry_left.png'
 				iconSize: [
 					32
 					32
 				])
 				
-			@g1_scared = L.icon(
+			@g1_scared = Leaflet.icon(
 				iconUrl: '/assets/images/Ghost_L1_Scared_left.png'
 				iconSize: [
 					32
@@ -53,20 +53,20 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				])
 				
 			# LEVEL 2
-			@g2 = L.icon(
+			@g2 = Leaflet.icon(
 				iconUrl: '/assets/images/Ghost_L2_left.png'
 				iconSize: [
 					32
 					32
 				])
-			@g2_angry = L.icon(
+			@g2_angry = Leaflet.icon(
 				iconUrl: '/assets/images/Ghost_L2_Angry_left.png'
 				iconSize: [
 					32
 					32
 				])
 				
-			@g2_scared = L.icon(
+			@g2_scared = Leaflet.icon(
 				iconUrl: '/assets/images/Ghost_L2_Scared_left.png'
 				iconSize: [
 					32
@@ -74,20 +74,20 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				])
 			
 			# LEVEL 2
-			@g3 = L.icon(
+			@g3 = Leaflet.icon(
 				iconUrl: '/assets/images/Ghost_L3_left.png'
 				iconSize: [
 					32
 					32
 				])
-			@g3_angry = L.icon(
+			@g3_angry = Leaflet.icon(
 				iconUrl: '/assets/images/Ghost_L3_Angry_left.png'
 				iconSize: [
 					32
 					32
 				])
 				
-			@g3_scared = L.icon(
+			@g3_scared = Leaflet.icon(
 				iconUrl: '/assets/images/Ghost_L3_Scared_left.png'
 				iconSize: [
 					32
@@ -95,14 +95,14 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				])
 			
 			# Treasure icons
-			@t_opened = L.icon(
+			@t_opened = Leaflet.icon(
 				iconUrl: '/assets/images/Treasure_open.png'
 				iconSize: [
 					32
 					32
 				])
 			
-			@t_closed = L.icon(
+			@t_closed = Leaflet.icon(
 				iconUrl: '/assets/images/Treasure_close.png'
 				iconSize: [
 					32
@@ -110,14 +110,14 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				])
 				
 			# Trap icons
-			@trap_active = L.icon(
+			@trap_active = Leaflet.icon(
 				iconUrl: '/assets/images/Trap_active.png'
 				iconSize: [
 					32
 					32
 				])
 			
-			@trap_idle = L.icon(
+			@trap_idle = Leaflet.icon(
 				iconUrl: '/assets/images/Trap_unactive.png'
 				iconSize: [
 					32
@@ -175,7 +175,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			type = "buster"
 			level= ""
 			# Buster icon
-			b_icon = L.icon(
+			b_icon = Leaflet.icon(
 				iconUrl: '/assets/images/G' + (@b_markers.length % 4) + '.png'
 				iconSize: [
 					32
