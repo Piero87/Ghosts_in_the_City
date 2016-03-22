@@ -223,7 +223,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				else 
 					g_icon = @g3_scared()
 			marker = new Marker(@map,type, uid, name, team, level, lat, lng)
-			marker.setIcon(g_icon)
+			#marker.setIcon(g_icon)
 			@g_markers.push marker
 		
 		setTreasureMarkers: (treasures) ->
