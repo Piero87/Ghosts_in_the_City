@@ -167,7 +167,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 		setBusterMarkers: (players) ->
 			# The busters markers on the map
 			@b_markers = []
-			@addBuster(
+			@addBusterMarker(
 				buster.uid, buster.name, buster.team, buster.pos.latitude, buster.pos.longitude
 			) for buster in players
 			
