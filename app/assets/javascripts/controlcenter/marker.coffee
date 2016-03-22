@@ -29,9 +29,9 @@ define ["leaflet"], (Leaflet) ->
 			t = type
 			switch t
 				when "buster" # Buster
-					if (@team == "red")
+					if @team == "red"
 						@marker = new Leaflet.Marker(latlng, {icon: @markericon}).bindPopup(@name, @customOptionsRed).addTo(@map)
-					else (@team == "blue")
+					else if @team == "blue"
 						@marker = new Leaflet.Marker(latlng, {icon: @markericon}).bindPopup(@name, @customOptionsBlue).addTo(@map)
 				
 				when "ghost" # Ghost
