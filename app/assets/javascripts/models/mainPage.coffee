@@ -397,7 +397,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 						@map.setBusterMarkers(json.game.players)
 						@map.setGhostMarkers(json.game.ghosts)
 						@map.setTreasuresMarkers(json.game.treasures)
-						@map.setTraps(json.game.traps)
+						@map.setTrapsMarkers(json.game.traps)
 						@map.startGame()
 						
 				else if json.event == "game_status"
