@@ -203,25 +203,25 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			g_icon = "" 
 			if(level == 1)
 				if(mood == 0)
-					g_icon = @g1()
+					g_icon = @g1
 				else if (mood == 1)
-					g_icon = @g1_angry()
+					g_icon = @g1_angry
 				else 
-					g_icon = @g1_scared()
+					g_icon = @g1_scared
 			else if(level == 2)
 				if(mood == 0)
-					g_icon = @g2()
+					g_icon = @g2
 				else if (mood == 1)
-					g_icon = @g2_angry()
+					g_icon = @g2_angry
 				else 
-					g_icon = @g2_scared()
+					g_icon = @g2_scared
 			else
 				if(mood == 0)
-					g_icon = @g3()
+					g_icon = @g3
 				else if (mood == 1)
-					g_icon = @g3_angry()
+					g_icon = @g3_angry
 				else 
-					g_icon = @g3_scared()
+					g_icon = @g3_scared
 			marker = new Marker(@map,type, uid, name, team, level, lat, lng, g_icon)
 			@g_markers.push marker
 		
@@ -240,9 +240,9 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			t_icon = ""
 			if(status == 0)
 			# Treasure closed
-				t_icon = @t_closed()
+				t_icon = @t_closed
 			else
-				t_icon = @t_open()
+				t_icon = @t_open
 			marker = new Marker(@map,type, uid, name, team, level, lat , lng, t_icon)
 			@t_markers.push marker
 		
@@ -288,25 +288,25 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				g_icon = "" 
 				if(level == 1)
 					if(mood == 0)
-						g_icon = @g1()
+						g_icon = @g1
 					else if (mood == 1)
-						g_icon = @g1_angry()
+						g_icon = @g1_angry
 					else 
-						g_icon = @g1_scared()
+						g_icon = @g1_scared
 				else if(level == 2)
 					if(mood == 0)
-						g_icon = @g2()
+						g_icon = @g2
 					else if (mood == 1)
-						g_icon = @g2_angry()
+						g_icon = @g2_angry
 					else 
-						g_icon = @g2_scared()
+						g_icon = @g2_scared
 				else
 					if(mood == 0)
-						g_icon = @g3()
+						g_icon = @g3
 					else if (mood == 1)
-						g_icon = @g3_angry()
+						g_icon = @g3_angry
 					else 
-						g_icon = @g3_scared()
+						g_icon = @g3_scared
 				marker.update(lat, lng)
 				marker.setMarkerIcon(g_icon)
 		
@@ -315,9 +315,9 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				t_icon = ""
 				if(status == 0)
 				# Treasure closed
-					t_icon = @t_closed()
+					t_icon = @t_closed
 				else
-					t_icon = @t_open()
+					t_icon = @t_open
 				marker.setMarkerIcon(t_icon)
 		
 		# Get key press
