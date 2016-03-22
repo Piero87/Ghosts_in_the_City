@@ -37,7 +37,7 @@ define ["leaflet"], (Leaflet) ->
 					# Check the level and the mood of the ghost
 					@marker = new Leaflet.Marker(latlng)
 					if level == 3 
-						@marker.on 'click', onClick
+						@marker.on 'click', @onClick()
 					@marker.addTo(@map)
 				
 				when "treasure" # Treasure
