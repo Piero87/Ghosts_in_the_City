@@ -176,7 +176,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			level= ""
 			# Buster icon
 			b_icon = Leaflet.icon(
-				iconUrl: '/assets/images/G' + (@b_markers.length % 4) + '.png'
+				iconUrl: '/assets/images/G' + ((@busters.length % 4)+1) + '.png'
 				iconSize: [
 					32
 					32
@@ -185,8 +185,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 					0
 					-15
 				])
-			marker = new Marker(@map,type, uid, name, team, level, lat , lng)
-			marker.setMarkerIcon(b_icon)
+			marker = new Marker(@map,type, uid, name, team, level, lat , lng, b_icon)
 			@b_markers.push marker
 		
 		setGhostMarkers: (ghosts) ->
@@ -222,8 +221,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 					g_icon = @g3_angry()
 				else 
 					g_icon = @g3_scared()
-			marker = new Marker(@map,type, uid, name, team, level, lat, lng)
-			#marker.setIcon(g_icon)
+			marker = new Marker(@map,type, uid, name, team, level, lat, lng, g_icon)
 			@g_markers.push marker
 		
 		setTreasureMarkers: (treasures) ->
@@ -244,8 +242,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				t_icon = @t_closed()
 			else
 				t_icon = @t_open()
-			marker = new Marker(@map,type, uid, name, team, level, lat , lng)
-			marker.setIcon(t_icon)
+			marker = new Marker(@map,type, uid, name, team, level, lat , lng, t_icon)
 			@t_markers.push marker
 		
 		setTrapsMarker: (traps)  ->
@@ -270,13 +267,12 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				trap_icon = @trap_idle()
 			else
 				trap_icon = @trap_active()
-			marker = new Marker(@map,type, uid, name, team, level lat , lng)
-			marker.setIcon(trap_icon)
+			marker = new Marker(@map,type, uid, name, team, level lat , lng, trap_icon)
 			@traps_markers.push marker
 		
 		updateActiveTrapMarker: (uid) ->
 			for marker, i in @traps_markers when marker.uid == uid
-				marker.setIcon(@trap_active())
+				marker.setMarkerIcon(@trap_active)
 		
 		removeTrapMarker: (uid) ->
 			for marker, i in @traps_markers when marker.uid == uid
@@ -311,7 +307,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 					else 
 						g_icon = @g3_scared()
 				marker.update(lat, lng)
-				marker.setIcon(g_icon)
+				marker.setMarkerIcon(g_icon)
 		
 		updateTreasureMarkers: (uid, status) ->
 			for marker, i in @t_markers when marker.uid == uid
@@ -321,7 +317,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 					t_icon = @t_closed()
 				else
 					t_icon = @t_open()
-				marker.setIcon(t_icon)
+				marker.setMarkerIcon(t_icon)
 		
 		# Get key press
 		keyPressed: (evt) ->

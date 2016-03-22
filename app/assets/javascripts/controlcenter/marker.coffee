@@ -4,7 +4,7 @@
 define ["leaflet"], (Leaflet) ->
 
 	class Marker
-		constructor: (map, type, uid, name, team, level, lat , lng) ->
+		constructor: (map, type, uid, name, team, level, lat , lng, icon) ->
 			@clicked = false
 			
 			@map = map
@@ -14,6 +14,7 @@ define ["leaflet"], (Leaflet) ->
 			@level = level
 			@lat = lat
 			@lng = lng
+			@markericon = icon
 			
 			latlng = new Leaflet.LatLng(lat, lng)
 			
@@ -28,9 +29,9 @@ define ["leaflet"], (Leaflet) ->
 			switch t
 				when "buster" # Buster
 					#if (@team == "red")
-						@marker = new Leaflet.Marker(latlng).bindPopup(@name, @customOptionsRed).addTo(@map)
+						@marker = new Leaflet.Marker(latlng, {icon: markericon}).bindPopup(@name, @customOptionsRed).addTo(@map)
 					#else
-						@marker = new Leaflet.Marker(latlng).bindPopup(@name, @customOptionsBlue).addTo(@map)
+						@marker = new Leaflet.Marker(latlng, {icon: markericon}).bindPopup(@name, @customOptionsBlue).addTo(@map)
 				
 				when "ghost" # Ghost
 					# Check the level and the mood of the ghost
