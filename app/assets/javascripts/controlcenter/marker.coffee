@@ -64,7 +64,7 @@ define ["leaflet"], (Leaflet) ->
 			
 		# onClick function. It activate the ghost manual mode for admin
 		onClick: () ->
-			if !@clicked()
+			if !@clicked
 				@map.updateGhostMarkers(@uid, 3, 1, @lat, @lng)
 				@map.ghostManualMode(uid) 
 			else
