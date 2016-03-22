@@ -137,7 +137,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				68 : false # D
 			
 		# Init Map with one player position and right zoom 
-		initMap: (lat, lon, zoom) ->
+		initMap: (lat, lng, zoom) ->
 			latlng = new Leaflet.LatLng(lat, lng)
 			@map.setView(latlng, zoom)
 			
