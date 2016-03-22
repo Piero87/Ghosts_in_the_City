@@ -28,25 +28,23 @@ define ["leaflet"], (Leaflet) ->
 			t = type
 			switch t
 				when "buster" # Buster
-					#if (@team == "red")
+					if (@team == "red")
 						@marker = new Leaflet.Marker(latlng, {icon: @markericon}).bindPopup(@name, @customOptionsRed).addTo(@map)
-					#else
+					else
 						@marker = new Leaflet.Marker(latlng, {icon: @markericon}).bindPopup(@name, @customOptionsBlue).addTo(@map)
 				
 				when "ghost" # Ghost
 					# Check the level and the mood of the ghost
-					@marker = new Leaflet.Marker(latlng)
+					@marker = new Leaflet.Marker(latlng, {icon: @markericon})
 					if level == 3 
 						@marker.on 'click', @onClick()
 					@marker.addTo(@map)
 				
 				when "treasure" # Treasure
-					@marker = new Leaflet.Marker(latlng)
-					@marker.addTo(@map)
+					@marker = new Leaflet.Marker(latlng, {icon: @markericon}).addTo(@map)
 				
 				when "trap" # Trap
-					@marker = new Leaflet.Marker(latlng)
-					@marker.addTo(@map)
+					@marker = new Leaflet.Marker(latlng, {icon: @markericon}).addTo(@map)
 					
 		# Update buster marker position with the given latLng coordinates
 		update: (lat, lng) ->
