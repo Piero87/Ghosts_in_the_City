@@ -4,10 +4,10 @@
 define ["leaflet"], (Leaflet) ->
 
 	class Marker
-		constructor: (map, type, uid, name, team, level, lat , lng, icon, mapClass) ->
+		constructor: (map_view, type, uid, name, team, level, lat , lng, icon, map_obj) ->
 			@clicked = false
 			
-			@map = map
+			@map = map_view
 			@uid = uid
 			@name = name
 			@team = team
@@ -15,6 +15,7 @@ define ["leaflet"], (Leaflet) ->
 			@lat = lat
 			@lng = lng
 			@markericon = icon
+			@map_obj = map_obj
 			
 			latlng = new Leaflet.LatLng(lat, lng)
 			
@@ -63,10 +64,10 @@ define ["leaflet"], (Leaflet) ->
 		# onClick function. It activate the ghost manual mode for admin
 		onClick: () ->
 			if !@clicked
-				@map.updateGhostMarkers(@uid, 3, 1, @lat, @lng)
-				@map.ghostManualMode(uid) 
+				@map_obj.updateGhostMarkers(@uid, 3, 1, @lat, @lng)
+				@map_obj.ghostManualMode(uid) 
 			else
-				@map.updateGhostMarkers(@uid, 3, 0, @lat, @lng)
-				@map.ghostNormalMode(uid)
+				@map_obj.updateGhostMarkers(@uid, 3, 0, @lat, @lng)
+				@map_obj.ghostNormalMode(uid)
 			
 	return Marker
