@@ -184,9 +184,9 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 					-15
 				])
 			if(team == 0)
-				buster_team = red
+				buster_team = "red"
 			else
-				buster_team = blue
+				buster_team = "blue"
 			marker = new Marker(@map,type, uid, name, buster_team, level, lat , lng, b_icon, this, this)
 			@b_markers.push marker
 		
@@ -284,7 +284,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			for marker, i in @b_markers when marker.uid == uid
 				marker.update(lat, lng)
 		
-		updateGhostMarkers: (uid, level, mood, lat, lon) ->
+		updateGhostMarkers: (uid, level, mood, lat, lng) ->
 			for marker, i in @g_markers when marker.uid == uid
 				g_icon = "" 
 				if(level == 1)
