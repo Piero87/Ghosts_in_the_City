@@ -65,9 +65,9 @@ define ["leaflet"], (Leaflet) ->
 		onClick: () ->
 			if !@clicked
 				@map_obj.updateGhostMarkers(@uid, 3, 1, @lat, @lng)
-				@map_obj.ghostManualMode(uid) 
+				@map_obj.ghostManualMode(@uid) 
 			else
 				@map_obj.updateGhostMarkers(@uid, 3, 0, @lat, @lng)
-				@map_obj.ghostNormalMode(uid)
+				@map_obj.ghostNormalMode(@uid)
 			
 	return Marker
