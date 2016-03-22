@@ -15,6 +15,8 @@ define ["leaflet"], (Leaflet) ->
 			@lat = lat
 			@lng = lng
 			
+			latlng = new Leaflet.LatLng(lat, lng)
+			
 			# Custom buster marker popup based on team	
 			@customOptionsRed =
 				'className': 'custom-red'
@@ -25,7 +27,7 @@ define ["leaflet"], (Leaflet) ->
 			t = type
 			switch t
 				when "buster" # Buster
-					@marker = new Leaflet.Marker([lat, lng])
+					@marker = new Leaflet.Marker(latlng)
 					if (@team == "red")
 						@marker.bindPopup(@name(), @customOptionsRed())
 					else
@@ -34,23 +36,24 @@ define ["leaflet"], (Leaflet) ->
 				
 				when "ghost" # Ghost
 					# Check the level and the mood of the ghost
-					@marker = new Leaflet.Marker([lat, lng])
+					@marker = new Leaflet.Marker(latlng)
 					if level == 3 
 						@marker.on 'click', onClick
 					@marker.addTo(map)
 				
 				when "treasure" # Treasure
-					@marker = new Leaflet.Marker([lat, lng])
+					@marker = new Leaflet.Marker(latlng)
 					@marker.addTo(map)
 				
 				when "trap" # Trap
-					@marker = new Leaflet.Marker([lat, lng])
+					@marker = new Leaflet.Marker(latlng)
 					@marker.addTo(map)
 					
 		# Update buster marker position with the given latLng coordinates
 		update: (lat, lng) ->
 			# Update the position
-			@marker.setLatLng([lat, lng])
+			latlng = new Leaflet.LatLng(lat, lng)
+			@marker.setLatLng(latlng)
 	
 		# Remove the marker from the map
 		remove: () ->
