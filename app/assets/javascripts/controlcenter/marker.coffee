@@ -31,7 +31,7 @@ define ["leaflet"], (Leaflet) ->
 				when "buster" # Buster
 					if (@team == "red")
 						@marker = new Leaflet.Marker(latlng, {icon: @markericon}).bindPopup(@name, @customOptionsRed).addTo(@map)
-					else
+					else (@team == "blue")
 						@marker = new Leaflet.Marker(latlng, {icon: @markericon}).bindPopup(@name, @customOptionsBlue).addTo(@map)
 				
 				when "ghost" # Ghost

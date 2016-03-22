@@ -9,12 +9,10 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			
 			# the map itself
 			@map = Leaflet.map("mapContainer")
-			new Leaflet.TileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}",
+			new Leaflet.TileLayer("https://api.tiles.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFyemFjazg3IiwiYSI6ImNpbTNoaXFwODAwcHB1eG00cXN5dWNobWUifQ.VeMWhSTA2gzKz0jkCnRgFg",
 				minZoom: 1
 				maxZoom: 20
 				attribution: attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-				id: '1234567890',
-				accessToken: 'pk.eyJ1IjoibWFyemFjazg3IiwiYSI6ImNpbTNoaXFwODAwcHB1eG00cXN5dWNobWUifQ.VeMWhSTA2gzKz0jkCnRgFg'
 			).addTo(@map)
 			
 			@map.setView([0,0], 2)
@@ -172,7 +170,8 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			
 		addBusterMarker: (uid, name, team, lat, lng) ->
 			type = "buster"
-			level= ""
+			level = ""
+			buster_team = ""
 			# Buster icon
 			b_icon = Leaflet.icon(
 				iconUrl: '/assets/images/G1.png'
@@ -184,7 +183,11 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 					0
 					-15
 				])
-			marker = new Marker(@map,type, uid, name, team, level, lat , lng, b_icon, this, this)
+			if(team == 0)
+				buster_team = red
+			else
+				buster_team = blue
+			marker = new Marker(@map,type, uid, name, buster_team, level, lat , lng, b_icon, this, this)
 			@b_markers.push marker
 		
 		setGhostMarkers: (ghosts) ->
