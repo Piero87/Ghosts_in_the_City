@@ -225,7 +225,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			marker = new Marker(@map, type, uid, name, team, level, lat, lng, g_icon, this)
 			@g_markers.push marker
 		
-		setTreasuresMarkerssetTraps: (treasures) ->
+		setTreasuresMarkers: (treasures) ->
 			# The treasures markers on the map
 			@t_markers = []
 			@addTreasureMarker(
