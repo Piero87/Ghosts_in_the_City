@@ -7,9 +7,9 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 	class Map
 		constructor: (ws) ->
 			
-			@lat = lat
-			@lng = lng
-			@zoom = zoom
+			#@lat = lat
+			#@lng = lng
+			#@zoom = zoom
 			
 			# the map itself
 			@map = Leaflet.map("mapContainer")
