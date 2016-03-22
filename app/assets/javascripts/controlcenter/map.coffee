@@ -222,7 +222,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 					g_icon = @g3_angry
 				else 
 					g_icon = @g3_scared
-			marker = new Marker(@map,type, uid, name, team, level, lat, lng, g_icon)
+			marker = new Marker(@map, type, uid, name, team, level, lat, lng, g_icon)
 			@g_markers.push marker
 		
 		setTreasureMarkers: (treasures) ->

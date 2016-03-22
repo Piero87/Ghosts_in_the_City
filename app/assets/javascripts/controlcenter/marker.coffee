@@ -4,7 +4,7 @@
 define ["leaflet"], (Leaflet) ->
 
 	class Marker
-		constructor: (map, type, uid, name, team, level, lat , lng, icon) ->
+		constructor: (map, type, uid, name, team, level, lat , lng, icon, mapClass) ->
 			@clicked = false
 			
 			@map = map
