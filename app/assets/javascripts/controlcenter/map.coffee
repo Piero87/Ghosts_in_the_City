@@ -176,7 +176,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			level= ""
 			# Buster icon
 			b_icon = Leaflet.icon(
-				iconUrl: '/assets/images/G' + ((@busters.length % 4)+1) + '.png'
+				iconUrl: '/assets/images/G1.png'
 				iconSize: [
 					32
 					32
