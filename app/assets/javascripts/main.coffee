@@ -26,6 +26,9 @@ require.config {
     knockout: {
       exports: "ko"
     }
+    leaflet: {
+      exports: "L"
+    }
   }
 }
 

@@ -7,16 +7,14 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 	class Map
 		constructor: (ws) ->
 			
-			#@lat = lat
-			#@lng = lng
-			#@zoom = zoom
-			
 			# the map itself
 			@map = Leaflet.map("mapContainer")
-			new Leaflet.TileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+			new Leaflet.TileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}",
 				minZoom: 1
 				maxZoom: 20
-				attribution: "Map data © OpenStreetMap contributors"
+				attribution: attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+				id: '1234567890',
+				accessToken: 'pk.eyJ1IjoibWFyemFjazg3IiwiYSI6ImNpbTNoaXFwODAwcHB1eG00cXN5dWNobWUifQ.VeMWhSTA2gzKz0jkCnRgFg'
 			).addTo(@map)
 			
 			@map.setView([0,0], 2)
