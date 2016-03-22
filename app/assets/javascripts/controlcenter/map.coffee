@@ -246,14 +246,14 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			marker = new Marker(@map,type, uid, name, team, level, lat , lng, t_icon, this)
 			@t_markers.push marker
 		
-		setTrapsMarker: (traps)  ->
+		setTrapsMarkers: (traps)  ->
 			# The treasures markers on the map
 			@traps_markers = []
 			@addTrapMarker(
 				trap.uid, trap.status, trap.pos.latitude, trap.pos.longitude
 			) for trap in traps
 			
-		setTrapsMarker: (uid, lat, lng)  ->
+		setTrapMarker: (uid, lat, lng)  ->
 			# The treasures markers on the map
 			@addTrapMarker(uid, 0, lat, lng)
 			
