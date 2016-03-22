@@ -152,7 +152,7 @@ define () ->
 			@busters.push buster
 			buster_img = new Image
 			# buster
-			buster_img.src = '/assets/images/G' + ((@busters.length % 4)+1) + '.png'
+			buster_img.src = '/assets/images/G' + (@busters.length % 4) + '.png'
 			@busters_images.push buster_img
 		
 		busterMove: (uid, latitude, longitude) ->
