@@ -28,10 +28,10 @@ define ["leaflet"], (Leaflet) ->
 			switch t
 				when "buster" # Buster
 					@marker = new Leaflet.Marker(latlng)
-					if (@team == "red")
-						@marker.bindPopup(@name, @customOptionsRed)
-					else
-						@marker.bindPopup(@name, @customOptionsBlue)
+					#if (@team == "red")
+						#@marker.bindPopup(@name, @customOptionsRed)
+					#else
+						#@marker.bindPopup(@name, @customOptionsBlue)
 					@marker.addTo(@map)
 				
 				when "ghost" # Ghost
