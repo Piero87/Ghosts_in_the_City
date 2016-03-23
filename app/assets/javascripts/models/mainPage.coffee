@@ -763,7 +763,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 			console.log(vertex)
 			for point in vertex
 				@game_area_points.push(point)
-			console(@game_area_points) 
+			console.log(@game_area_points) 
 		
 		refreshPlayerList: (json) ->
 			# Compute missing players only if is not admin
