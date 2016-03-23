@@ -145,7 +145,7 @@ sealed case class Point(latitude: Double, longitude: Double){
   
   private def bearing_rad_to(p: Point): Double = {
     
-    val delta_lng = p.longitude - longitude
+    val delta_lng = p.longitude_rad - longitude_rad
     
     Math.atan2( Math.sin(delta_lng) * Math.cos(p.latitude_rad),
                 Math.cos(latitude_rad) * Math.sin(p.latitude_rad) - Math.sin(latitude_rad) * Math.cos(p.latitude_rad)*Math.cos(delta_lng))
@@ -160,7 +160,7 @@ sealed case class Point(latitude: Double, longitude: Double){
     
     val new_latitude_rad = Math.asin( Math.sin(latitude_rad) * Math.cos( meters / R ) +
                                       Math.cos(latitude_rad) * Math.sin( meters / R ) * Math.cos(bearing_rad) )
-    val new_longitude_rad = longitude + Math.atan2( Math.cos( meters / R ) - Math.sin(latitude_rad) * Math.sin(new_latitude_rad), 
+    val new_longitude_rad = longitude_rad + Math.atan2( Math.cos( meters / R ) - Math.sin(latitude_rad) * Math.sin(new_latitude_rad), 
                                                     Math.cos(latitude_rad) * Math.sin( meters / R ) * Math.cos(bearing_rad) )
     
     new Point( Math.toDegrees(new_latitude_rad), Math.toDegrees(new_longitude_rad) )
