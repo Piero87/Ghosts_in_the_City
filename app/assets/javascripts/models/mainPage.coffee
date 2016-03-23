@@ -759,8 +759,8 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 			seconds = "0" + date.getSeconds()
 			@gametime(hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2))
 			
-		takeGameAreaPoints: (json.game.area.vertex) ->
-			for point in json.game.area.vertex
+		takeGameAreaPoints: (vertex) ->
+			for point in vertex
 				@game_area_points.push(point) 
 		
 		refreshPlayerList: (json) ->
