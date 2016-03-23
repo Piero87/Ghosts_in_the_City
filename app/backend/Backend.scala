@@ -157,7 +157,6 @@ class Backend extends Actor {
    * It asks to the GameManagerBackend actors saved in game_manager_backends list all the game with started status.
    */
   def startedGamesList (origin: ActorRef) = {
-    logger.log("GameList request")
     implicit val ec = context.dispatcher
     val taskFutures: List[Future[Game]] = game_manager_backends map { gm_be =>
         implicit val timeout = Timeout(5 seconds)

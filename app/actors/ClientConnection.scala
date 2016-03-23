@@ -197,7 +197,6 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
               logger.log("ADMIN LOGIN ERROR: " + e.toString() + " FROM " + sender.path)
            }
          case "started_games_list" =>
-           logger.log("Admin game list request received")
            val startedGameListRequest: JsResult[StartedGamesListRequestJSON] = msg.validate[StartedGamesListRequestJSON](CommonMessages.startedGamesListRequestReads)
             startedGameListRequest match {
             case s: JsSuccess[StartedGamesListRequestJSON] =>
@@ -214,7 +213,7 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
           }
            
          case "ghost_normal_mode" =>
-           logger.log("Admin ghost normal mode request received")
+           logger.log("ADMIN - Ghost normal mode request")
            val ghostNormalModeRequest: JsResult[GhostNormalModeRequestJSON] = msg.validate[GhostNormalModeRequestJSON](CommonMessages.ghostNormalModeRequestReads)
             ghostNormalModeRequest match {
                case s: JsSuccess[GhostNormalModeRequestJSON] =>
@@ -224,7 +223,7 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
                  logger.log("GHOST NORMAL MODE ERROR: " + e.toString() + " FROM " + sender.path)
            }
          case "ghost_manual_mode" =>
-           logger.log("Admin ghost manual mode request received")
+           logger.log("ADMIN - Ghost manual mode request")
            val ghostManualModeRequest: JsResult[GhostManualModeRequestJSON] = msg.validate[GhostManualModeRequestJSON](CommonMessages.ghostManualModeRequestReads)
             ghostManualModeRequest match {
                case s: JsSuccess[GhostManualModeRequestJSON] =>
@@ -234,7 +233,7 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
                 logger.log("GHOST MANUAL MODE ERROR: " + e.toString() + " FROM " + sender.path)
            }
          case "ghost_hit_player" =>
-           logger.log("Admin ghost hit player request received")
+           logger.log("ADMIN - Ghost hit player request")
            val ghostHitPlayerRequest: JsResult[GhostHitPlayerRequestJSON] = msg.validate[GhostHitPlayerRequestJSON](CommonMessages.ghostHitPlayerRequestReads)
             ghostHitPlayerRequest match {
                case s: JsSuccess[GhostHitPlayerRequestJSON] =>
@@ -244,7 +243,7 @@ class ClientConnection(name: String, uid: String, upstream: ActorRef,frontendMan
               logger.log("GHOST HIT PLAYER ERROR: " + e.toString() + " FROM " + sender.path)
            }
          case "update_posghost_position" =>
-           logger.log("Admin new ghost pos request received")
+           logger.log("ADMIN - New ghost pos request")
            val updatePosGhostRequest: JsResult[GhostUpdatePositionJSON] = msg.validate[GhostUpdatePositionJSON](CommonMessages.updateGhostPositionReads)
             updatePosGhostRequest match {
                case s: JsSuccess[GhostUpdatePositionJSON] =>
