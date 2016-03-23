@@ -677,7 +677,7 @@ class GameManagerBackend () extends Actor {
       val rnd_key = new Random()
       
       var n_treasures_tmp = n_treasures_and_ghosts
-      var n_keys_tmp = rnd_key.nextInt(n_treasures_and_ghosts/2)
+      var n_keys_tmp = 0 // rnd_key.nextInt(n_treasures_and_ghosts/2)
       var n_treasures_closed_tmp = n_keys_tmp
       var index = 0
       
