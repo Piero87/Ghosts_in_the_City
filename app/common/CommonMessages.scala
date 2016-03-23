@@ -161,7 +161,7 @@ case class GameHandler(game: Game, ref: ActorRef = null)
 case class LeaveGame(uid: String)
 case class PauseGame(uid: String)
 case class NewGame(name: String, n_players: Int, player: PlayerInfo, game_area_edge: Double, game_type: String, ref: ActorRef = null)
-case class Game(id: String, name: String, n_players: Int, status: Int, g_type: String, players: MutableList[PlayerInfo], ghosts: MutableList[GhostInfo], treasures: MutableList[TreasureInfo], traps: MutableList[TrapInfo])
+case class Game(id: String, name: String, n_players: Int, status: Int, g_type: String, area: Polygon, players: MutableList[PlayerInfo], ghosts: MutableList[GhostInfo], treasures: MutableList[TreasureInfo], traps: MutableList[TrapInfo])
 case class GamesList(list: List[Game])
 case class GamesListFiltered(game_type: String)
 case object GameStatus
@@ -221,6 +221,9 @@ object CommonMessages {
 
   implicit val pointReads = Json.reads[Point]
   implicit val pointWrites = Json.writes[Point]
+  
+  implicit val polygonReads = Json.reads[Polygon]
+  implicit val polygonWrites = Json.writes[Polygon]
   
   implicit val keyReads = Json.reads[Key]
   implicit val keyWrites = Json.writes[Key]

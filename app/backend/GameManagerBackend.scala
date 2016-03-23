@@ -88,14 +88,14 @@ class GameManagerBackend () extends Actor {
       val tmp_t = treasures.map(x => x._1)
       val tmp_p = players.map(x => x._1)
       val tmp_tr = traps.map(x => x.getTrapInfo)
-      var g = new Game(game_id,name,n_players,game_status,game_type,tmp_p,tmp_g,tmp_t, tmp_tr)
+      var g = new Game(game_id,name,n_players,game_status,game_type,game_area,tmp_p,tmp_g,tmp_t, tmp_tr)
       sender ! GameHandler(g,self)
     case GameStatus =>
       val tmp_g = ghosts.map(x => x._1)
       val tmp_t = treasures.map(x => x._1)
       val tmp_p = players.map(x => x._1)
       val tmp_tr = traps.map(x => x.getTrapInfo)
-      sender ! Game(game_id,game_name,game_n_players,game_status,game_type,tmp_p,tmp_g,tmp_t, tmp_tr)
+      sender ! Game(game_id,game_name,game_n_players,game_status,game_type,game_area,tmp_p,tmp_g,tmp_t, tmp_tr)
     case JoinGame(game,player,ref) =>
       logger.log("Join Request riceived")
       if (players.size < game_n_players) {
@@ -109,11 +109,11 @@ class GameManagerBackend () extends Actor {
         val tmp_t = treasures.map(x => x._1)
         val tmp_p = players.map(x => x._1)
         val tmp_tr = traps.map(x => x.getTrapInfo)
-        sender ! Game(game_id,game_name,game_n_players,game_status,game_type, tmp_p,tmp_g,tmp_t, tmp_tr)
+        sender ! Game(game_id,game_name,game_n_players,game_status,game_type,game_area,tmp_p,tmp_g,tmp_t,tmp_tr)
         // Ora mandiamo il messaggio di update game status a tutti i giocatori (***Dobbiamo evitare di mandarlo a quello che si è
         // appena Joinato?
         // Qui non va filtrato nulla per la partita in AR dato che ancora la partita non è iniziata
-        gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,game_type,tmp_p,tmp_g,tmp_t, tmp_tr))
+        gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,game_type,game_area,tmp_p,tmp_g,tmp_t, tmp_tr))
         if(players.size == game_n_players){
           newGame()
         }
@@ -131,7 +131,7 @@ class GameManagerBackend () extends Actor {
           val tmp_p = players.map(x => x._1)
           val tmp_tr = traps.map(x => x.getTrapInfo)
           players = players :+ Tuple2(player,null)
-          sender ! Game(game_id,game_name,game_n_players,game_status,game_type, tmp_p,tmp_g,tmp_t, tmp_tr)
+          sender ! Game(game_id,game_name,game_n_players,game_status,game_type,game_area,tmp_p,tmp_g,tmp_t, tmp_tr)
         }
       }
     case ResumeGame(gameid: String, player: PlayerInfo, ref: ActorRef) =>
@@ -150,7 +150,7 @@ class GameManagerBackend () extends Actor {
       val tmp_t = treasures.map(x => x._1)
       val tmp_p = players.map(x => x._1)
       val tmp_tr = traps.map(x => x.getTrapInfo)
-      sender ! Game(game_id,game_name,game_n_players,game_status,game_type,tmp_p,tmp_g,tmp_t, tmp_tr)
+      sender ! Game(game_id,game_name,game_n_players,game_status,game_type,game_area,tmp_p,tmp_g,tmp_t, tmp_tr)
     case PauseGame(p_uid) =>
       logger.log("PauseGame Request")
       paused_players = paused_players :+ Tuple2(p_uid, System.currentTimeMillis())
@@ -165,7 +165,7 @@ class GameManagerBackend () extends Actor {
       val tmp_p = players.map(x => x._1)
       val tmp_tr = traps.map(x => x.getTrapInfo)
       // Qui non dobbiamo filtrare per la partita in AR dato che andiamo in pausa
-      gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,game_type,tmp_p,tmp_g,tmp_t, tmp_tr))
+      gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,game_type,game_area,tmp_p,tmp_g,tmp_t, tmp_tr))
     case LeaveGame(p_uid) =>
       logger.log("LeaveGame Request")
       players = players.filterNot(elm => elm._1.uid == p_uid)
@@ -198,7 +198,7 @@ class GameManagerBackend () extends Actor {
         val tmp_p = players.map(x => x._1)
         val tmp_tr = traps.map(x => x.getTrapInfo)
         // Ci sono ancora giocatori nella lista quindi aggiorna lo stato
-        gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,game_type,tmp_p,tmp_g,tmp_t, tmp_tr))
+        gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,game_type,game_area,tmp_p,tmp_g,tmp_t, tmp_tr))
        
       }
     case UpdatePosition(player) =>
@@ -310,7 +310,7 @@ class GameManagerBackend () extends Actor {
           val tmp_t = treasures.map(x => x._1)
           val tmp_p = players.map(x => x._1).filter(x => x.uid != admin_uid)
           val tmp_tr = traps.map(x => x.getTrapInfo)
-          gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,game_type,tmp_p,tmp_g,tmp_t, tmp_tr))
+          gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,game_type,game_area,tmp_p,tmp_g,tmp_t, tmp_tr))
           scheduler()
         } else {
           game_status = previous_game_status
@@ -321,7 +321,7 @@ class GameManagerBackend () extends Actor {
           val tmp_t = treasures.map(x => x._1)
           val tmp_p = players.map(x => x._1).filter(x => x.uid != admin_uid)
           val tmp_tr = traps.map(x => x.getTrapInfo)
-          gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,game_type,tmp_p,tmp_g,tmp_t, tmp_tr))
+          gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,game_type,game_area,tmp_p,tmp_g,tmp_t, tmp_tr))
         }
         
       }
@@ -360,7 +360,7 @@ class GameManagerBackend () extends Actor {
         val tmp_t = treasures.map(x => x._1)
         val tmp_p = players.map(x => x._1)
         val tmp_tr = traps.map(x => x.getTrapInfo)
-        var g = new Game(game_id,game_name,game_n_players,game_status,game_type,tmp_p,tmp_g,tmp_t, tmp_tr)
+        var g = new Game(game_id,game_name,game_n_players,game_status,game_type,game_area,tmp_p,tmp_g,tmp_t, tmp_tr)
         gameManagerClient ! UpdateInfo(g, admin_uid)
       }
       
@@ -481,7 +481,7 @@ class GameManagerBackend () extends Actor {
             val tmp_t = treasures.map(x => x._1)
             val tmp_p = players.map(x => x._1)
             val tmp_tr = traps.map(x => x.getTrapInfo)
-            var g = new Game(game_id,game_name,game_n_players,game_status,game_type,tmp_p,tmp_g,tmp_t, tmp_tr)
+            var g = new Game(game_id,game_name,game_n_players,game_status,game_type,game_area,tmp_p,tmp_g,tmp_t, tmp_tr)
             gameManagerClient ! UpdateInfo(g, admin_uid)
           }
           
@@ -582,7 +582,7 @@ class GameManagerBackend () extends Actor {
           val tmp_t = treasures.map(x => x._1)
           val tmp_p = players.map(x => x._1)
           val tmp_tr = traps.map(x => x.getTrapInfo)
-          var g = new Game(game_id,game_name,game_n_players,game_status,game_type,tmp_p,tmp_g,tmp_t, tmp_tr)
+          var g = new Game(game_id,game_name,game_n_players,game_status,game_type,game_area,tmp_p,tmp_g,tmp_t, tmp_tr)
           gameManagerClient ! UpdateInfo(g, admin_uid)
         }
       }
@@ -653,8 +653,8 @@ class GameManagerBackend () extends Actor {
   
   def newGame () = {
     // inizializziamo i parametri di partita
-    var n_treasures_and_ghosts = game_n_players*2
-    var n_free_ghosts = game_n_players + 1
+    var n_treasures_and_ghosts = 1 // game_n_players * 2
+    var n_free_ghosts = 0 // game_n_players + 1
     
     try {
       var spaces = UtilFunctions.createSpaces(n_treasures_and_ghosts, game_area)
@@ -774,7 +774,7 @@ class GameManagerBackend () extends Actor {
       val tmp_t = treasures.map(x => x._1)
       val tmp_p = players.map(x => x._1)
       val tmp_tr = traps.map(x => x.getTrapInfo)
-      gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,game_type,tmp_p,tmp_g,tmp_t, tmp_tr))
+      gameManagerClient ! GameStatusBroadcast(Game(game_id,game_name,game_n_players,game_status,game_type,game_area,tmp_p,tmp_g,tmp_t, tmp_tr))
       for (i <- 0 to ghosts.size-1) {
         ghosts(i)._2 ! GhostStart
       }

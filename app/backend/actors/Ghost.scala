@@ -304,7 +304,11 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
     if (arena.contains(position)) {
       if (level == 3 || position.distanceFrom(position_treasure, game_type) < GameParameters.treasure_radius) {
         return true
+      } else {
+        logger.log("position too far from treasure");
       }
+    } else {
+      logger.log("position out of the arena");
     }
     return false
   }
@@ -316,6 +320,7 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
    * @param position
    */
   def updatePosition(position: Point) = {
+    logger.log("new position: " + position);
     ghostpos = position
     GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
   }
