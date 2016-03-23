@@ -399,7 +399,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 						@map.setGhostMarkers(json.game.ghosts)
 						@map.setTreasuresMarkers(json.game.treasures)
 						@map.setTrapsMarkers(json.game.traps)
-						@takeGameAreaPoints(json.game.area)
+						@takeGameAreaPoints(json.game.area.vertex)
 						@map.addGameArea(@game_area_points[0], @game_area_points[1], @game_area_points[2], @game_area_points[3])
 						@map.startGame()
 						
@@ -429,7 +429,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 								@map.setGhostMarkers(json.game.ghosts)
 								@map.setTrapsMarkers(json.game.traps)
 								@map.setTreasuresMarkers(json.game.treasures)
-								@takeGameAreaPoints(json.game.area)
+								@takeGameAreaPoints(json.game.area.vertex)
 								@map.addGameArea(@game_area_points[0], @game_area_points[1], @game_area_points[2], @game_area_points[3])
 								@map.startGame()
 								
@@ -759,8 +759,8 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 			seconds = "0" + date.getSeconds()
 			@gametime(hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2))
 			
-		takeGameAreaPoints(json.game.area): ->
-			for point in json.game.area
+		takeGameAreaPoints(json.game.area.vertex): ->
+			for point in json.game.area.vertex
 				@game_area_points.push(point) 
 		
 		refreshPlayerList: (json) ->
