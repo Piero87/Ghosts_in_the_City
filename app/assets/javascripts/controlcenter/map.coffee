@@ -157,6 +157,14 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				]
 			]).addTo(@map)
 			
+			@circle = L.circle([
+  				51.508
+  				-0.11
+			], 500,
+			color: 'red'
+			fillColor: '#f03'
+			fillOpacity: 0.5).addTo(@map)
+			
 			
 		# Start Game	
 		startGame: () ->
