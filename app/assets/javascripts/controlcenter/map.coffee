@@ -137,6 +137,27 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			latlng = new Leaflet.LatLng(lat, lng)
 			@map.setView(latlng, zoom)
 			
+		addGameArea: (point1, point2, point3, point4) ->
+			@game_area = Leaflet.polygon([
+				[
+					point1.latitude
+					point1.longitude
+				]
+				[
+					point2.latitude
+					point2.longitude
+				]
+				[
+					point3.latitude
+					point3.longitude
+				]
+				[
+					point4.latitude
+					point4.longitude
+				]
+			]).addTo(@map)
+			
+			
 		# Start Game	
 		startGame: () ->
 			# Add keyboard listener
@@ -187,7 +208,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				buster_team = "red"
 			else
 				buster_team = "blue"
-			marker = new Marker(@map,type, uid, name, buster_team, level, lat , lng, b_icon, this, this)
+			marker = new Marker(@map,type, uid, name, buster_team, level, lat , lng, b_icon, this)
 			@b_markers.push marker
 		
 		setGhostMarkers: (ghosts) ->
