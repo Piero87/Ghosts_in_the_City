@@ -46,6 +46,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 			@game_team_RED = ko.observableArray()
 			@game_team_BLUE = ko.observableArray()
 			@game_type_web = ko.observable(true)
+			@game_area_points = []
 			
 			# Game arenas(map could be used only if user is an admin)
 			@game_client_engine = null
@@ -398,10 +399,12 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 						@map.setGhostMarkers(json.game.ghosts)
 						@map.setTreasuresMarkers(json.game.treasures)
 						@map.setTrapsMarkers(json.game.traps)
+						@takeGameAreaPoints(json.game.area.vertex)
+						@map.addGameArea(@game_area_points[0], @game_area_points[1], @game_area_points[2], @game_area_points[3])
 						@map.startGame()
 						
 				else if json.event == "game_status"
-					# {event: "game_status", game: {id: [Int], name: [String], n_players: [Int], players [Array of String], status: [Int]}}
+					# {event: "game_status", game: {id: [Int], name: [String], n_players: [Int], players [Array of String], status: [Int]}, g_type: [String], game_area: [Array of String], .. .. .. ..}
 					@changeGameStatus(json.game.status)
 					switch json.game.status
 						when 1 # game started
@@ -426,6 +429,8 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 								@map.setGhostMarkers(json.game.ghosts)
 								@map.setTrapsMarkers(json.game.traps)
 								@map.setTreasuresMarkers(json.game.treasures)
+								@takeGameAreaPoints(json.game.area.vertex)
+								@map.addGameArea(@game_area_points[0], @game_area_points[1], @game_area_points[2], @game_area_points[3])
 								@map.startGame()
 								
 							@refreshPlayersList(json)
@@ -753,6 +758,10 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 			minutes = "0" + date.getMinutes()
 			seconds = "0" + date.getSeconds()
 			@gametime(hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2))
+			
+		takeGameAreaPoints(json.game.area.vertex): ->
+			for point in json.game.area.vertex
+				@game_area_points.push(point) 
 		
 		refreshPlayerList: (json) ->
 			# Compute missing players only if is not admin
