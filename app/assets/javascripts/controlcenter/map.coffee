@@ -158,8 +158,8 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			]).addTo(@map)
 			
 			@circle = L.circle([
-  				51.508
-  				-0.11
+				44.236267
+				12.071202
 			], 500,
 			color: 'red'
 			fillColor: '#f03'
