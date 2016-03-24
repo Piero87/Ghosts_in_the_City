@@ -80,7 +80,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 					@playername(localStorage.admin)
 					@adminName(localStorage.admin)
 					@adminPwd(localStrorage.adminpwd)
-					@@adminuid(localStorage.adminuid)
+					@adminuid(localStorage.adminuid)
 					@adminConnect()
 		
 		# Connect
