@@ -157,7 +157,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				]
 			]).addTo(@map)
 			
-			@circle = L.circle([
+			@circle = Leaflet.circle([
 				44.236267
 				12.071202
 			], 500,
