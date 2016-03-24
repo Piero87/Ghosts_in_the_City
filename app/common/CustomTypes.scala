@@ -154,14 +154,16 @@ sealed case class Point(latitude: Double, longitude: Double){
   private def real_step_to(bearing_rad: Double, meters: Double): Point = {
     
     // lat2: =ASIN(SIN(lat1)*COS(d/R) + COS(lat1)*SIN(d/R)*COS(brng))
-    // lon2: =lon1 + ATAN2(COS(d/R)-SIN(lat1)*SIN(lat2), SIN(brng)*SIN(d/R)*COS(lat1))
+    // delta_lon: =lon1 + ATAN2(COS(d/R)-SIN(lat1)*SIN(lat2), SIN(brng)*SIN(d/R)*COS(lat1))
+    // lon2: = mod( lon1-dlon +pi,2*pi )-pi
     
     val R = UtilFunctions.EARTH_RADIUS;
     
     val new_latitude_rad = Math.asin( Math.sin(latitude_rad) * Math.cos( meters / R ) +
                                       Math.cos(latitude_rad) * Math.sin( meters / R ) * Math.cos(bearing_rad) )
-    val new_longitude_rad = longitude_rad + Math.atan2( Math.cos( meters / R ) - Math.sin(latitude_rad) * Math.sin(new_latitude_rad), 
-                                                    Math.cos(latitude_rad) * Math.sin( meters / R ) * Math.cos(bearing_rad) )
+    val delta_longitude_rad = Math.atan2( Math.cos( meters / R ) - Math.sin(latitude_rad) * Math.sin(new_latitude_rad), 
+                                                    Math.cos(latitude_rad) * Math.sin( meters / R ) * Math.sin(bearing_rad) )
+    val new_longitude_rad = ((longitude_rad + delta_longitude_rad + 3*Math.PI) % (2 * Math.PI)) - Math.PI
     
     new Point( Math.toDegrees(new_latitude_rad), Math.toDegrees(new_longitude_rad) )
     
