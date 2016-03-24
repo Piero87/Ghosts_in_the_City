@@ -72,7 +72,7 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
   def receive = {
     case GhostStart => 
       GMbackend = sender
-      update_pos_scheduler = system.scheduler.schedule(0 millis, 2000 millis, self, UpdateGhostPosition)
+      update_pos_scheduler = system.scheduler.schedule(0 millis, 500 millis, self, UpdateGhostPosition)
     case UpdateGhostPosition => 
       if(ghostpos.distanceFrom(position_treasure, game_type) < treasure_radius || level == 3){
        mood = GhostMood.CALM
@@ -132,7 +132,7 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
       }else{
         mood = GhostMood.TRAPPED
       }
-      update_pos_scheduler = system.scheduler.schedule(0 millis, 2000 millis, self, UpdateGhostPosition)
+      update_pos_scheduler = system.scheduler.schedule(0 millis, 500 millis, self, UpdateGhostPosition)
     
     // Admin messages
     case AttackThatPlayer(target_player_actor) =>

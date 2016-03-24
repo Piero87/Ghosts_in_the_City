@@ -653,8 +653,8 @@ class GameManagerBackend () extends Actor {
   
   def newGame () = {
     // inizializziamo i parametri di partita
-    var n_treasures_and_ghosts = 1 // game_n_players * 2
-    var n_free_ghosts = 0 // game_n_players + 1
+    var n_treasures_and_ghosts = game_n_players * 2
+    var n_free_ghosts = game_n_players + 1
     
     try {
       var spaces = UtilFunctions.createSpaces(n_treasures_and_ghosts, game_area)
@@ -677,7 +677,7 @@ class GameManagerBackend () extends Actor {
       val rnd_key = new Random()
       
       var n_treasures_tmp = n_treasures_and_ghosts
-      var n_keys_tmp = 0 // rnd_key.nextInt(n_treasures_and_ghosts/2)
+      var n_keys_tmp = rnd_key.nextInt(n_treasures_and_ghosts/2)
       var n_treasures_closed_tmp = n_keys_tmp
       var index = 0
       
