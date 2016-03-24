@@ -90,6 +90,7 @@ sealed case class Point(latitude: Double, longitude: Double){
   // longitude == y
   val latitude_rad = Math.toRadians(latitude)
   val longitude_rad = Math.toRadians(longitude)
+  val logger = new CustomLogger("Point")
   
   private def pixelsFrom(p: Point): Double = {
     Math.sqrt(Math.pow((p.latitude - latitude),2) + Math.pow((p.longitude - longitude),2))
@@ -164,6 +165,15 @@ sealed case class Point(latitude: Double, longitude: Double){
     val delta_longitude_rad = Math.atan2( Math.cos( meters / R ) - Math.sin(latitude_rad) * Math.sin(new_latitude_rad), 
                                                     Math.cos(latitude_rad) * Math.sin( meters / R ) * Math.sin(bearing_rad) )
     val new_longitude_rad = longitude_rad + delta_longitude_rad
+    
+    logger.log("Bearing RAD: " + bearing_rad)
+    logger.log("Bearing DEG: " + Math.toDegrees(bearing_rad))
+    logger.log("New Lat RAD: " + new_latitude_rad)
+    logger.log("New Lat DEG: " + Math.toDegrees(new_latitude_rad))
+    logger.log("ΔLongit RAD: " + delta_longitude_rad)
+    logger.log("ΔLongit DEG: " + Math.toDegrees(delta_longitude_rad))
+    logger.log("New Lng RAD: " + new_longitude_rad)
+    logger.log("New Lng DEG: " + Math.toDegrees(new_longitude_rad))
     
     new Point( Math.toDegrees(new_latitude_rad), Math.toDegrees(new_longitude_rad) )
     
