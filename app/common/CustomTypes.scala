@@ -163,7 +163,7 @@ sealed case class Point(latitude: Double, longitude: Double){
                                       Math.cos(latitude_rad) * Math.sin( meters / R ) * Math.cos(bearing_rad) )
     val delta_longitude_rad = Math.atan2( Math.cos( meters / R ) - Math.sin(latitude_rad) * Math.sin(new_latitude_rad), 
                                                     Math.cos(latitude_rad) * Math.sin( meters / R ) * Math.sin(bearing_rad) )
-    val new_longitude_rad = ((longitude_rad + delta_longitude_rad + 3*Math.PI) % (2 * Math.PI)) - Math.PI
+    val new_longitude_rad = longitude_rad + delta_longitude_rad
     
     new Point( Math.toDegrees(new_latitude_rad), Math.toDegrees(new_longitude_rad) )
     
