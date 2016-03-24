@@ -76,12 +76,11 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 					@playeruid(localStorage.uid)
 					@connect()
 			else
-				if localStorage.admin
-					@playername(localStorage.admin)
-					@adminName(localStorage.admin)
-					@adminPwd(localStrorage.adminpwd)
-					@adminuid(localStorage.adminuid)
-					@adminConnect()
+				@playername(localStorage.admin)
+				@adminName(localStorage.admin)
+				@adminPwd(localStrorage.adminpwd)
+				@adminuid(localStorage.adminuid)
+				@adminConnect()
 		
 		# Connect
 		connect: ->
