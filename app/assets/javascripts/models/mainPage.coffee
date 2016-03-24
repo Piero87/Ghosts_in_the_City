@@ -316,6 +316,9 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 					localStorage.removeItem("gameid")
 					
 					# Destroy everything and clean it all up.
+					@gamename("")
+					@game_client_engine.endGame() if @game_client_engine
+					@game_client_engine = null
 					@map.destroy() if @map
 					@map = null
 				
@@ -333,12 +336,15 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 						callback = @startedGamesList.bind(this)
 						@interval = setInterval(callback, 1000)
 					else
-						@disconnected(true)
-						@connected(false)
-						@connecting(null)
-						@notlogged(true)
-						
+						localStorage.removeItem("adminName")
+						localStorage.removeItem("adminUid")
+						localStorage.removeItem("adminPwd")
+						localStorage.removeItem("gameid")
+					
 						# Destroy everything and clean it all up.
+						@gamename("")
+						@game_client_engine.endGame() if @game_client_engine
+						@game_client_engine = null
 						@map.destroy() if @map
 						@map = null
 						
@@ -381,8 +387,10 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 					@gamestarted(true)
 					@gameended(false)
 					
-					@game_client_engine = new GameClientEngine(@adminUid(), @adminws, @admin()) if (@game_client_engine == null)
-					@map = new Map(@adminws) if (@map == null)
+					if(json.game.g_type == "web")
+						@game_client_engine = new GameClientEngine(@adminUid(), @adminws, @admin()) if (@game_client_engine == null)
+					else if(json.game.g_type == "reality")
+						@map = new Map(@adminws) if (@map == null)
 					
 					$("#game-result-won").hide()
 					$("#game-result-lost").hide()

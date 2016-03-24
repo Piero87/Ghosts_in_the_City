@@ -12,7 +12,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			new Leaflet.TileLayer("https://api.tiles.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFyemFjazg3IiwiYSI6ImNpbTNoaXFwODAwcHB1eG00cXN5dWNobWUifQ.VeMWhSTA2gzKz0jkCnRgFg",
 				minZoom: 1
 				maxZoom: 20
-				attribution: attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+				attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
 			).addTo(@map)
 			
 			@map.setView([0,0], 2)
@@ -173,10 +173,16 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			
 		# End Game	
 		endGame: () ->
+			# Remove keyboard listener.
+			window.removeEventListener 'keydown', @callback_keydown, true
+			window.removeEventListener 'keyup', @callback_keyup, true
 			@destroy()
 			
 		# Destroy the map
 		destroy: ->
+			# Remove keyboard listener.
+			window.removeEventListener 'keydown', @callback_keydown, true
+			window.removeEventListener 'keyup', @callback_keyup, true
 			try
 				@map.remove()
 			catch e
