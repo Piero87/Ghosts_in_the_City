@@ -400,8 +400,9 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 					else if @map_keys[39] # right
 						angle = 0
 					
-					latitude = marker[i].getLatLng().latitude
-					longitude = marker[i].getLatLng().longitude
+					latlng = marker[i].getLatLng()
+					latitude = latlng.lat
+					longitude = latlng.lng
 					
 					lat_rad = latitude * Math.PI / 180
 					lng_rad = longitude * Math.PI / 180
@@ -412,7 +413,8 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 					new_lat = latitude + delta_lat
 					new_lng = longitude + delta_lng
 					
-					marker[i].setLatLng([new_lat, new_lng])
+					new_latlng = new Leaflet.LatLng(new_lat, new_lng)
+					marker[i].setLatLng(new_latlng)
 					
 					@ws.send(JSON.stringify
 						event: "update_posghost_position"
