@@ -17,6 +17,8 @@ define ["leaflet"], (Leaflet) ->
 			@markericon = icon
 			@map_obj = map_obj
 			
+			@callback_click = @onClick.bind(this)
+			
 			latlng = new Leaflet.LatLng(lat, lng)
 			
 			# Custom buster marker popup based on team	
@@ -38,7 +40,7 @@ define ["leaflet"], (Leaflet) ->
 					# Check the level and the mood of the ghost
 					@marker = new Leaflet.Marker(latlng, {icon: @markericon})
 					if level == 3 
-						@marker.on 'click', @onClick2()
+						@marker.on 'click', @callback_click
 					@marker.addTo(@map)
 				
 				when "treasure" # Treasure
@@ -61,8 +63,8 @@ define ["leaflet"], (Leaflet) ->
 		remove: () ->
 			@map.removeLayer(@marker)
 			
-		# onClick2 function. It activate the ghost manual mode for admin
-		onClick2: () ->
+		# onClick function. It activate the ghost manual mode for admin
+		onClick: (evt) ->
 			if (@clicked != true)
 				@clicked = true
 				@map_obj.updateGhostMarkers(@uid, 3, 1, @lat, @lng)

@@ -186,6 +186,9 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			try
 				@map.remove()
 			catch e
+			map_container = document.getElementById("mapContainer")
+			while map_container.firstChild
+				map_container.removeChild(map_container.firstChild)
 		
 		setBusterMarkers: (players) ->
 			# The busters markers on the map
