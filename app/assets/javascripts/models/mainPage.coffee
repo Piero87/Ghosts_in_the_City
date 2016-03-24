@@ -70,11 +70,18 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 			@closing = false
 			
 			# Load previously player name if set
-			if localStorage.playername
-				@playername(localStorage.playername)
-				@playeruid(localStorage.uid)
-				
-				@connect()
+			if(@admin() != true)
+				if localStorage.playername
+					@playername(localStorage.playername)
+					@playeruid(localStorage.uid)
+					@connect()
+			else
+				if localStorage.admin
+					@playername(localStorage.admin)
+					@adminName(localStorage.admin)
+					@adminPwd(localStrorage.adminpwd)
+					@@adminuid(localStorage.adminuid)
+					@adminConnect()
 		
 		# Connect
 		connect: ->
@@ -305,6 +312,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 					@closing = false
 					localStorage.removeItem("admin")
 					localStorage.removeItem("adminuid")
+					localStorage.removeItem("adminupwd")
 					localStorage.removeItem("gameid")
 					
 					# Destroy everything and clean it all up.
@@ -600,6 +608,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 			@adminuid(@generateUID())
 			localStorage.setItem("adminuid", @adminuid())
 			localStorage.setItem("admin", @adminName())
+			localStorage.setItem("adminpwd", @adminPwd())
 			if(@notlogged() == true)
 				@notlogged(false)
 			@adminConnect()
