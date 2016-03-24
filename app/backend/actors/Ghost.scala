@@ -163,7 +163,7 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
     
     
     if (player_distance <= GameParameters.max_action_distance && gold_available > 0) {
-      
+      logger.log("Player is close enought, mo me lo magno!")
       var now = System.currentTimeMillis()
       if (now >= last_attack + 1500 ) {
         last_attack = now
@@ -184,7 +184,10 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
       
       var new_position : Point = ghostpos.stepTowards(player_info.pos, GameParameters.ghost_step, game_type)
       
+      logger.log("new position towards player: " + new_position)
+      
       if (allowedPosition(new_position)) {
+        logger.log("new position allowed")
         updatePosition(new_position)
       }
       
@@ -301,15 +304,10 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
    * @param position
    */
   def allowedPosition(position: Point): Boolean = {
-    logger.log("new position: " + position)
     if (arena.contains(position)) {
       if (level == 3 || position.distanceFrom(position_treasure, game_type) < GameParameters.treasure_radius) {
         return true
-      } else {
-        logger.log("position too far from treasure");
       }
-    } else {
-      logger.log("position out of the area");
     }
     return false
   }
@@ -321,7 +319,6 @@ class Ghost(uid: String, arena : Polygon, position: Point, level: Int, treasure:
    * @param position
    */
   def updatePosition(position: Point) = {
-    logger.log("new position: " + position);
     ghostpos = position
     GMbackend ! GhostPositionUpdate(uid, ghostpos, mood)
   }
