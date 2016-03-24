@@ -76,11 +76,11 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 					@playeruid(localStorage.uid)
 					@connect()
 			else
-				@playername(localStorage.admin)
-				@adminName(localStorage.adminName)
-				@adminPwd(localStrorage.adminPwd)
-				@adminUid(localStorage.adminUid)
-				@submitAdminData()
+				if localStorage.adminName
+					@adminName(localStorage.adminName)
+					@adminPwd(localStrorage.adminPwd)
+					@adminUid(localStorage.adminUid)
+					@adminConnect()
 				
 		
 		# Connect
@@ -287,8 +287,9 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 			# When the websocket opens
 			@adminws.onopen = (event) =>
 				
-				# Initialize the canvas game arena
+				# Initialize the game arenas
 				@game_client_engine = new GameClientEngine(@adminUid(), @adminws, @admin())
+				@map = new Map(@adminws)
 				
 				@connecting(null)
 				# Send login data to the server
