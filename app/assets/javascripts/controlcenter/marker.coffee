@@ -38,7 +38,7 @@ define ["leaflet"], (Leaflet) ->
 					# Check the level and the mood of the ghost
 					@marker = new Leaflet.Marker(latlng, {icon: @markericon})
 					if level == 3 
-						@marker.on 'click', @onClick(this)
+						@marker.on 'click', @onClick
 					@marker.addTo(@map)
 				
 				when "treasure" # Treasure
@@ -62,7 +62,7 @@ define ["leaflet"], (Leaflet) ->
 			@map.removeLayer(@marker)
 			
 		# onClick function. It activate the ghost manual mode for admin
-		onClick: (evt) ->
+		onClick: () ->
 			if (@clicked != true)
 				@clicked = true
 				@map_obj.updateGhostMarkers(@uid, 3, 1, @lat, @lng)
