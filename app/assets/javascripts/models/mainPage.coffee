@@ -424,7 +424,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 								@game_client_engine.startGame()
 							else
 								console.log("json.game.players[0].pos.latitude: " + json.game.players[0].pos.latitude, " json.game.players[0].pos.longitude: " +  json.game.players[0].pos.longitude)
-								@map.initMap(json.game.players[0].pos.latitude, json.game.players[0].pos.longitude, 17)
+								@map.initMap(json.game.players[0].pos.latitude, json.game.players[0].pos.longitude, 18)
 								@map.setBusterMarkers(json.game.players)
 								@map.setGhostMarkers(json.game.ghosts)
 								@map.setTrapsMarkers(json.game.traps)
@@ -688,8 +688,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 				
 		playAgain: ->
 			@clearGameData()
-			if(!@admin())
-				window.location.reload(true)
+			window.location.reload(true)
 		
 		clearGameData: ->
 			@changeGameStatus(-1)

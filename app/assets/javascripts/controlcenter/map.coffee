@@ -157,15 +157,6 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				]
 			]).addTo(@map)
 			
-			@circle = Leaflet.circle([
-					44.236267
-					12.071202
-				], 500,
-				color: 'red'
-				fillColor: '#f03'
-				fillOpacity: 0.5).addTo(@map)
-			
-			
 		# Start Game	
 		startGame: () ->
 			# Add keyboard listener
