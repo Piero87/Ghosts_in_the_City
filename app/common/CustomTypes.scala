@@ -161,12 +161,16 @@ sealed case class Point(latitude: Double, longitude: Double){
     
     val new_latitude_rad = Math.asin( Math.sin(latitude_rad) * Math.cos( meters / R ) +
                                       Math.cos(latitude_rad) * Math.sin( meters / R ) * Math.cos(bearing_rad) )
-    val delta_longitude_rad = Math.atan2( Math.cos( meters / R ) - Math.sin(latitude_rad) * Math.sin(new_latitude_rad), 
-                                                    Math.cos(latitude_rad) * Math.sin( meters / R ) * Math.sin(bearing_rad) )
+    val delta_longitude_rad = Math.atan2( Math.cos(latitude_rad) * Math.sin( meters / R ) * Math.sin(bearing_rad),
+                                          Math.cos( meters / R ) - Math.sin(latitude_rad) * Math.sin(new_latitude_rad))
     val new_longitude_rad = longitude_rad + delta_longitude_rad
     
     System.out.println("Bearing RAD: " + bearing_rad)
     System.out.println("Bearing DEG: " + Math.toDegrees(bearing_rad))
+    System.out.println("Old Lat RAD: " + latitude_rad)
+    System.out.println("Old Lat DEG: " + Math.toDegrees(longitude_rad))
+    System.out.println("Old Lng RAD: " + longitude_rad)
+    System.out.println("Old Lng DEG: " + Math.toDegrees(latitude_rad))
     System.out.println("New Lat RAD: " + new_latitude_rad)
     System.out.println("New Lat DEG: " + Math.toDegrees(new_latitude_rad))
     System.out.println("ΔLongit RAD: " + delta_longitude_rad)
