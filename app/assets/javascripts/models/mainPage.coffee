@@ -80,7 +80,8 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 				@adminName(localStorage.adminName)
 				@adminPwd(localStrorage.adminPwd)
 				@adminUid(localStorage.adminUid)
-				@adminConnect()
+				@submitAdminData()
+				
 		
 		# Connect
 		connect: ->
@@ -311,7 +312,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 					@closing = false
 					localStorage.removeItem("adminName")
 					localStorage.removeItem("adminUid")
-					localStorage.removeItem("adminuPwd")
+					localStorage.removeItem("adminPwd")
 					localStorage.removeItem("gameid")
 					
 					# Destroy everything and clean it all up.
@@ -697,6 +698,8 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 		playAgain: ->
 			@clearGameData()
 			window.location.reload(true)
+			if(@admin() == true)
+				@submitAdminData()
 		
 		clearGameData: ->
 			@changeGameStatus(-1)
