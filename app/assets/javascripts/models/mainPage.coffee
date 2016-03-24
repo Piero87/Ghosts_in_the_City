@@ -16,7 +16,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 			@adminName = ko.observable()
 			@adminPwd = ko.observable()
 			@admin = ko.observable(false)
-			@adminuid = ko.observable()
+			@adminUid = ko.observable()
 			@notlogged = ko.observable(false)
 			
 			@music("on")
@@ -77,9 +77,9 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 					@connect()
 			else
 				@playername(localStorage.admin)
-				@adminName(localStorage.admin)
-				@adminPwd(localStrorage.adminpwd)
-				@adminuid(localStorage.adminuid)
+				@adminName(localStorage.adminName)
+				@adminPwd(localStrorage.adminPwd)
+				@adminUid(localStorage.adminUid)
 				@adminConnect()
 		
 		# Connect
@@ -281,13 +281,13 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 			@connecting("Connecting...")
 			@disconnected(null)
 			
-			@adminws = new WebSocket(jsRoutes.controllers.Application.login(@adminName(), @adminuid()).webSocketURL())
+			@adminws = new WebSocket(jsRoutes.controllers.Application.login(@adminName(), @adminUid()).webSocketURL())
 			
 			# When the websocket opens
 			@adminws.onopen = (event) =>
 				
 				# Initialize the canvas game arena
-				@game_client_engine = new GameClientEngine(@adminuid(), @adminws, @admin())
+				@game_client_engine = new GameClientEngine(@adminUid(), @adminws, @admin())
 				
 				@connecting(null)
 				# Send login data to the server
@@ -309,9 +309,9 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 					@disconnected(true)
 					@connected(false)
 					@closing = false
-					localStorage.removeItem("admin")
-					localStorage.removeItem("adminuid")
-					localStorage.removeItem("adminupwd")
+					localStorage.removeItem("adminName")
+					localStorage.removeItem("adminUid")
+					localStorage.removeItem("adminuPwd")
 					localStorage.removeItem("gameid")
 					
 					# Destroy everything and clean it all up.
@@ -380,7 +380,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 					@gamestarted(true)
 					@gameended(false)
 					
-					@game_client_engine = new GameClientEngine(@adminuid(), @adminws, @admin()) if (@game_client_engine == null)
+					@game_client_engine = new GameClientEngine(@adminUid(), @adminws, @admin()) if (@game_client_engine == null)
 					@map = new Map(@adminws) if (@map == null)
 					
 					$("#game-result-won").hide()
@@ -604,10 +604,10 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 		# Admin clicked connect
 		submitAdminData: ->
 			@playername(@adminName())
-			@adminuid(@generateUID())
-			localStorage.setItem("adminuid", @adminuid())
-			localStorage.setItem("admin", @adminName())
-			localStorage.setItem("adminpwd", @adminPwd())
+			@adminUid(@generateUID())
+			localStorage.setItem("adminUid", @adminUid())
+			localStorage.setItem("adminName", @adminName())
+			localStorage.setItem("adminPwd", @adminPwd())
 			if(@notlogged() == true)
 				@notlogged(false)
 			@adminConnect()
