@@ -17,8 +17,6 @@ define ["leaflet"], (Leaflet) ->
 			@markericon = icon
 			@map_obj = map_obj
 			
-			@callback_click = @onClick.bind(this)
-			
 			latlng = new Leaflet.LatLng(lat, lng)
 			
 			# Custom buster marker popup based on team	
@@ -40,7 +38,7 @@ define ["leaflet"], (Leaflet) ->
 					# Check the level and the mood of the ghost
 					@marker = new Leaflet.Marker(latlng, {icon: @markericon})
 					if level == 3 
-						@marker.on 'click', @callback_click
+						@marker.on 'click', @onClick(this)
 					@marker.addTo(@map)
 				
 				when "treasure" # Treasure
