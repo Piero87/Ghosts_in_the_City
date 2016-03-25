@@ -47,11 +47,11 @@ define ["leaflet"], (Leaflet) ->
 				
 				when "treasure" # Treasure
 					@marker = new Leaflet.Marker(latlng, {icon: @markericon}).addTo(@map)
-					@circle = new Leaflet.Circle(latlng, 6).addTo(@map)
+					@circle = new Leaflet.Circle(latlng, 6, {color: 'yellow', fillColor: '#f2ce00', fillOpacity: 0.5}).addTo(@map)
 				
 				when "trap" # Trap
 					@marker = new Leaflet.Marker(latlng, {icon: @markericon}).addTo(@map)
-					@circle = new Leaflet.Circle(latlng, 2).addTo(@map)
+					@circle = new Leaflet.Circle(latlng, 2, {color: 'grey', fillColor: '#7f8f9f', fillOpacity: 0.5}).addTo(@map)
 					
 		# Update buster marker position with the given latLng coordinates
 		update: (lat, lng) ->
