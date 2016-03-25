@@ -5,7 +5,7 @@
 define ["marker", "leaflet"], (Marker, Leaflet) ->
 
 	class Map
-		constructor: (ws) ->
+		constructor: (websocket) ->
 			
 			# the map itself
 			@map = Leaflet.map("mapContainer")
@@ -18,7 +18,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			@map.setView([0,0], 2)
 			
 			# The websocket
-			@ws = ws
+			@ws = websocket
 			
 			@earth_rad = 6371010
 			@move = 1

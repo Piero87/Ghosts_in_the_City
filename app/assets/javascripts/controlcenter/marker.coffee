@@ -4,7 +4,7 @@
 define ["leaflet"], (Leaflet) ->
 
 	class Marker
-		constructor: (map_view, type, uid, name, team, level, lat , lng, icon, angry_icon, ws) ->
+		constructor: (map_view, type, uid, name, team, level, lat , lng, icon, angry_icon, websocket) ->
 			
 			
 			@clicked = false
@@ -18,7 +18,7 @@ define ["leaflet"], (Leaflet) ->
 			@lng = lng
 			@markericon = icon
 			@angryicon = angry_icon
-			@ws = ws
+			@ws = websocket
 			
 			latlng = new Leaflet.LatLng(lat, lng)
 			
