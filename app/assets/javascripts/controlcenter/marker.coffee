@@ -26,8 +26,8 @@ define ["leaflet"], (Leaflet) ->
 			@customOptionsBlue =
 				'className': 'custom-blue'
 			
-			t = type
-			switch t
+			@t = type
+			switch @t
 				when "buster" # Buster
 					if @team == "red"
 						@marker = new Leaflet.Marker(latlng, {icon: @markericon}).bindPopup(@name, @customOptionsRed).addTo(@map)
@@ -52,7 +52,7 @@ define ["leaflet"], (Leaflet) ->
 			# Update the position
 			latlng = new Leaflet.LatLng(lat, lng)
 			@marker.setLatLng(latlng)
-			@circle.setLatLng(latlng)
+			@circle.setLatLng(latlng) if @t != "buster"
 			
 		#Set icon
 		setMarkerIcon: (icon) ->
