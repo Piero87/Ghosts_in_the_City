@@ -73,21 +73,28 @@ define ["leaflet"], (Leaflet) ->
 			
 		# onClick function. It activate the ghost manual mode for admin
 		onClick: (evt) ->
-			if (@clicked != true)
-				@clicked = true
-				@setIcon(@angryicon)
-				# Tell the server to restart the ghost
-				@ghost_possessed = ""
-				@ws.send(JSON.stringify
-					event: "ghost_manual_mode"
-					ghost_uid: @uid
-				)
+			if(localStorage.ghost_possessed == "")
+				if (@clicked != true)
+					@clicked = true
+					@setIcon(@angryicon)
+					localStorage.setItem("ghost_possessed", @uid)
+				
+					# Tell the server to restart the ghost
+					@ws.send(JSON.stringify
+						event: "ghost_manual_mode"
+						ghost_uid: @uid
+					)
+				else
+					@clicked = false
+					@setIcon(@markericon)
+					localStorage.setItem("ghost_possessed", "")
+					
+					# Release the ghost
+					@ws.send(JSON.stringify
+						event: "ghost_normal_mode"
+						ghost_uid: @uid
+					)
 			else
-				@clicked = false
-				@setIcon(@markericon)
-				@ws.send(JSON.stringify
-					event: "ghost_normal_mode"
-					ghost_uid: @uid
-				)
+				console.log("A ghost is already possessed")
 			
 	return Marker

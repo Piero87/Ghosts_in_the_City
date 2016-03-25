@@ -20,10 +20,10 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			# The websocket
 			@ws = ws
 			
-			@ghost_possessed = ""
-			
 			@earth_rad = 6371010
 			@move = 1
+			
+			localStorage.setItem("ghost_possessed", "")
 			
 			# Ghosts icons
 			# LEVEL 1
@@ -291,9 +291,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				t_icon = @t_closed
 			else
 				t_icon = @t_open
-			console.log(@)
 			marker = new Marker(@map,type, uid, name, team, level, lat , lng, t_icon,"", @ws)
-			console.log(marker)
 			@t_markers.push marker
 		
 		setTrapsMarkers: (traps)  ->
