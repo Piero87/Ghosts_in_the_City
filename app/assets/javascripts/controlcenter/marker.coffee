@@ -45,6 +45,7 @@ define ["leaflet"], (Leaflet) ->
 				
 				when "treasure" # Treasure
 					@marker = new Leaflet.Marker(latlng, {icon: @markericon}).addTo(@map)
+					@circle = Leaflet.Circle(latlng, 6).addTo(@map)
 				
 				when "trap" # Trap
 					@marker = new Leaflet.Marker(latlng, {icon: @markericon}).addTo(@map)
