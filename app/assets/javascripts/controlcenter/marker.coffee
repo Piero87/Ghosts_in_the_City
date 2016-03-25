@@ -58,7 +58,7 @@ define ["leaflet"], (Leaflet) ->
 			# Update the position
 			latlng = new Leaflet.LatLng(lat, lng)
 			@marker.setLatLng(latlng)
-			@circle.setLatLng(latlng)
+			#@circle.setLatLng(latlng)
 			
 		#Set icon
 		setMarkerIcon: (icon) ->
