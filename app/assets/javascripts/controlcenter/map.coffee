@@ -145,7 +145,6 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			
 		# End Game	
 		endGame: () ->
-			localStorage.removeItem("ghost_possessed")
 			@destroy()
 			
 		# Destroy the map
