@@ -324,8 +324,11 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				marker.setMarkerIcon(@trap_active)
 		
 		removeTrapMarker: (uid) ->
+			trap_index = -1
 			for marker, i in @traps_markers when marker.uid == uid
 				marker.remove()
+				trap_index = i
+			@traps_markers.splice(trap_index, 1)
 		
 		updateBusterMarkers: (uid, lat, lng) ->
 			for marker, i in @b_markers when marker.uid == uid
