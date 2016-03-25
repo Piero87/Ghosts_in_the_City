@@ -58,7 +58,7 @@ define ["leaflet"], (Leaflet) ->
 			# Update the position
 			latlng = new Leaflet.LatLng(lat, lng)
 			@marker.setLatLng(latlng)
-			#@circle.setLatLng(latlng)
+			@circle.setLatLng(latlng)
 			
 		#Set icon
 		setMarkerIcon: (icon) ->
@@ -70,7 +70,7 @@ define ["leaflet"], (Leaflet) ->
 			@map.removeLayer(@circle)
 			
 		# onClick function. It activate the ghost manual mode for admin
-		onClick: (evt) ->
+		onClick: () ->
 			if(localStorage.ghost_possessed == "-1")
 				if (@clicked != true)
 					@clicked = true
