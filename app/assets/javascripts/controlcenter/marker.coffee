@@ -41,7 +41,7 @@ define ["leaflet"], (Leaflet) ->
 					# Check the level and the mood of the ghost
 					@marker = new Leaflet.Marker(latlng, {icon: @markericon})
 					if level == 3 
-						@marker.on 'click', @onClick
+						@marker.on 'click', @onClick(@ws)
 					@marker.addTo(@map)
 					@circle = new Leaflet.Circle(latlng, 3*level, {color: 'white', fillColor: '#fff', fillOpacity: 0.5}).addTo(@map)
 				
@@ -70,7 +70,8 @@ define ["leaflet"], (Leaflet) ->
 			@map.removeLayer(@circle)
 			
 		# onClick function. It activate the ghost manual mode for admin
-		onClick: () ->
+		onClick: (websocket) ->
+			ws = websocket
 			if(localStorage.ghost_possessed == "-1")
 				if (@clicked != true)
 					@clicked = true
@@ -78,7 +79,7 @@ define ["leaflet"], (Leaflet) ->
 					localStorage.setItem("ghost_possessed", @uid)
 				
 					# Tell the server to restart the ghost
-					@ws.send(JSON.stringify
+					ws.send(JSON.stringify
 						event: "ghost_manual_mode"
 						ghost_uid: @uid
 					)
@@ -87,7 +88,7 @@ define ["leaflet"], (Leaflet) ->
 					localStorage.setItem("ghost_possessed", "-1")
 					
 					# Release the ghost
-					@ws.send(JSON.stringify
+					ws.send(JSON.stringify
 						event: "ghost_normal_mode"
 						ghost_uid: @uid
 					)
