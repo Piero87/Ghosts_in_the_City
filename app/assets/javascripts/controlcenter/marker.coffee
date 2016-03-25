@@ -6,7 +6,7 @@ define ["leaflet"], (Leaflet) ->
 	class Marker
 		constructor: (map_view, type, uid, name, team, level, lat , lng, icon, map_obj) ->
 			
-			console.log(map_obj)
+			
 			@clicked = false
 			
 			@map = map_view
@@ -18,6 +18,8 @@ define ["leaflet"], (Leaflet) ->
 			@lng = lng
 			@markericon = icon
 			@map_obj = map_obj
+			console.log(@map_obj)
+			console.log("cacca")
 			
 			latlng = new Leaflet.LatLng(lat, lng)
 			
