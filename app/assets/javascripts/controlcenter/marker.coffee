@@ -75,7 +75,7 @@ define ["leaflet"], (Leaflet) ->
 		onClick: (evt) ->
 			if (@clicked != true)
 				@clicked = true
-				@marker.setIcon(@angryicon)
+				@setIcon(@angryicon)
 				# Tell the server to restart the ghost
 				@ghost_possessed = ""
 				@ws.send(JSON.stringify
@@ -84,7 +84,7 @@ define ["leaflet"], (Leaflet) ->
 				)
 			else
 				@clicked = false
-				@market.setIcon(@markericon)
+				@setIcon(@markericon)
 				@ws.send(JSON.stringify
 					event: "ghost_normal_mode"
 					ghost_uid: @uid
