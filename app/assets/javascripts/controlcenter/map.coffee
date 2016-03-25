@@ -220,7 +220,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				buster_team = "red"
 			else
 				buster_team = "blue"
-			marker = new Marker(@map,type, uid, name, buster_team, level, lat , lng, b_icon, @)
+			marker = new Marker(@map,type, uid, name, buster_team, level, lat , lng, b_icon,"", @ws)
 			@b_markers.push marker
 		
 		setGhostMarkers: (ghosts) ->
@@ -234,29 +234,39 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			type = "ghost"
 			team = ""
 			name = ""
-			g_icon = "" 
+			g_icon = ""
+			g_angry_icon = "" 
 			if(level == 1)
 				if(mood == 0)
 					g_icon = @g1
+					g_angry_icon = @g1_angry
 				else if (mood == 1)
 					g_icon = @g1_angry
+					g_angry_icon = @g1
 				else 
 					g_icon = @g1_scared
+					g_angry_icon = @g1
 			else if(level == 2)
 				if(mood == 0)
 					g_icon = @g2
+					g_angry_icon = @g2_angry
 				else if (mood == 1)
 					g_icon = @g2_angry
+					g_angry_icon = @g2
 				else 
 					g_icon = @g2_scared
+					g_angry_icon = @g2
 			else
 				if(mood == 0)
 					g_icon = @g3
+					g_angry_icon = @g3_angry
 				else if (mood == 1)
 					g_icon = @g3_angry
+					g_angry_icon = @g3
 				else 
 					g_icon = @g3_scared
-			marker = new Marker(@map, type, uid, name, team, level, lat, lng, g_icon, @)
+					g_angry_icon = @g3
+			marker = new Marker(@map, type, uid, name, team, level, lat, lng, g_icon, g_angry_icon, @ws)
 			@g_markers.push marker
 		
 		setTreasuresMarkers: (treasures) ->
@@ -278,7 +288,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			else
 				t_icon = @t_open
 			console.log(@)
-			marker = new Marker(@map,type, uid, name, team, level, lat , lng, t_icon, @)
+			marker = new Marker(@map,type, uid, name, team, level, lat , lng, t_icon,"", @ws)
 			console.log(marker)
 			@t_markers.push marker
 		
@@ -304,7 +314,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				trap_icon = @trap_idle()
 			else
 				trap_icon = @trap_active()
-			marker = new Marker(@map,type, uid, name, team, level lat , lng, trap_icon, @)
+			marker = new Marker(@map,type, uid, name, team, level lat , lng, trap_icon, "", @ws)
 			@traps_markers.push marker
 		
 		updateActiveTrapMarker: (uid) ->
@@ -369,23 +379,6 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				@map_keys[evt.keyCode] = false 
 				evt.preventDefault()
 			@action()
-			
-		ghostNormalMode: (uid) ->
-			# Tell the server to restart the ghost
-			@ghost_possessed = ""
-			@ws.send(JSON.stringify
-				event: "ghost_normal_mode"
-				ghost_uid: @ghost_possessed
-			)
-				
-		ghostManualMode: (uid) ->
-			if (@ghost_possessed == "")	
-				@ghost_possessed = uid
-				
-				@ws.send(JSON.stringify
-					event: "ghost_manual_mode"
-					ghost_uid: @ghost_possessed
-				)
 			
 		action: ->
 			for marker, i in @g_markers when marker.uid == @ghost_possessed

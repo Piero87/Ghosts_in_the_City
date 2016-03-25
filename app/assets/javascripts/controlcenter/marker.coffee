@@ -4,7 +4,7 @@
 define ["leaflet"], (Leaflet) ->
 
 	class Marker
-		constructor: (map_view, type, uid, name, team, level, lat , lng, icon, map_obj) ->
+		constructor: (map_view, type, uid, name, team, level, lat , lng, icon, angry_icon, ws) ->
 			
 			
 			@clicked = false
@@ -17,7 +17,8 @@ define ["leaflet"], (Leaflet) ->
 			@lat = lat
 			@lng = lng
 			@markericon = icon
-			@map_obj = map_obj
+			@angryicon = angry_icon
+			@ws = ws
 			
 			latlng = new Leaflet.LatLng(lat, lng)
 			
@@ -74,11 +75,19 @@ define ["leaflet"], (Leaflet) ->
 		onClick: (evt) ->
 			if (@clicked != true)
 				@clicked = true
-				@map_obj.updateGhostMarkers(@uid, 3, 1, @lat, @lng)
-				@map_obj.ghostManualMode(@uid) 
+				@marker.setIcon(@angryicon)
+				# Tell the server to restart the ghost
+				@ghost_possessed = ""
+				@ws.send(JSON.stringify
+					event: "ghost_manual_mode"
+					ghost_uid: @uid
+				)
 			else
 				@clicked = false
-				@map_obj.updateGhostMarkers(@uid, 3, 0, @lat, @lng)
-				@map_obj.ghostNormalMode(@uid)
+				@market.setIcon(@markericon)
+				@ws.send(JSON.stringify
+					event: "ghost_normal_mode"
+					ghost_uid: @uid
+				)
 			
 	return Marker
