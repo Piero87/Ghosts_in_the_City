@@ -289,7 +289,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 				
 				# Initialize the game arenas
 				@game_client_engine = new GameClientEngine(@adminUid(), @adminws, @admin())
-				@map = new Map(@adminws)
+				@map = new Map()
 				
 				@connecting(null)
 				# Send login data to the server
@@ -391,7 +391,7 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 					if(json.game.g_type == "web")
 						@game_client_engine = new GameClientEngine(@adminUid(), @adminws, @admin()) if (@game_client_engine == null)
 					else if(json.game.g_type == "reality")
-						@map = new Map(@adminws) if (@map == null)
+						@map = new Map() if (@map == null)
 					
 					$("#game-result-won").hide()
 					$("#game-result-lost").hide()
@@ -418,7 +418,6 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 						@map.setTrapsMarkers(json.game.traps)
 						@takeGameAreaPoints(json.game.area.vertex)
 						@map.addGameArea(@game_area_points[0], @game_area_points[1], @game_area_points[2], @game_area_points[3])
-						@map.startGame()
 						
 				else if json.event == "game_status"
 					# {event: "game_status", game: {id: [Int], name: [String], n_players: [Int], players [Array of String], status: [Int]}, g_type: [String], game_area: [Array of String], .. .. .. ..}
@@ -448,7 +447,6 @@ define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngin
 								@map.setTreasuresMarkers(json.game.treasures)
 								@takeGameAreaPoints(json.game.area.vertex)
 								@map.addGameArea(@game_area_points[0], @game_area_points[1], @game_area_points[2], @game_area_points[3])
-								@map.startGame()
 								
 							@refreshPlayersList(json)
 							

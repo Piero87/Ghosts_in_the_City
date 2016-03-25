@@ -4,7 +4,7 @@
 define ["leaflet"], (Leaflet) ->
 
 	class Marker
-		constructor: (map_view, type, uid, name, team, level, lat , lng, icon, angry_icon, websocket) ->
+		constructor: (map_view, type, uid, name, team, level, lat , lng, icon, angry_icon) ->
 			
 			
 			@clicked = false
@@ -14,11 +14,8 @@ define ["leaflet"], (Leaflet) ->
 			@name = name
 			@team = team
 			@level = level
-			@lat = lat
-			@lng = lng
 			@markericon = icon
 			@angryicon = angry_icon
-			@ws = websocket
 			
 			latlng = new Leaflet.LatLng(lat, lng)
 			
@@ -39,10 +36,7 @@ define ["leaflet"], (Leaflet) ->
 				
 				when "ghost" # Ghost
 					# Check the level and the mood of the ghost
-					@marker = new Leaflet.Marker(latlng, {icon: @markericon})
-					if level == 3 
-						@marker.on 'click', @onClick(@ws)
-					@marker.addTo(@map)
+					@marker = new Leaflet.Marker(latlng, {icon: @markericon}).addTo(@map)
 					@circle = new Leaflet.Circle(latlng, 3*level, {color: 'white', fillColor: '#fff', fillOpacity: 0.5}).addTo(@map)
 				
 				when "treasure" # Treasure
@@ -69,33 +63,4 @@ define ["leaflet"], (Leaflet) ->
 			@map.removeLayer(@marker)
 			@map.removeLayer(@circle)
 		
-		onClickTest: ->
-			console.log("lat: " + @lat + ", lng: " + @lng)
-		
-		# onClick function. It activate the ghost manual mode for admin
-		onClick: (websocket) ->
-			ws = websocket
-			if(localStorage.ghost_possessed == "-1")
-				if (@clicked != true)
-					@clicked = true
-					#@setIcon(@angryicon)
-					localStorage.setItem("ghost_possessed", @uid)
-				
-					# Tell the server to restart the ghost
-					ws.send(JSON.stringify
-						event: "ghost_manual_mode"
-						ghost_uid: @uid
-					)
-				else
-					@clicked = false
-					localStorage.setItem("ghost_possessed", "-1")
-					
-					# Release the ghost
-					ws.send(JSON.stringify
-						event: "ghost_normal_mode"
-						ghost_uid: @uid
-					)
-			else
-				console.log("A ghost is already possessed")
-			
 	return Marker
