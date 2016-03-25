@@ -23,7 +23,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			@earth_rad = 6371010
 			@move = 1
 			
-			localStorage.setItem("ghost_possessed", "")
+			localStorage.setItem("ghost_possessed", "-1")
 			
 			# Ghosts icons
 			# LEVEL 1

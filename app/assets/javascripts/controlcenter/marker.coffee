@@ -84,7 +84,7 @@ define ["leaflet"], (Leaflet) ->
 					)
 				else
 					@clicked = false
-					localStorage.setItem("ghost_possessed", "")
+					localStorage.setItem("ghost_possessed", "-1")
 					
 					# Release the ghost
 					@ws.send(JSON.stringify
