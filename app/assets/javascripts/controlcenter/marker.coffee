@@ -58,11 +58,11 @@ define ["leaflet"], (Leaflet) ->
 			latlng = new Leaflet.LatLng(lat, lng)
 			@marker.setLatLng(latlng)
 			@circle.setLatLng(latlng)
+			console.log(@map_obj)
+			console.log("cacca")
 			
 		#Set icon
 		setMarkerIcon: (icon) ->
-			console.log(@map_obj)
-			console.log("cacca")
 			@marker.setIcon(icon)
 	
 		# Remove the marker from the map
