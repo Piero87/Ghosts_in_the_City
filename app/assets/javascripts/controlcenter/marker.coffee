@@ -42,6 +42,7 @@ define ["leaflet"], (Leaflet) ->
 					if level == 3 
 						@marker.on 'click', @onClick
 					@marker.addTo(@map)
+					@circle = Leaflet.Circle(latlng, 3*level, {color: 'white', fillColor: '#fff', fillOpacity: 0.5}).addTo(@map)
 				
 				when "treasure" # Treasure
 					@marker = new Leaflet.Marker(latlng, {icon: @markericon}).addTo(@map)
@@ -49,12 +50,14 @@ define ["leaflet"], (Leaflet) ->
 				
 				when "trap" # Trap
 					@marker = new Leaflet.Marker(latlng, {icon: @markericon}).addTo(@map)
+					@circle = Leaflet.Circle(latlng, 2).addTo(@map)
 					
 		# Update buster marker position with the given latLng coordinates
 		update: (lat, lng) ->
 			# Update the position
 			latlng = new Leaflet.LatLng(lat, lng)
 			@marker.setLatLng(latlng)
+			@circle.setLatLng(latlng)
 			
 		#Set icon
 		setMarkerIcon: (icon) ->
@@ -64,6 +67,7 @@ define ["leaflet"], (Leaflet) ->
 	
 		# Remove the marker from the map
 		remove: () ->
+			@map.removeLayer(@marker)
 			@map.removeLayer(@marker)
 			
 		# onClick function. It activate the ghost manual mode for admin
