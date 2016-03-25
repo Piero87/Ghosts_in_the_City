@@ -71,7 +71,7 @@ define ["leaflet"], (Leaflet) ->
 			
 		# onClick function. It activate the ghost manual mode for admin
 		onClick: (evt) ->
-			if(localStorage.ghost_possessed == "")
+			if(localStorage.ghost_possessed == "-1")
 				if (@clicked != true)
 					@clicked = true
 					#@setIcon(@angryicon)
