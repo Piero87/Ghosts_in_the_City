@@ -86,7 +86,6 @@ define ["leaflet"], (Leaflet) ->
 					)
 				else
 					@clicked = false
-					@setIcon(@markericon)
 					localStorage.setItem("ghost_possessed", "")
 					
 					# Release the ghost
