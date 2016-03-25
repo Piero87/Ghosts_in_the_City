@@ -5,6 +5,8 @@ define ["leaflet"], (Leaflet) ->
 
 	class Marker
 		constructor: (map_view, type, uid, name, team, level, lat , lng, icon, map_obj) ->
+			
+			console.log(map_obj)
 			@clicked = false
 			
 			@map = map_view
