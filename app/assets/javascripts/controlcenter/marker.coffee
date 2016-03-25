@@ -62,7 +62,7 @@ define ["leaflet"], (Leaflet) ->
 			@map.removeLayer(@marker)
 			
 		# onClick function. It activate the ghost manual mode for admin
-		onClick: () ->
+		onClick: (evt) ->
 			if (@clicked != true)
 				@clicked = true
 				@map_obj.updateGhostMarkers(@uid, 3, 1, @lat, @lng)
