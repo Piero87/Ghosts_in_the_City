@@ -74,7 +74,7 @@ define ["leaflet"], (Leaflet) ->
 			if(localStorage.ghost_possessed == "")
 				if (@clicked != true)
 					@clicked = true
-					@setIcon(@angryicon)
+					#@setIcon(@angryicon)
 					localStorage.setItem("ghost_possessed", @uid)
 				
 					# Tell the server to restart the ghost
