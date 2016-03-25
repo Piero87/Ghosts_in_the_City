@@ -216,7 +216,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				buster_team = "red"
 			else
 				buster_team = "blue"
-			marker = new Marker(@map,type, uid, name, buster_team, level, lat , lng, b_icon, this)
+			marker = new Marker(@map,type, uid, name, buster_team, level, lat , lng, b_icon, @)
 			@b_markers.push marker
 		
 		setGhostMarkers: (ghosts) ->
@@ -252,7 +252,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 					g_icon = @g3_angry
 				else 
 					g_icon = @g3_scared
-			marker = new Marker(@map, type, uid, name, team, level, lat, lng, g_icon, this)
+			marker = new Marker(@map, type, uid, name, team, level, lat, lng, g_icon, @)
 			@g_markers.push marker
 		
 		setTreasuresMarkers: (treasures) ->
@@ -273,7 +273,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				t_icon = @t_closed
 			else
 				t_icon = @t_open
-			marker = new Marker(@map,type, uid, name, team, level, lat , lng, t_icon, this)
+			marker = new Marker(@map,type, uid, name, team, level, lat , lng, t_icon, @)
 			@t_markers.push marker
 		
 		setTrapsMarkers: (traps)  ->
@@ -298,7 +298,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				trap_icon = @trap_idle()
 			else
 				trap_icon = @trap_active()
-			marker = new Marker(@map,type, uid, name, team, level lat , lng, trap_icon, this)
+			marker = new Marker(@map,type, uid, name, team, level lat , lng, trap_icon, @)
 			@traps_markers.push marker
 		
 		updateActiveTrapMarker: (uid) ->
