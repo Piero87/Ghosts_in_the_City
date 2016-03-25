@@ -226,6 +226,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			else
 				buster_team = "blue"
 			marker = new Marker(@map,type, uid, name, buster_team, level, lat , lng, b_icon,"", @ws)
+			marker.marker.on("click", marker.onClickTest)
 			@b_markers.push marker
 		
 		setGhostMarkers: (ghosts) ->

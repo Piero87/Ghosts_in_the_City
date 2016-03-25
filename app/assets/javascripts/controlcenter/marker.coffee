@@ -68,7 +68,10 @@ define ["leaflet"], (Leaflet) ->
 		remove: () ->
 			@map.removeLayer(@marker)
 			@map.removeLayer(@circle)
-			
+		
+		onClickTest: ->
+			console.log("lat: " + @lat + ", lng: " + @lng)
+		
 		# onClick function. It activate the ghost manual mode for admin
 		onClick: (websocket) ->
 			ws = websocket
