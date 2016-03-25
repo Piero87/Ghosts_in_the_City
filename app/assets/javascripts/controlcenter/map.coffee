@@ -176,6 +176,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			# Remove keyboard listener.
 			window.removeEventListener 'keydown', @callback_keydown, true
 			window.removeEventListener 'keyup', @callback_keyup, true
+			localStorage.removeItem("ghost_possessed")
 			@destroy()
 			
 		# Destroy the map
