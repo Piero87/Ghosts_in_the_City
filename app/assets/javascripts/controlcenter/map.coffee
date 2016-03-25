@@ -184,10 +184,14 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 			window.removeEventListener 'keydown', @callback_keydown, true
 			window.removeEventListener 'keyup', @callback_keyup, true
 			try
-				for marker, i in @b_markers marker[i].remove()
-				for marker, i in @g_markers marker[i].remove()
-				for marker, i in @t_markers marker[i].remove()
-				for marker, i in @traps_markers marker[i].remove()
+				for marker, i in @b_markers 
+					marker[i].remove()
+				for marker, i in @g_markers 
+					marker[i].remove()
+				for marker, i in @t_markers 
+					marker[i].remove()
+				for marker, i in @traps_markers 
+					marker[i].remove()
 				@map.remove()
 			catch e
 			map_container = document.getElementById("mapContainer")
