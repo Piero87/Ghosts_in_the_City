@@ -271,7 +271,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				else 
 					g_icon = @g3_scared
 					g_angry_icon = @g3
-			marker = new Marker(@map, type, uid, name, team, level, lat, lng, g_icon, g_angry_icon, @ws).on('click', alert("culo"))
+			marker = new Marker(@map, type, uid, name, team, level, lat, lng, g_icon, g_angry_icon, @ws)
 			@g_markers.push marker
 		
 		setTreasuresMarkers: (treasures) ->
