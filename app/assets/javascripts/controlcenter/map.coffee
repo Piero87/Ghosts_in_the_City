@@ -275,6 +275,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				t_icon = @t_open
 			console.log(@)
 			marker = new Marker(@map,type, uid, name, team, level, lat , lng, t_icon, @)
+			console.log(marker)
 			@t_markers.push marker
 		
 		setTrapsMarkers: (traps)  ->
