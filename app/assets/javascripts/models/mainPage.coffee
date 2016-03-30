@@ -4,7 +4,7 @@
 # This class handles most of the player interactions with the buttons/menus/forms on the page, as well as manages
 # the WebSocket connection.	It delegates to other classes to manage everything else.
 #
-define ["knockout", "gps", "gameClientEngine", "map"], (ko, Gps, GameClientEngine, Map) ->
+define ["knockout", "gameClientEngine", "map"], (ko, GameClientEngine, Map) ->
 	class MainPageModel
 		constructor: () ->
 			
