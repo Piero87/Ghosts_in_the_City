@@ -704,10 +704,7 @@ define ["knockout", "gameClientEngine", "map"], (ko, GameClientEngine, Map) ->
 				
 		playAgain: ->
 			@clearGameData()
-			if(@admin() == true)
-				@submitAdminData()
-			else
-				window.location.reload(true)
+			window.location.reload(true)
 			
 		
 		clearGameData: ->
