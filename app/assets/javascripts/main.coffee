@@ -4,7 +4,6 @@
 require.config {
   paths: {
     mainPage: "./models/mainPage"
-    gps: "./services/gps"
     gameClientEngine: "./services/gameClientEngine"
     md5: "./md5.min"
     bootstrap: "../lib/bootstrap/js/bootstrap"
@@ -12,7 +11,6 @@ require.config {
     knockout: "../lib/knockout/knockout"
     map: "./controlcenter/map"
     marker: "./controlcenter/marker"
-    markerRenderer: "./controlcenter/markerRenderer"
     leaflet: "../lib/leaflet/leaflet"
   }
   shim: {
