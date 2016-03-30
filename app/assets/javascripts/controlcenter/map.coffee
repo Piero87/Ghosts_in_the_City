@@ -282,7 +282,7 @@ define ["marker", "leaflet"], (Marker, Leaflet) ->
 				trap_icon = @trap_idle
 			else
 				trap_icon = @trap_active
-			marker = new Marker(@map,type, uid, name, team, level lat , lng, trap_icon, "")
+			marker = new Marker(@map,type, uid, name, team, level, lat , lng, trap_icon, "")
 			@traps_markers.push marker
 		
 		updateActiveTrapMarker: (uid) ->
