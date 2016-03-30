@@ -44,7 +44,7 @@ class Backend extends Actor {
 
   import Backend._
   
-  val admin_name = "admin" // Magari inserirlo all'interno di conf 
+  val admin_name = "admin"
   val admin_pwd = "pwd"
     
   val cluster = Cluster(context.system)
