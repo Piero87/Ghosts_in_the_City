@@ -9,30 +9,30 @@ import common._
 import akka.actor.PoisonPill
 import scala.collection.mutable.MutableList
 /**
- * Factory for [[actors.GameManagerClient]] instances.
+ * Factory for [[clientactor.GameManagerFrontend]] instances.
  * Represents the abstraction of a single game manager client-side.
  * It receives the messages from ClientConnection or FrontendManager actor and
- * send them to the backend-side actors.
+ * send them to the backend-side clientactor.
  */
-object GameManagerClient {
+object GameManagerFrontend {
   
-  def props(backend: ActorRef) = Props(new GameManagerClient(backend))
+  def props(backend: ActorRef) = Props(new GameManagerFrontend(backend))
 }
 
 /**
- * Actor GameManagerClient implementation class.
+ * Actor GameManagerFrontend implementation class.
  * 
  * @constructor create a new actor with backend actor ref.
  * @param backend 
  */
-class GameManagerClient (backend: ActorRef) extends Actor {
+class GameManagerFrontend (backend: ActorRef) extends Actor {
   
-  import GameManagerClient._
+  import GameManagerFrontend._
 
   implicit val timeout = Timeout(5 seconds)
   implicit val ec = context.dispatcher
   
-  val logger = new CustomLogger("GameManagerClient")
+  val logger = new CustomLogger("GameManagerFrontend")
   var gameManagerBackend: ActorRef = _
   var clientsConnections: MutableList[Tuple2[PlayerInfo, ActorRef]] = MutableList()
   var game_name = ""
@@ -53,7 +53,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
       game_type = g_type
       val origin = sender
       var p = player
-      // We store all ClientConnection actors for that particular game
+      // We store all ClientConnection clientactor for that particular game
       clientsConnections = clientsConnections :+ Tuple2(p,ref)
       // Wait for the backend succes response to new game request 
       val future = backend ? NewGame(name,n_players,player,game_area_edge,g_type,self)
@@ -101,7 +101,7 @@ class GameManagerClient (backend: ActorRef) extends Actor {
             for (i <- 0 to clientsConnections.size-1) {
               if (clientsConnections(i)._1.uid == player.uid) {
                 // When a player resume a game after a connection trouble we update the ClientConnection actor
-                // ref in our clientConnections actors list
+                // ref in our clientConnections clientactor list
                 clientsConnections(i) = clientsConnections(i).copy(_2 = ref)
               }
             }

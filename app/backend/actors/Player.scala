@@ -16,7 +16,7 @@ import scala.util.Random
 object Player {
 
   /**
-   * Factory for [[backend,actors.Player]] instances.
+   * Factory for [[backend,clientactor.Player]] instances.
    */
   def props(uid: String, name: String, team: Int, GMbackend: ActorRef): Props = Props(new Player(uid, name, team, GMbackend))
   

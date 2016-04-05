@@ -11,7 +11,7 @@ import com.typesafe.config.ConfigFactory
 object Treasure {
   
   /**
-   * Factory for [[backend,actors.Treasures]] instances.
+   * Factory for [[backend,clientactor.Treasures]] instances.
    */
   def props(uid: String, position: Point, loot: Tuple2[Key,Int], needKey: Tuple2[Boolean, Key], GMbackend: ActorRef) = Props(new Treasure(uid,position,loot,needKey,GMbackend))
 }

@@ -106,7 +106,7 @@ class Backend extends Actor {
   
   /**
    * Game List method.
-   * It asks to the GameManagerBackend actors saved in game_manager_backends list all the game with waiting status.
+   * It asks to the GameManagerBackend clientactor saved in game_manager_backends list all the game with waiting status.
    * All the Game object are received like Future objet and before send them back they are filtered by game type.
    */
   def gamesList (origin: ActorRef, game_type: String) = {
@@ -154,7 +154,7 @@ class Backend extends Actor {
   
   /**
    * Game List method.
-   * It asks to the GameManagerBackend actors saved in game_manager_backends list all the game with started status.
+   * It asks to the GameManagerBackend clientactor saved in game_manager_backends list all the game with started status.
    */
   def startedGamesList (origin: ActorRef) = {
     implicit val ec = context.dispatcher

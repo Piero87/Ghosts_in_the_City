@@ -10,7 +10,7 @@ import play.api.Logger
 import com.typesafe.config.ConfigFactory
 import akka.actor._
 import frontend.FrontendManager
-import actors.ClientConnection
+import clientactor.ClientConnection
 import play.api.libs.json.JsValue
 
 

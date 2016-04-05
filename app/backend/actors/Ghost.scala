@@ -21,7 +21,7 @@ object Ghost{
   case object UpdateGhostPosition
   
   /**
-   * Factory for [[backend,actors.Ghost]] instances.
+   * Factory for [[backend,clientactor.Ghost]] instances.
    */
   def props(uid: String, arena: Polygon, position: Point, level: Int, treasure: ActorRef, position_treasure: Point, t_uid: String, game_type: String) = Props(new Ghost(uid, arena,position, level, treasure,position_treasure, t_uid, game_type))
 }

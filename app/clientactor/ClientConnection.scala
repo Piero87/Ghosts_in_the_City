@@ -1,4 +1,4 @@
-package actors
+package clientactor
 
 import akka.actor._
 import scala.concurrent.duration._
@@ -11,7 +11,7 @@ import backend.actors.models._
 import common._
 
 /**
- * Factory for [[actors.ClientConnection]] instances.
+ * Factory for [[clientactor.ClientConnection]] instances.
  * To handle a WebSocket with an actor, we need to give Play a akka.actor.Props object 
  * that describes the actor that Play should create when it receives the WebSocket connection.
  */

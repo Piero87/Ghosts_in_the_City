@@ -52,7 +52,7 @@ class FrontendManager extends Actor {
       context watch sender()
       backends = backends :+ sender()
     case Terminated(a) =>
-      if (a.actorRef == GameManagerClient) {
+      if (a.actorRef == GameManagerFrontend) {
         logger.log("GMBackend removed")
         game_manager_frontends = game_manager_frontends.filterNot(_ == a)
         
@@ -78,7 +78,7 @@ class FrontendManager extends Actor {
   def newGame (name: String,n_players: Int, player: PlayerInfo, game_area_edge: Double, game_type: String, ref: ActorRef) = {
     backendCounter += 1
     var b = backends(backendCounter % backends.size)
-    val gm_client = context.actorOf(Props(new GameManagerClient(b)), name = name)
+    val gm_client = context.actorOf(Props(new GameManagerFrontend(b)), name = name)
     // We monitor the gm_client lifecycle to be notified when it stops and to receive the Terminated message.
     // We want an actor to be notified when another actor dies.
     context watch gm_client
