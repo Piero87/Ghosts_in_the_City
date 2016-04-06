@@ -16,7 +16,7 @@ import backend.Backend
  * Its akka.actor.Props object is defined in Application class because
  * FrontendManager actor is a child of system actor
  */
-class FrontendManager extends Actor {
+class Frontend extends Actor {
   
   val logger = new CustomLogger("FrontendManager")
   var backends: List[ActorRef] = List()

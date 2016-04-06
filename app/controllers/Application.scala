@@ -9,7 +9,7 @@ import akka.actor.Props
 import play.api.Logger
 import com.typesafe.config.ConfigFactory
 import akka.actor._
-import frontend.FrontendManager
+import frontend.Frontend
 import clientactor.ClientConnection
 import play.api.libs.json.JsValue
 
@@ -26,7 +26,7 @@ class Application extends Controller {
       withFallback(ConfigFactory.parseString("akka.cluster.roles = [frontend]")).
       withFallback(ConfigFactory.load())
   val system = ActorSystem("GhostsSystem", config)
-  val frontendManager = system.actorOf(Props[FrontendManager], name = "frontend")
+  val frontendManager = system.actorOf(Props[Frontend], name = "frontend")
   
   Logger.info("Application Started")
   
