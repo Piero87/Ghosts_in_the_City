@@ -215,7 +215,7 @@ case class GhostUpdatePositionJSON(event: String, ghost_uid: String, pos: Point)
 import play.api.libs.json._
 
 /**
- * All message serializer
+ * All message serializer and deserializer
  */
 object CommonMessages {
 
