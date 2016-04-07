@@ -16,6 +16,10 @@ import scala.collection.mutable.MutableList
 import com.typesafe.config.ConfigFactory
 import scala.util.Random
 
+/**
+ * Actor GameManagerBackend implementation class.
+ * 
+ */
 class GameManagerBackend () extends Actor {
   
   var gameManagerFrontend: ActorRef = _
@@ -50,6 +54,10 @@ class GameManagerBackend () extends Actor {
   implicit val timeout = Timeout(5 seconds)
   implicit val ec = context.dispatcher
   
+    /**
+   * Receive method.
+   * It helds all the messages that could be received
+   */
   def receive = {
     case NewGame(name,n_players,player,ga_edge,g_type,ref) =>
       logger.log("NewGame request")
@@ -646,11 +654,19 @@ class GameManagerBackend () extends Actor {
     
   }
   
-  //Metodo per stampare il contenuto delle liste
+  /**
+   * This is a utility method to print every element of a list
+   */
   def printList(args: TraversableOnce[_]): Unit = {
     args.foreach(println)
   }
   
+  /**
+   * New Game method.
+   * Create all the players who will be part of the game, 
+   * like ghosts and treasures, and calculates their position so that there is a 
+   * certain distance between them according to the playing area. 
+   */
   def newGame () = {
     // inizializziamo i parametri di partita
     var n_treasures_and_ghosts = game_n_players * 2
@@ -800,12 +816,21 @@ class GameManagerBackend () extends Actor {
     rnd_team
   }
   
+  /**
+   * Create a random string of characters
+   */
   def randomString(length: Int) = scala.util.Random.alphanumeric.take(length).mkString
   
+  /**
+   * Scheduler that check every 1 second if the game must to be in pause or can be resumed
+   */
   def scheduler() = {
      context.system.scheduler.scheduleOnce(1000 millis, self, CheckPaused) 
   }
   
+  /**
+   * Scheduler that remove a trap with a specific uid after 10 seconds.
+   */
   def removeTrapScheduler(uid:String) = {
      context.system.scheduler.scheduleOnce(10000 millis, self, RemoveTrap(uid))
   }
