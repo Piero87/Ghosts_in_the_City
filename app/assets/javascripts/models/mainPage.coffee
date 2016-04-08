@@ -799,10 +799,11 @@ define ["knockout", "gameClientEngine", "map"], (ko, GameClientEngine, Map) ->
 		
 		showMessage: (msg_code, option) ->
 			c = msg_code
+			console.log("Messaggio di tipo: "+c+" con opzione "+option)
 			switch c
 				when -1
 					# NO_TRAP - no enough money to set a trap
-					message = "You cannot set a trap, asshole!"
+					message = "You cannot set a trap!"
 					type = "alert"
 				when -2
 					# OUT_OF_AREA - out of area
@@ -815,7 +816,7 @@ define ["knockout", "gameClientEngine", "map"], (ko, GameClientEngine, Map) ->
 					$("#treasure-locked").get(0).play()
 				when -4
 					# NOT_ENOUGH_PLAYERS - not enough player
-					message = "Some moron leaved the mission and has not come back in time..."
+					message = "Someone leaved the mission and has not come back in time..."
 					type = "alert"
 				when -5
 					# T_EMPTY - treasure empty
@@ -823,7 +824,7 @@ define ["knockout", "gameClientEngine", "map"], (ko, GameClientEngine, Map) ->
 					type = "alert"
 				when -6
 					# NO_T_NEAR_YOU - no treasure nearby
-					message = "There are no treasure near you, moron."
+					message = "There are no treasure near you."
 					type = "alert"
 				when 1
 					# PARANORMAL_ATTACK - attacked from ghost
