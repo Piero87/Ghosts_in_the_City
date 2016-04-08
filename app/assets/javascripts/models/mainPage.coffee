@@ -799,7 +799,6 @@ define ["knockout", "gameClientEngine", "map"], (ko, GameClientEngine, Map) ->
 		
 		showMessage: (msg_code, option) ->
 			c = msg_code
-			console.log("Messaggio di tipo: "+c+" con opzione "+option)
 			switch c
 				when -1
 					# NO_TRAP - no enough money to set a trap

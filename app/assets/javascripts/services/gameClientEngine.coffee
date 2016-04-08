@@ -436,7 +436,6 @@ define () ->
 							event: "set_trap"
 						)
 					else if @map_keys[83]
-						console.log("Invio richiesta apertura tesoro...")
 						@ws.send(JSON.stringify
 							event: "open_treasure"
 						)
