@@ -64,28 +64,6 @@ object UtilFunctions {
     return point
   }
   
-  /*
-	def randomPositionsInSpace(rect_space: Rectangle, permitted_area: Polygon, n_positions: Int): Array[Point] = {
-    var attemps = 0
-    var pos = new Array[Point](n_positions)
-    val rnd = new Random()
-    for(i <- 0 to n_positions-1){
-      attemps = 0
-      var point : Point = null
-      do {
-        var lat = rect_space.origin.latitude + ( rect_space.width * rnd.nextDouble() )
-        var lng = rect_space.origin.longitude + ( rect_space.height * rnd.nextDouble() )
-        point = new Point(lat,lng)
-        attemps += 1
-      } while (!permitted_area.contains(point) && attemps != MAX_ATTEMPTS)
-      if (attemps == MAX_ATTEMPTS){
-        throw new PointOutOfPolygonException("from randomPositionsInSpace")
-      }
-      pos(i) = point
-    }
-    return pos
-  }
-  */
   
   /**
    * randomPositionAroundPoint method
